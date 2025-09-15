@@ -8,5 +8,13 @@
   "Plugin Example": "Plugin Example",
   "Success!": "Success!",
   "This is a custom page contributed by the console plugin template. The extension that adds the page is declared in console-extensions.json in the project root along with the corresponding nav item. Update console-extensions.json to change or add extensions. Code references in console-extensions.json must have a corresponding property": "This is a custom page contributed by the console plugin template. The extension that adds the page is declared in console-extensions.json in the project root along with the corresponding nav item. Update console-extensions.json to change or add extensions. Code references in console-extensions.json must have a corresponding property",
-  "Your plugin is working.": "Your plugin is working."
+  "Your plugin is working.": "Your plugin is working.",
+  "Genie - AI Assistant": "Genie - AI Assistant",
+  "Genie": "Genie",
+  "Your AI Assistant for OpenShift": "Your AI Assistant for OpenShift",
+  "Welcome to Genie": "Welcome to Genie",
+  "This is a standalone page that runs independently of the OpenShift Console layout. It provides a full-screen experience for the Genie AI assistant.": "This is a standalone page that runs independently of the OpenShift Console layout. It provides a full-screen experience for the Genie AI assistant.",
+  "Hello! I'm Genie, your AI assistant. How can I help you with OpenShift today?": "Hello! I'm Genie, your AI assistant. How can I help you with OpenShift today?",
+  "Ask me anything about OpenShift...": "Ask me anything about OpenShift...",
+  "Send": "Send"
 }

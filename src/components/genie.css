@@ -1,0 +1,221 @@
+/* Genie Standalone Page Styles */
+
+.genie-standalone {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.genie-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  width: 100%;
+}
+
+.genie-header {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.genie-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.genie-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0.5rem 0 0 0;
+  font-weight: 300;
+}
+
+.genie-main {
+  flex: 1;
+  padding: 3rem 0;
+  display: flex;
+  align-items: center;
+}
+
+.genie-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.genie-welcome {
+  padding: 2rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.genie-welcome h2 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.genie-welcome p {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+}
+
+.genie-chat {
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.genie-messages {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background: white;
+}
+
+.genie-message {
+  margin-bottom: 1rem;
+  display: flex;
+}
+
+.genie-message--assistant {
+  justify-content: flex-start;
+}
+
+.genie-message--user {
+  justify-content: flex-end;
+}
+
+.genie-message-content {
+  max-width: 70%;
+  padding: 1rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.genie-message--assistant .genie-message-content {
+  background: #e3f2fd;
+  color: #1565c0;
+  border-bottom-left-radius: 8px;
+}
+
+.genie-message--user .genie-message-content {
+  background: #667eea;
+  color: white;
+  border-bottom-right-radius: 8px;
+}
+
+.genie-input-area {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.genie-input-wrapper {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.genie-input {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: 2px solid #e9ecef;
+  border-radius: 25px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.genie-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.genie-send-button {
+  padding: 1rem 2rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.genie-send-button:hover {
+  background: #5a6fd8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.genie-send-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .genie-container {
+    padding: 0 1rem;
+  }
+
+  .genie-title {
+    font-size: 2rem;
+  }
+
+  .genie-subtitle {
+    font-size: 1rem;
+  }
+
+  .genie-main {
+    padding: 2rem 0;
+  }
+
+  .genie-content {
+    border-radius: 12px;
+  }
+
+  .genie-welcome {
+    padding: 1.5rem;
+  }
+
+  .genie-messages {
+    padding: 1.5rem;
+  }
+
+  .genie-input-area {
+    padding: 1rem;
+  }
+
+  .genie-input-wrapper {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .genie-send-button {
+    width: 100%;
+  }
+
+  .genie-message-content {
+    max-width: 85%;
+  }
+}

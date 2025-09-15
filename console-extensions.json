@@ -16,5 +16,13 @@
       "perspective": "admin",
       "section": "home"
     }
+  },
+  {
+    "type": "console.page/route/standalone",
+    "properties": {
+      "exact": true,
+      "path": "/genie",
+      "component": { "$codeRef": "GeniePage" }
+    }
   }
 ]
