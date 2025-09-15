@@ -4,125 +4,13 @@ import Helmet from 'react-helmet';
 import { useTranslation } from 'react-i18next';
 import { AIStateProvider, useSendMessage, useMessages } from '@redhat-cloud-services/ai-react-state';
 import { createClientStateManager } from '@redhat-cloud-services/ai-client-state';
+import { LightspeedClient } from '@redhat-cloud-services/lightspeed-client';
 import './genie.css';
 
-// Custom client compatible with Red Hat Cloud Services but designed for simple lightspeed-stack API
-class SimpleLightspeedClient {
-  private baseUrl: string;
-  private fetchFunction: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
-
-  constructor(config: { baseUrl: string; fetchFunction?: typeof fetch }) {
-    this.baseUrl = config.baseUrl;
-    this.fetchFunction = config.fetchFunction || fetch;
-  }
-
-  // Main method that the state manager will call
-  async ask(query: string, conversationId?: string): Promise<any> {
-    console.log(`[SimpleLightspeedClient] Sending query to ${this.baseUrl}/v1/query:`, query);
-    
-    try {
-      const requestBody = {
-        query: query,
-      };
-
-      console.log(`[SimpleLightspeedClient] Request body:`, requestBody);
-
-      const response = await this.fetchFunction(`${this.baseUrl}/v1/query`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      console.log(`[SimpleLightspeedClient] Response status:`, response.status, response.statusText);
-
-      if (!response.ok) {
-        let errorDetails = '';
-        try {
-          const errorData = await response.json();
-          errorDetails = JSON.stringify(errorData, null, 2);
-          console.error(`[SimpleLightspeedClient] Error response:`, errorData);
-        } catch (e) {
-          errorDetails = await response.text();
-          console.error(`[SimpleLightspeedClient] Error response text:`, errorDetails);
-        }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}\nDetails: ${errorDetails}`);
-      }
-
-      const data = await response.json();
-      console.log(`[SimpleLightspeedClient] Response data:`, data);
-      
-      // Return in the format expected by the state manager
-      return {
-        answer: data.response || data.message || data.answer || data.content || 'Received response from lightspeed service',
-        query: query,
-        conversationId: conversationId || 'simple-conversation'
-      };
-      
-    } catch (error) {
-      console.error('[SimpleLightspeedClient] Error sending query:', error);
-      
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error(`Cannot connect to lightspeed-stack service at ${this.baseUrl}. Please ensure the service is running.`);
-      } else if (error instanceof Error) {
-        throw new Error(`Lightspeed-stack service error: ${error.message}`);
-      } else {
-        throw new Error('Unknown error occurred while communicating with lightspeed-stack service');
-      }
-    }
-  }
-
-  // Additional methods that might be expected by the Red Hat state manager
-  async init(): Promise<{ conversations: any[]; limitation?: any; error?: any }> {
-    // Simple client doesn't need initialization
-    console.log('[SimpleLightspeedClient] Client initialized');
-    return { conversations: [] };
-  }
-
-  async createNewConversation(): Promise<any> {
-    // Simple client doesn't use conversations, return a conversation object
-    return {
-      id: 'simple-conversation',
-      title: 'Genie Chat',
-      createdAt: new Date().toISOString(),
-      lastMessageAt: new Date().toISOString(),
-      messageCount: 0
-    };
-  }
-
-  async getConversationHistory(conversationId: string): Promise<any[]> {
-    // Simple client doesn't store history
-    return [];
-  }
-
-  async healthCheck(): Promise<boolean> {
-    try {
-      const response = await this.fetchFunction(`${this.baseUrl}/health`);
-      return response.ok;
-    } catch {
-      return false;
-    }
-  }
-
-  // Compatibility method matching Red Hat Cloud Services interface
-  async sendMessage(conversationId: string, message: string, options?: any): Promise<any> {
-    const result = await this.ask(message, conversationId);
-    return {
-      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      answer: result.answer,
-      query: message,
-      conversationId: conversationId || 'simple-conversation',
-      timestamp: new Date().toISOString()
-    };
-  }
-}
-
 // Initialize state manager outside React scope (following Red Hat Cloud Services pattern)
-const client = new SimpleLightspeedClient({ 
+const client = new LightspeedClient({ 
   baseUrl: 'http://localhost:8080', 
-  fetchFunction: (input, init) => fetch(input, init)
+  fetchFunction: (input, init) => fetch(input, init),
 });
 
 const stateManager = createClientStateManager(client);
@@ -169,7 +57,7 @@ function ChatInterface() {
     setIsLoading(true);
 
     try {
-      await sendMessage(messageContent, { stream: true });
+      await sendMessage(messageContent, { stream: false });
     } finally {
       setIsLoading(false);
     }
