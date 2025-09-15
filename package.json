@@ -1,5 +1,5 @@
 {
-  "name": "console-plugin-template",
+  "name": "genie-plugin",
   "version": "0.0.1",
   "description": "Template project for OpenShift Console plugins",
   "private": true,
@@ -69,7 +69,7 @@
     "webpack-dev-server": "^4.7.4"
   },
   "consolePlugin": {
-    "name": "console-plugin-template",
+    "name": "genie-plugin",
     "version": "0.0.1",
     "displayName": "OpenShift Console Plugin Template",
     "description": "Template project for OpenShift Console plugins. Edit package.json to change this message and the plugin name.",

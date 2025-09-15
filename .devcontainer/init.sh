@@ -4,7 +4,7 @@ if [[ ! -f .devcontainer/dev.env ]]
 then
     cat << EOF
     env file 'dev.env' does not exist in .devcontainer, please create it and add the the correct values for your cluster.
-    OC_PLUGIN_NAME=my-plugin
+    OC_PLUGIN_NAME=genie-plugin
     OC_URL=https://api.example.com:6443
     OC_USER=kubeadmin
     OC_PASS=<password>
@@ -26,7 +26,7 @@ if ((success)); then
 else
     cat << EOF
     dev.env is not formatted correctly, please add the the correct values for your cluster.
-    OC_PLUGIN_NAME=my-plugin
+    OC_PLUGIN_NAME=genie-plugin
     OC_URL=https://api.example.com:6443
     OC_USER=kubeadmin
     OC_PASS=<password>
