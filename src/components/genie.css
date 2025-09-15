@@ -108,6 +108,7 @@
   border-radius: 20px;
   font-size: 0.95rem;
   line-height: 1.5;
+  position: relative;
 }
 
 .genie-message--assistant .genie-message-content {
@@ -120,6 +121,52 @@
   background: #667eea;
   color: white;
   border-bottom-right-radius: 8px;
+}
+
+.genie-message-time {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 0.25rem;
+  padding: 0 1rem;
+}
+
+.genie-message--user .genie-message-time {
+  text-align: right;
+}
+
+/* Typing indicator animation */
+.genie-typing-indicator {
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+.genie-typing-indicator span {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #1565c0;
+  margin: 0 1px;
+  animation: typing 1.5s infinite ease-in-out;
+}
+
+.genie-typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.genie-typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
 }
 
 .genie-input-area {
@@ -170,6 +217,73 @@
 
 .genie-send-button:active {
   transform: translateY(0);
+}
+
+.genie-send-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.genie-send-button:disabled:hover {
+  background: #ccc;
+  transform: none;
+  box-shadow: none;
+}
+
+.genie-input:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Smooth scrolling for messages */
+.genie-messages {
+  scroll-behavior: smooth;
+}
+
+/* Health status indicators */
+.genie-health-status {
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.genie-health-status.loading {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.genie-health-status.success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.genie-health-status.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.genie-connection-details {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid;
+}
+
+.genie-connection-details.success {
+  background-color: #f0fdf4;
+  border-left-color: #22c55e;
+  color: #15803d;
+}
+
+.genie-connection-details.error {
+  background-color: #fef2f2;
+  border-left-color: #ef4444;
+  color: #dc2626;
 }
 
 /* Responsive Design */

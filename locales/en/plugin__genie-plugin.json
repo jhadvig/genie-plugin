@@ -13,8 +13,11 @@
   "Genie": "Genie",
   "Your AI Assistant for OpenShift": "Your AI Assistant for OpenShift",
   "Welcome to Genie": "Welcome to Genie",
-  "This is a standalone page that runs independently of the OpenShift Console layout. It provides a full-screen experience for the Genie AI assistant.": "This is a standalone page that runs independently of the OpenShift Console layout. It provides a full-screen experience for the Genie AI assistant.",
+  "This is a standalone AI-powered chat interface for OpenShift assistance. Built using the ai-web-clients architecture pattern.": "This is a standalone AI-powered chat interface for OpenShift assistance. Built using the ai-web-clients architecture pattern.",
   "Hello! I'm Genie, your AI assistant. How can I help you with OpenShift today?": "Hello! I'm Genie, your AI assistant. How can I help you with OpenShift today?",
   "Ask me anything about OpenShift...": "Ask me anything about OpenShift...",
-  "Send": "Send"
+  "Send": "Send",
+  "Sending...": "Sending...",
+  "Thinking...": "Thinking...",
+  "Ensure your lightspeed service is running and accessible. Check browser console for detailed request/response logs.": "Ensure your lightspeed service is running and accessible. Check browser console for detailed request/response logs."
 }
