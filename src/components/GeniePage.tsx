@@ -57,7 +57,7 @@ function ChatInterface() {
     setIsLoading(true);
 
     try {
-      await sendMessage(messageContent, { stream: false });
+      await sendMessage(messageContent, { stream: true });
     } finally {
       setIsLoading(false);
     }
