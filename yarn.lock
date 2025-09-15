@@ -321,6 +321,26 @@
   resolved "https://registry.yarnpkg.com/@patternfly/react-tokens/-/react-tokens-6.2.2.tgz#4ab12cf77fab60a730f52aed2433dbf892d47509"
   integrity sha512-2GRWDPBTrcTlGNFc5NPJjrjEVU90RpgcGX/CIe2MplLgM32tpVIkeUtqIoJPLRk5GrbhyFuHJYRU+O93gU4o3Q==
 
+"@redhat-cloud-services/ai-client-common@0.13.0":
+  version "0.13.0"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/ai-client-common/-/ai-client-common-0.13.0.tgz#62e71afff1c5becefa2ed6eaf9aed49df2bff380"
+  integrity sha512-aeoSUsYyOKErYQDK3bf11bBPzd7xiJ9+Eqe8eQfTVaacjch0T/5B0urwcNGiSVyTq/dmNpyebNWputxfR8N+EA==
+
+"@redhat-cloud-services/ai-client-state@0.14.1", "@redhat-cloud-services/ai-client-state@^0.14.1":
+  version "0.14.1"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/ai-client-state/-/ai-client-state-0.14.1.tgz#92a3dc449f9d7256f580a914309b925c116c7d84"
+  integrity sha512-uqNb8xyi031imxC6mtH9pKfOKyW9OCWy8ehAQ7nMweI3woqcD6bS25NsVOfPPfeD647tfp5wqgPtNJ/zed3vnA==
+  dependencies:
+    "@redhat-cloud-services/ai-client-common" "0.13.0"
+
+"@redhat-cloud-services/ai-react-state@^0.14.1":
+  version "0.14.3"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/ai-react-state/-/ai-react-state-0.14.3.tgz#7e3718b0faf10ddff9050c3ee6a7275002e0b9ea"
+  integrity sha512-1dpY8Lwifn7bHIN4vUnIA1AY/kfshUEZjaJvFTHwOCr8lo8jQxRMTCOUvnMTauKmY33NQzM0aLeqXQIlUWO+VA==
+  dependencies:
+    "@redhat-cloud-services/ai-client-common" "0.13.0"
+    "@redhat-cloud-services/ai-client-state" "0.14.1"
+
 "@remix-run/router@1.15.3":
   version "1.15.3"
   resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.15.3.tgz#d2509048d69dbb72d5389a14945339f1430b2d3c"

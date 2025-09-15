@@ -24,9 +24,8 @@
     "webpack": "node -r ts-node/register ./node_modules/.bin/webpack"
   },
   "dependencies": {
-    "@redhatinsights/ai-client-state": "^1.0.0",
-    "@redhatinsights/ai-react-state": "^1.0.0",
-    "@redhatinsights/lightspeed-client": "^1.0.0"
+    "@redhat-cloud-services/ai-client-state": "^0.14.1",
+    "@redhat-cloud-services/ai-react-state": "^0.14.1"
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.15.5",

@@ -19,5 +19,5 @@
   "Send": "Send",
   "Sending...": "Sending...",
   "Thinking...": "Thinking...",
-  "Ensure your lightspeed service is running and accessible. Check browser console for detailed request/response logs.": "Ensure your lightspeed service is running and accessible. Check browser console for detailed request/response logs."
+  "Ensure your lightspeed-stack service is running and accessible. Check browser console for detailed request/response logs.": "Ensure your lightspeed-stack service is running and accessible. Check browser console for detailed request/response logs."
 }
