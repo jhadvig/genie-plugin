@@ -181,31 +181,38 @@ export default function GeniePage() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Helmet>
       
-      <header className="genie-header">
-        <div className="genie-container">
+      {/* Centered Title */}
+      <div className="genie-title-container">
+        <div className="genie-title-content">
           <h1 className="genie-title">{t('Genie')}</h1>
           <p className="genie-subtitle">{t('Your AI Assistant for OpenShift')}</p>
         </div>
-      </header>
+      </div>
 
+      {/* Chat Area */}
       <main className="genie-main">
         <div className="genie-container">
-            <div className="genie-content">
-              <div className="genie-status">
-                <p>
-                  <strong>📡 Health Check:</strong> <code>localhost:8080/readiness</code> 
-                  <span 
-                    className={`genie-health-status ${connectionStatus.loading ? 'loading' : connectionStatus.success ? 'success' : 'error'}`}
-                  >
-                    {connectionStatus.loading ? '🔄 Testing...' : connectionStatus.success ? '✅ Connected' : '❌ Failed'}
-                  </span>
-                </p>
-              </div>
-
-              <App />
-            </div>
+          <div className="genie-content">
+            <App />
+          </div>
         </div>
       </main>
+
+      {/* Pinned Status at Bottom */}
+      <div className="genie-status-bottom">
+        <div className="genie-container">
+          <div className="genie-status">
+            <p>
+              <strong>📡 Health Check:</strong> <code>localhost:8080/readiness</code> 
+              <span 
+                className={`genie-health-status ${connectionStatus.loading ? 'loading' : connectionStatus.success ? 'success' : 'error'}`}
+              >
+                {connectionStatus.loading ? '🔄 Testing...' : connectionStatus.success ? '✅ Connected' : '❌ Failed'}
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

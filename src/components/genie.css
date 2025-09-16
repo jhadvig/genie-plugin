@@ -12,6 +12,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .genie-container {
@@ -19,6 +20,26 @@
   margin: 0 auto;
   padding: 0 2rem;
   width: 100%;
+}
+
+/* Centered Title Container */
+.genie-title-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  text-align: center;
+  pointer-events: none; /* Allow clicking through to chat behind */
+}
+
+.genie-title-content {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 2rem 3rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .genie-header {
@@ -46,9 +67,10 @@
 
 .genie-main {
   flex: 1;
-  padding: 3rem 0;
+  padding: 3rem 0 6rem 0; /* Add bottom padding for pinned status */
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .genie-content {
@@ -59,6 +81,8 @@
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  position: relative;
+  z-index: 100; /* Ensure chatbot content stays above status */
 }
 
 .genie-welcome {
@@ -278,6 +302,31 @@
   border-left: 3px solid;
 }
 
+/* Pinned Bottom Status */
+.genie-status-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+  z-index: 10; /* Lower z-index to stay behind chatbot */
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.genie-status-bottom .genie-status {
+  margin: 0;
+  text-align: center;
+}
+
+.genie-status-bottom .genie-status p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
 .genie-connection-details.success {
   background-color: #f0fdf4;
   border-left-color: #22c55e;
@@ -305,7 +354,15 @@
   }
 
   .genie-main {
-    padding: 2rem 0;
+    padding: 2rem 0 6rem 0; /* Keep bottom padding for status */
+  }
+
+  .genie-title-content {
+    padding: 1.5rem 2rem;
+  }
+
+  .genie-status-bottom {
+    padding: 0.75rem 0;
   }
 
   .genie-content {
