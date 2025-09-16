@@ -26,7 +26,7 @@
   "dependencies": {
     "@redhat-cloud-services/ai-client-state": "^0.14.1",
     "@redhat-cloud-services/ai-react-state": "^0.14.1",
-    "@redhat-cloud-services/lightspeed-client": "^0.12.0"
+    "@redhat-cloud-services/lightspeed-client": "^0.14.1"
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.15.5",

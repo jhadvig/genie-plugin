@@ -22,6 +22,12 @@ stateManager.init().then(() => {
   console.error('[Genie] State manager initialization failed:', error);
 });
 
+// stateManager.sendMessage('Hello!').then(() => {
+//   console.log('[Genie] Message sent:', 'Hello!');
+// }).catch((error) => {
+//   console.error('[Genie] Message sending failed:', error);
+// });
+
 // ChatInterface using official Red Hat Cloud Services hooks
 function ChatInterface() {
   const { t } = useTranslation('plugin__genie-plugin');
@@ -132,7 +138,7 @@ function ChatInterface() {
 // Test connection to health endpoint for status display
 async function testConnection(): Promise<{ success: boolean; message: string }> {
   try {
-    const healthEndpoints = ['/health', '/v1/health', '/readiness', '/'];
+    const healthEndpoints = ['/readiness'];
     
     for (const endpoint of healthEndpoints) {
       try {
