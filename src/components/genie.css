@@ -1,5 +1,9 @@
 /* Genie Standalone Page Styles */
 
+.pf-chatbot--layout--welcome   {
+  padding: 15px;
+}
+
 .genie-standalone {
   margin: 0;
   padding: 0;

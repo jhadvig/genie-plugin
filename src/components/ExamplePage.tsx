@@ -10,6 +10,7 @@ export default function ExamplePage() {
 
   return (
     <>
+      {/* @ts-ignore - React 17 compatibility with react-helmet */}
       <Helmet>
         <title data-test="example-page-title">{t('Hello, Plugin!')}</title>
       </Helmet>

@@ -24,9 +24,15 @@
     "webpack": "node -r ts-node/register ./node_modules/.bin/webpack"
   },
   "dependencies": {
+    "@patternfly/chatbot": "^6.3.2",
     "@redhat-cloud-services/ai-client-state": "^0.14.1",
     "@redhat-cloud-services/ai-react-state": "^0.14.1",
     "@redhat-cloud-services/lightspeed-client": "^0.14.1"
+  },
+  "overrides": {
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "framer-motion": "^6.5.1"
   },
   "devDependencies": {
     "@cypress/webpack-preprocessor": "^5.15.5",

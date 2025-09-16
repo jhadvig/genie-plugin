@@ -1,11 +1,28 @@
 import * as React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import Helmet from 'react-helmet';
 import { useTranslation } from 'react-i18next';
+
+// Polyfill for React 17 compatibility with libraries expecting React 18
+if (!(React as any).useInsertionEffect) {
+  (React as any).useInsertionEffect = useLayoutEffect;
+}
 import { AIStateProvider, useSendMessage, useMessages } from '@redhat-cloud-services/ai-react-state';
 import { createClientStateManager } from '@redhat-cloud-services/ai-client-state';
 import { LightspeedClient } from '@redhat-cloud-services/lightspeed-client';
+import { 
+  Chatbot, 
+  ChatbotDisplayMode,
+  ChatbotContent,
+  ChatbotWelcomePrompt,
+  ChatbotFooter,
+  MessageBox,
+  Message,
+  MessageBar
+} from '@patternfly/chatbot';
 import './genie.css';
+// Import PatternFly ChatBot CSS as the last import to override styles
+import '@patternfly/chatbot/dist/css/main.css';
 
 // Initialize state manager outside React scope (following Red Hat Cloud Services pattern)
 const client = new LightspeedClient({ 
@@ -22,116 +39,65 @@ stateManager.init().then(() => {
   console.error('[Genie] State manager initialization failed:', error);
 });
 
-// stateManager.sendMessage('Hello!').then(() => {
-//   console.log('[Genie] Message sent:', 'Hello!');
-// }).catch((error) => {
-//   console.error('[Genie] Message sending failed:', error);
-// });
-
-// ChatInterface using official Red Hat Cloud Services hooks
+// ChatInterface using PatternFly ChatBot with Red Hat Cloud Services hooks
 function ChatInterface() {
   const { t } = useTranslation('plugin__genie-plugin');
-  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [welcomeShown, setWelcomeShown] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const sendMessage = useSendMessage();
   const messages = useMessages();
 
-  // Show welcome message if no messages exist
-  useEffect(() => {
-    if (!welcomeShown && messages.length === 0) {
-      // Add welcome message to show initial state
-      setWelcomeShown(true);
-    }
-  }, [messages, welcomeShown]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // Convert Red Hat Cloud Services messages to PatternFly format
+  const formatMessages = () => {
+    return messages.map((msg) => {
+      const message = msg as any; // Type assertion for Red Hat Cloud Services message format
+      const isBot = message.role === 'bot' || message.role === 'assistant';
+      
+      return (
+        <Message
+          key={msg.id}
+          name={isBot ? 'Genie' : 'You'}
+          role={isBot ? 'bot' : 'user'}
+          avatar={isBot ? "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/openshift.png" : "https://www.freepik.com/icon/user_8742495"}
+          timestamp={new Date(message.timestamp || message.createdAt || Date.now()).toLocaleTimeString()}
+          content={message.answer || message.query || message.message || message.content || ''}
+        />
+      );
+    });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  const handlePatternFlySend = async (message: string) => {
+    if (!message.trim() || isLoading) return;
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || isLoading) return;
-
-    const messageContent = inputValue.trim();
-    setInputValue('');
     setIsLoading(true);
-
     try {
-      await sendMessage(messageContent, { stream: true });
+      await sendMessage(message, { stream: true });
     } finally {
       setIsLoading(false);
     }
   };
 
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
   return (
-    <div className="genie-chat">
-      <div className="genie-messages">
-        {messages.length === 0 ? (
-          <div className="genie-message genie-message--assistant">
-            <div className="genie-message-content">
-              {t("Hello! I'm Genie, your AI assistant. How can I help you with OpenShift today?")}
-            </div>
-            <div className="genie-message-time">
-              {new Date().toLocaleTimeString()}
-            </div>
-          </div>
-        ) : (
-          messages.map((msg) => {
-            const message = msg as any; // Type assertion to handle Red Hat Cloud Services message format
-            const isAssistant = message.role === 'bot' || message.role === 'assistant';
-            return (
-              <div 
-                key={msg.id} 
-                className={`genie-message ${isAssistant ? 'genie-message--assistant' : 'genie-message--user'}`}
-              >
-                <div className="genie-message-content">
-                  {message.answer || message.query || message.message || message.content || ''}
-                </div>
-                <div className="genie-message-time">
-                  {new Date(message.timestamp || message.createdAt || Date.now()).toLocaleTimeString()}
-                </div>
-              </div>
-            );
-          })
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-      
-      <div className="genie-input-area">
-        <div className="genie-input-wrapper">
-          <input
-            type="text"
-            className="genie-input"
-            placeholder={t('Ask me anything about OpenShift...')}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            disabled={isLoading}
-          />
-          <button 
-            className="genie-send-button"
-            onClick={handleSend}
-            disabled={!inputValue.trim() || isLoading}
-          >
-            {isLoading ? t('Sending...') : t('Send')}
-          </button>
-        </div>
-      </div>
-    </div>
+    <Chatbot displayMode={ChatbotDisplayMode.docked}>
+      <ChatbotContent>
+        <ChatbotWelcomePrompt
+          title={t("Hello! I'm Genie")}
+          description={t('Your AI assistant for OpenShift. Ask me anything!')}
+        />
+        <MessageBox>
+          {formatMessages()}
+        </MessageBox>
+      </ChatbotContent>
+      <ChatbotFooter>
+        <MessageBar
+          onSendMessage={handlePatternFlySend}
+          placeholder={t('Ask me anything about OpenShift...')}
+          hasMicrophoneButton={false}
+          isSendButtonDisabled={isLoading}
+          alwayShowSendButton={true}
+        />
+      </ChatbotFooter>
+    </Chatbot>
   );
 }
 
@@ -209,6 +175,7 @@ export default function GeniePage() {
 
   return (
     <div className="genie-standalone">
+      {/* @ts-ignore - React 17 compatibility with react-helmet */}
       <Helmet>
         <title>{t('Genie - AI Assistant')}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -223,27 +190,20 @@ export default function GeniePage() {
 
       <main className="genie-main">
         <div className="genie-container">
-          <div className="genie-content">
-            <div className="genie-welcome">
-              <h2>{t('Welcome to Genie')}</h2>
-              <p>
-                {t('This is a standalone AI-powered chat interface for OpenShift assistance. Built using the ai-web-clients architecture pattern.')}
-              </p>
-              <p>
-                <strong>🔗 API Endpoint:</strong> <code>localhost:8080/v1/query</code><br/>
-                <strong>📡 Health Check:</strong> <code>localhost:8080/readiness</code> 
-                <span 
-                  className={`genie-health-status ${connectionStatus.loading ? 'loading' : connectionStatus.success ? 'success' : 'error'}`}
-                >
-                  {connectionStatus.loading ? '🔄 Testing...' : connectionStatus.success ? '✅ Connected' : '❌ Failed'}
-                </span>
-                <br/>
-                <small>{t('Ensure your lightspeed-stack service is running and accessible. Check browser console for detailed request/response logs.')}</small>
-              </p>
-            </div>
+            <div className="genie-content">
+              <div className="genie-status">
+                <p>
+                  <strong>📡 Health Check:</strong> <code>localhost:8080/readiness</code> 
+                  <span 
+                    className={`genie-health-status ${connectionStatus.loading ? 'loading' : connectionStatus.success ? 'success' : 'error'}`}
+                  >
+                    {connectionStatus.loading ? '🔄 Testing...' : connectionStatus.success ? '✅ Connected' : '❌ Failed'}
+                  </span>
+                </p>
+              </div>
 
-            <App />
-          </div>
+              <App />
+            </div>
         </div>
       </main>
     </div>
