@@ -58,7 +58,7 @@ function ChatInterface() {
           key={msg.id}
           name={isBot ? 'Genie' : 'You'}
           role={isBot ? 'bot' : 'user'}
-          avatar={isBot ? "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/openshift.png" : "https://www.freepik.com/icon/user_8742495"}
+          avatar={isBot ? "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/openshift.png" : "https://w7.pngwing.com/pngs/831/88/png-transparent-user-profile-computer-icons-user-interface-mystique-miscellaneous-user-interface-design-smile-thumbnail.png"}
           timestamp={new Date(message.timestamp || message.createdAt || Date.now()).toLocaleTimeString()}
           content={message.answer || message.query || message.message || message.content || ''}
         />
