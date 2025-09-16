@@ -308,7 +308,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: #764ba2;
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding: 1rem 0;
@@ -324,7 +324,7 @@
 .genie-status-bottom .genie-status p {
   margin: 0;
   font-size: 0.9rem;
-  color: #374151;
+  color: white;
 }
 
 .genie-connection-details.success {
