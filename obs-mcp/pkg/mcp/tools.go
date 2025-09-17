@@ -12,7 +12,13 @@ func CreateListMetricsTool() mcp.Tool {
 
 func CreateExecuteRangeQueryTool() mcp.Tool {
 	return mcp.NewTool("execute_range_query",
-		mcp.WithDescription("Execute a PromQL range query with flexible time specification"),
+		mcp.WithDescription("Execute a PromQL range query with flexible time specification.
+
+For current/recent data queries, use the 'duration' parameter to specify how far back
+to look from now (e.g., '1h' for last hour, '30m' for last 30 minutes).
+
+For historical data queries, use explicit 'start' and 'end' times.
+"),
 		mcp.WithString("query",
 			mcp.Required(),
 			mcp.Description("PromQL query string"),
