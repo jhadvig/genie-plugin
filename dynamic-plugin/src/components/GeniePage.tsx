@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import * as React from 'react';
 import { useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import Helmet from 'react-helmet';
@@ -53,6 +54,9 @@ import {
 import './genie.css';
 // Import PatternFly ChatBot CSS as the last import to override styles
 import '@patternfly/chatbot/dist/css/main.css';
+// import { DatasourceSelect } from '@perses-dev/plugin-system';
+// import DataSource from './PersesBindings/DataSource';
+import { MockedTimeSeries } from './PersesBindings';
 
 // Initialize state manager outside React scope (following Red Hat Cloud Services pattern)
 const client = new LightspeedClient({
@@ -110,7 +114,7 @@ function ChatInterface() {
 
     setIsLoading(true);
     try {
-      await sendMessage(message, { stream: true });
+      await sendMessage(message, { stream: true, requestOptions: {} });
     } finally {
       setIsLoading(false);
     }
@@ -225,6 +229,9 @@ export default function GeniePage() {
         <div className="genie-title-content">
           <h1 className="genie-title">{t('Genie')}</h1>
           <p className="genie-subtitle">{t('Your AI Assistant for OpenShift')}</p>
+        </div>
+        <div>
+          <MockedTimeSeries />
         </div>
       </div>
 
