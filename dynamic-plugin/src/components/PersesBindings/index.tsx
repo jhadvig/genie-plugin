@@ -27,23 +27,23 @@ import { generateChartsTheme, getTheme } from '@perses-dev/components';
 export const muiTheme = getTheme('light');
 export const chartsTheme = generateChartsTheme(muiTheme, {});
 
-const testEvent = {
-  event: 'tool_call',
-  data: {
-    id: 150,
-    role: 'tool_execution',
-    token: {
-      tool_name: 'execute_range_query',
-      arguments: {
-        duration: '5m',
-        end: '2025-09-18T06:00:00Z',
-        query: 'sum(rate(container_cpu_usage_seconds_total[5m]))',
-        start: '2025-09-18T05:00:00Z',
-        step: '1m',
-      },
-    },
-  },
-};
+// const testEvent = {
+//   event: 'tool_call',
+//   data: {
+//     id: 150,
+//     role: 'tool_execution',
+//     token: {
+//       tool_name: 'execute_range_query',
+//       arguments: {
+//         duration: '5m',
+//         end: '2025-09-18T06:00:00Z',
+//         query: 'sum(rate(container_cpu_usage_seconds_total[5m]))',
+//         start: '2025-09-18T05:00:00Z',
+//         step: '1m',
+//       },
+//     },
+//   },
+// };
 
 type TimeSeriesProps = {
   duration: string;
@@ -136,9 +136,9 @@ const persesTimeRange = {
   pastDuration: '1h' as prometheusPlugin.DurationString,
 };
 
-export const MockedTimeSeries = () => {
+export const MockedTimeSeries = (props: TimeSeriesProps) => {
   const { t } = useTranslation('plugin__genie-plugin');
-  const timeSeriesProps = testEvent.data.token.arguments as TimeSeriesProps;
+  const timeSeriesProps = props;
   const timeRange = useTimeRange(
     timeSeriesProps.start,
     timeSeriesProps.end,

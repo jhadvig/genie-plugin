@@ -57,6 +57,7 @@ import '@patternfly/chatbot/dist/css/main.css';
 // import { DatasourceSelect } from '@perses-dev/plugin-system';
 // import DataSource from './PersesBindings/DataSource';
 import { MockedTimeSeries } from './PersesBindings';
+import useEventQueries from './useEventQueries';
 
 // Initialize state manager outside React scope (following Red Hat Cloud Services pattern)
 const client = new LightspeedClient({
@@ -181,11 +182,27 @@ async function testConnection(): Promise<{ success: boolean; message: string }> 
 
 // App component following Red Hat Cloud Services pattern
 function App() {
-  return (
-    <AIStateProvider stateManager={stateManager}>
-      <ChatInterface />
-    </AIStateProvider>
-  );
+  return <ChatInterface />;
+}
+
+function Layout() {
+  const queryEvents = useEventQueries();
+  console.log({ queryEvents });
+  const elements = queryEvents.map((event, index) => {
+    return (
+      <div key={index} style={{ marginTop: '20px' }}>
+        <h3>Query: {event.arguments.query}</h3>
+        <MockedTimeSeries
+          query={event.arguments.query}
+          start={event.arguments.start}
+          end={event.arguments.end}
+          duration={event.arguments.duration}
+          step={event.arguments.step}
+        />
+      </div>
+    );
+  });
+  return <>{elements}</>;
 }
 
 // Main Genie Page Component
@@ -217,58 +234,50 @@ export default function GeniePage() {
   }, []);
 
   return (
-    <div className="genie-standalone">
-      {/* @ts-ignore - React 17 compatibility with react-helmet */}
-      <Helmet>
-        <title>{t('Genie - AI Assistant')}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Helmet>
+    <AIStateProvider stateManager={stateManager}>
+      <div className="genie-standalone">
+        {/* @ts-ignore - React 17 compatibility with react-helmet */}
+        <Helmet>
+          <title>{t('Genie - AI Assistant')}</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Helmet>
 
-      {/* Centered Title */}
-      <div className="genie-title-container">
-        <div className="genie-title-content">
-          <h1 className="genie-title">{t('Genie')}</h1>
-          <p className="genie-subtitle">{t('Your AI Assistant for OpenShift')}</p>
-        </div>
-        <div>
-          <MockedTimeSeries />
-        </div>
-      </div>
-
-      {/* Chat Area */}
-      <main className="genie-main">
-        <div className="genie-container">
-          <div className="genie-content">
-            <App />
+        {/* Chat Area */}
+        <main className="genie-main">
+          <Layout />
+          <div className="genie-container">
+            <div className="genie-content">
+              <App />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
 
-      {/* Pinned Status at Bottom */}
-      <div className="genie-status-bottom">
-        <div className="genie-container">
-          <div className="genie-status">
-            <p>
-              <strong>📡 Health Check:</strong> <code>localhost:8080/readiness</code>
-              <span
-                className={`genie-health-status ${
-                  connectionStatus.loading
-                    ? 'loading'
+        {/* Pinned Status at Bottom */}
+        <div className="genie-status-bottom">
+          <div className="genie-container">
+            <div className="genie-status">
+              <p>
+                <strong>📡 Health Check:</strong> <code>localhost:8080/readiness</code>
+                <span
+                  className={`genie-health-status ${
+                    connectionStatus.loading
+                      ? 'loading'
+                      : connectionStatus.success
+                      ? 'success'
+                      : 'error'
+                  }`}
+                >
+                  {connectionStatus.loading
+                    ? '🔄 Testing...'
                     : connectionStatus.success
-                    ? 'success'
-                    : 'error'
-                }`}
-              >
-                {connectionStatus.loading
-                  ? '🔄 Testing...'
-                  : connectionStatus.success
-                  ? '✅ Connected'
-                  : '❌ Failed'}
-              </span>
-            </p>
+                    ? '✅ Connected'
+                    : '❌ Failed'}
+                </span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </AIStateProvider>
   );
 }

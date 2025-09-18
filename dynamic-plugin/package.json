@@ -44,7 +44,7 @@
     "@perses-dev/timeseries-table-plugin": "^0.9.0",
     "@redhat-cloud-services/ai-client-state": "^0.14.1",
     "@redhat-cloud-services/ai-react-state": "^0.14.1",
-    "@redhat-cloud-services/lightspeed-client": "^0.14.1",
+    "@redhat-cloud-services/lightspeed-client": "^0.14.2",
     "@tanstack/react-query": "^4.0.0",
     "use-resize-observer": "^9.1.0"
   },
