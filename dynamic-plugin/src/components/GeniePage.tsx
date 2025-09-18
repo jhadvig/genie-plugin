@@ -54,10 +54,13 @@ import {
 import './genie.css';
 // Import PatternFly ChatBot CSS as the last import to override styles
 import '@patternfly/chatbot/dist/css/main.css';
+// Import react-grid-layout CSS
+import 'react-grid-layout/css/styles.css';
 // import { DatasourceSelect } from '@perses-dev/plugin-system';
 // import DataSource from './PersesBindings/DataSource';
 import { MockedTimeSeries } from './PersesBindings';
 import useEventQueries from './useEventQueries';
+import ReactGridLayout from 'react-grid-layout';
 
 // Initialize state manager outside React scope (following Red Hat Cloud Services pattern)
 const client = new LightspeedClient({
@@ -187,10 +190,25 @@ function App() {
 
 function Layout() {
   const queryEvents = useEventQueries();
-  console.log({ queryEvents });
-  const elements = queryEvents.map((event, index) => {
+
+  // Create layout configuration for grid items
+  const layout = queryEvents.map((_, index) => ({
+    i: `item-${index}`,
+    x: (index % 2) * 6, // 2 columns layout
+    y: Math.floor(index / 2) * 4, // Row height of 4
+    w: 6, // Width of 6 units (half the grid)
+    h: 6, // Height of 6 units
+    minW: 4,
+    minH: 3,
+  }));
+
+  // Create grid items
+  const gridItems = queryEvents.map((event, index) => {
     return (
-      <div key={index} style={{ marginTop: '20px' }}>
+      <div
+        key={`item-${index}`}
+        style={{ border: '1px solid #ccc', padding: '10px', backgroundColor: '#f9f9f9' }}
+      >
         <h3>Query: {event.arguments.query}</h3>
         <MockedTimeSeries
           query={event.arguments.query}
@@ -202,7 +220,22 @@ function Layout() {
       </div>
     );
   });
-  return <>{elements}</>;
+
+  return (
+    // @ts-ignore
+    <ReactGridLayout
+      className="layout"
+      layout={layout}
+      cols={12}
+      rowHeight={60}
+      width={1200}
+      isDraggable={true}
+      isResizable={true}
+      margin={[16, 16]}
+    >
+      {gridItems}
+    </ReactGridLayout>
+  );
 }
 
 // Main Genie Page Component

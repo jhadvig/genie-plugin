@@ -2,30 +2,30 @@ import { LightSpeedCoreAdditionalProperties } from '@redhat-cloud-services/light
 import {
   isToolExecutionToken,
   isValidToolArguments,
-  mockToolCalls,
+  // mockToolCalls,
   ToolExecutionToken,
 } from './mockedToolCalls';
 import { useMemo } from 'react';
-// import { useMessages } from '@redhat-cloud-services/ai-react-state';
+import { useMessages } from '@redhat-cloud-services/ai-react-state';
 
 // Example prompts
 // Can you show me pod CPU usage for the last 6 hours?
 
 function useEventQueries() {
-  // const messages = useMessages<LightSpeedCoreAdditionalProperties>();
+  const messages = useMessages<LightSpeedCoreAdditionalProperties>();
   // mocking the data for now so we don't have to constantly talk to backend
-  const messages: {
-    additionalAttributes: LightSpeedCoreAdditionalProperties;
-  }[] = useMemo(
-    () => [
-      {
-        additionalAttributes: {
-          toolCalls: mockToolCalls.toolCalls,
-        },
-      },
-    ],
-    [mockToolCalls],
-  );
+  // const messages: {
+  //   additionalAttributes: LightSpeedCoreAdditionalProperties;
+  // }[] = useMemo(
+  //   () => [
+  //     {
+  //       additionalAttributes: {
+  //         toolCalls: mockToolCalls.toolCalls,
+  //       },
+  //     },
+  //   ],
+  //   [mockToolCalls],
+  // );
   const tools = useMemo(
     () =>
       messages.reduce<Map<string, ToolExecutionToken>>((acc, msg) => {
