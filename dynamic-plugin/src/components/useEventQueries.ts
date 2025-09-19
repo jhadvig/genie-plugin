@@ -1,7 +1,7 @@
 import { LightSpeedCoreAdditionalProperties } from '@redhat-cloud-services/lightspeed-client';
 import {
   isToolExecutionToken,
-  isValidToolArguments,
+  // isValidToolArguments,
   // mockToolCalls,
   ToolExecutionToken,
 } from './mockedToolCalls';
@@ -40,14 +40,10 @@ function useEventQueries() {
           toolCalls.forEach((tc) => {
             if (typeof (tc as any).data.token.arguments === 'object') {
               const token = (tc as any).data.token as ToolExecutionToken;
-              if (isValidToolArguments(token.arguments)) {
-                const key = JSON.stringify(token);
-                if (!acc.has(key)) {
-                  // mocking the time until the MCP gives correct timestamps
-                  token.arguments.start = '2025-09-18T05:00:00Z';
-                  token.arguments.end = '2025-09-18T06:00:00Z';
-                  acc.set(key, token);
-                }
+              const key = JSON.stringify(token);
+              if (!acc.has(key)) {
+                // mocking the time until the MCP gives correct timestamps
+                acc.set(key, token);
               }
             }
           });
