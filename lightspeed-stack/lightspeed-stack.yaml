@@ -24,3 +24,15 @@ mcp_servers:
   - name: "obs"
     provider_id: "model-context-protocol"
     url: "http://localhost:9100/mcp"
+
+customization:
+  system_prompt: |-
+    Always use available tools.
+
+    Execute a PromQL range query with flexible time specification.
+
+    For current/recent data queries, use only the 'duration' parameter to specify how far back
+    to look from now (e.g., '1h' for last hour, '30m' for last 30 minutes). In that case
+    YOU MUST NOT provide neither 'start' NOR 'end' at all.
+
+    Do NOT USE 'start' and 'end' times.

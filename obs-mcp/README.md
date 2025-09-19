@@ -15,5 +15,5 @@ PROM_POD=$(kubectl get pods -n openshift-monitoring -l app.kubernetes.io/instanc
 kubectl port-forward -n openshift-monitoring $PROM_POD 9090:9090
 ```
 
-2. run the server with `go run ./cmd/obs-mcp`
+2. run the server with `go run ./cmd/obs-mcp/ --listen 127.0.0.1:9100`
 
