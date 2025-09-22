@@ -22,7 +22,15 @@
     "properties": {
       "exact": true,
       "path": "/genie",
-      "component": { "$codeRef": "GeniePage" }
+      "component": { "$codeRef": "GenieWidgetsPage" }
+    }
+  },
+  {
+    "type": "console.page/route/standalone",
+    "properties": {
+      "exact": true,
+      "path": "/genie/widgets",
+      "component": { "$codeRef": "GenieWidgetsPage" }
     }
   }
 ]

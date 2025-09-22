@@ -58,7 +58,55 @@ export const mockToolCalls = {
       data: {
         id: 5,
         role: 'tool_execution',
-        token: '',
+        token: {
+          tool_name: 'create_dashboard',
+          response: {
+            success: true,
+            operation: 'create_dashboard',
+            layoutId: '',
+            message: "Created dashboard 'Test Dashboard' with 2 widgets",
+            timestamp: '0001-01-01T00:00:00Z',
+            widgets: [
+              {
+                id: 'welcome-text',
+                componentType: 'text',
+                position: {
+                  x: 0,
+                  y: 0,
+                  w: 6,
+                  h: 2,
+                },
+                props: {
+                  content: 'Welcome to your A dashboard for testing purposes',
+                  title: 'Welcome',
+                },
+                breakpoint: 'lg',
+              },
+              {
+                id: 'basic-chart',
+                componentType: 'chart',
+                position: {
+                  x: 6,
+                  y: 0,
+                  w: 6,
+                  h: 4,
+                },
+                props: {
+                  chartType: 'line',
+                  title: 'Basic Chart',
+                },
+                breakpoint: 'lg',
+              },
+            ],
+            totalFound: 2,
+            layout: {
+              id: 'fda75bdf-4f35-48d3-8a9e-a70cf0f49eda',
+              layoutId: 'test_dashboard_layout',
+              name: 'Test Dashboard',
+              description: 'Dashboard created from: A dashboard for testing purposes',
+            },
+          },
+        },
       },
     },
     {
