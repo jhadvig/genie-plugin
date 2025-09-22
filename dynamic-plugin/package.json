@@ -106,7 +106,8 @@
     "description": "Template project for OpenShift Console plugins. Edit package.json to change this message and the plugin name.",
     "exposedModules": {
       "ExamplePage": "./components/ExamplePage",
-      "GeniePage": "./components/GeniePage"
+      "GeniePage": "./components/GeniePage",
+      "GenieWidgetsPage": "./components/GenieWidgetsPage"
     },
     "dependencies": {
       "@console/pluginAPI": "*"

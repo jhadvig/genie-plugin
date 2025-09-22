@@ -190,6 +190,7 @@ function App() {
 
 function Layout() {
   const queryEvents = useEventQueries();
+  console.log('Query Events:', queryEvents);
 
   // Create layout configuration for grid items
   const layout = queryEvents.map((_, index) => ({
