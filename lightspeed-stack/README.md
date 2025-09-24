@@ -10,7 +10,9 @@ files to get it running for the purposes of this project.
 2. Copy the `lightspeed-stack.yaml` and `run.yaml` from this dir into the lightspeed-stack repository dir.
 3. Follow the [Lightspeed Stack README](https://github.com/lightspeed-core/lightspeed-stack?tab=readme-ov-file#set-llm-provider-and-model) to configure the providers
 5. `uv sync`
-6. `make run`
+6. Add dependencies as described in [getting_started](https://github.com/lightspeed-core/lightspeed-stack/blob/main/docs/getting_started.md#installing-dependencies-for-llama-stack)
+   and add any missing via `uv add`.
+7. `make run`
 
 ### Model configuration
 

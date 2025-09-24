@@ -31,6 +31,11 @@ providers:
       provider_type: remote::gemini
       config:
         api_key: ${env.GOOGLE_API_KEY}
+    - provider_id: ollama
+      provider_type: remote::ollama
+      config:
+        url: http://localhost:11434
+        api_key: ignored
   agents:
     - config:
         persistence_store:
