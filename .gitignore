@@ -4,3 +4,4 @@
 .devcontainer/dev.env
 integration-tests/videos
 integration-tests/screenshots
+.venv
