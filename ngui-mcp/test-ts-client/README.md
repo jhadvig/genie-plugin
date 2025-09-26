@@ -50,7 +50,7 @@ Expected output:
   "fields": [
     {
       "name": "Name",
-      "data_path": "$..metadata.name",
+      "data_path": "$..namespaces[*].metadata.name",
       "data": [
         "default",
         "kube-node-lease",

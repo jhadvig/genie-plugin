@@ -1,3 +1,5 @@
+{
+    "namespaces":
 [
   {
     "apiVersion": "project.openshift.io/v1",
@@ -2995,3 +2997,5 @@
     }
   }
 ]
+
+}

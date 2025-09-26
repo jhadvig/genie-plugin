@@ -73,7 +73,7 @@ async function run() {
     console.log(tools)
 
     const namespaces_all = await readFile("kube_namespaces_all_mock.json", "utf8");
-    const user_prompt = "What are my namespaces?"
+    const user_prompt = "What are my all namespaces?"
     await generate_ui(user_prompt, [{ id: "some_id", data: namespaces_all }])
 }
 
