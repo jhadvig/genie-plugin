@@ -22,7 +22,7 @@
     "properties": {
       "exact": true,
       "path": "/genie",
-      "component": { "$codeRef": "GenieWidgetsPage" }
+      "component": { "$codeRef": "GeniePage" }
     }
   },
   {
