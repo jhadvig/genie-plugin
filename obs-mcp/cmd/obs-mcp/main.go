@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/inecas/obs-mcp/pkg/http"
 	"github.com/inecas/obs-mcp/pkg/mcp"
 	"github.com/inecas/obs-mcp/pkg/prometheus"
 	"github.com/mark3labs/mcp-go/server"
@@ -36,7 +35,7 @@ func main() {
 	if *listen != "" {
 		// HTTP mode
 		ctx := context.Background()
-		if err := http.Serve(ctx, mcpServer, *listen); err != nil {
+		if err := mcp.Serve(ctx, mcpServer, *listen); err != nil {
 			log.Fatalf("HTTP server failed: %v", err)
 		}
 	} else {
