@@ -6,7 +6,38 @@ This is an [MCP](https://modelcontextprotocol.io/introduction) server to allow L
 
 ## Development Quickstart
 
-### Installation
+### Installation - Docker image
+
+```sh
+podman pull quay.io/next-gen-ui/mcp
+```
+
+### Run server
+
+#### Open AI
+
+```sh
+podman run --rm -it -p 9200:9200 \
+    --env MCP_PORT="9200" \
+    --env NGUI_MODEL="gpt-4o" \
+    --env NGUI_PROVIDER_API_KEY=$OPENAI_API_KEY \
+    quay.io/next-gen-ui/mcp
+```
+
+#### Ollama
+
+```sh
+podman run --rm -it -p 9200:9200 \
+    --env MCP_PORT="9200" \
+    --env NGUI_MODEL="llama3.2" \
+    --env NGUI_PROVIDER_API_BASE_URL="http://host.containers.internal:11434/v1" \
+    --env NGUI_PROVIDER_API_KEY="ollama" \
+    quay.io/next-gen-ui/mcp
+```
+
+
+### Installation - Python package
+
 
 ```sh
 cd ngui-mcp
