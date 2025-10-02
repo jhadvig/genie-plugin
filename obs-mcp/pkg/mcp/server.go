@@ -1,8 +1,27 @@
 package mcp
 
 import (
-	"github.com/inecas/obs-mcp/pkg/prometheus"
+	"context"
+	"errors"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"strings"
+	"syscall"
+	"time"
+
 	"github.com/mark3labs/mcp-go/server"
+
+	"github.com/inecas/obs-mcp/pkg/prometheus"
+)
+
+type authHeader string
+
+const (
+	authHeaderStr   authHeader = "kubernetes-authorization"
+	mcpEndpoint                = "/mcp"
+	healthEndpoint             = "/health"
 )
 
 func NewMCPServer(promClient *prometheus.PrometheusClient) (*server.MCPServer, error) {
@@ -33,5 +52,84 @@ func SetupTools(mcpServer *server.MCPServer, promClient *prometheus.PrometheusCl
 	mcpServer.AddTool(listMetricsTool, listMetricsHandler)
 	mcpServer.AddTool(executeRangeQueryTool, executeRangeQueryHandler)
 
+	return nil
+}
+
+func authFromRequest(ctx context.Context, r *http.Request) context.Context {
+	authHeaderValue := r.Header.Get(string(authHeaderStr))
+	token, found := strings.CutPrefix(authHeaderValue, "Bearer ")
+	if !found {
+		return ctx
+	}
+	return context.WithValue(ctx, authHeaderStr, token)
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("[DEBUG] Incoming request: %s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
+		log.Printf("[DEBUG] Request headers: %v", r.Header)
+		if r.ContentLength > 0 {
+			log.Printf("[DEBUG] Content-Length: %d", r.ContentLength)
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func Serve(ctx context.Context, mcpServer *server.MCPServer, listenAddr string) error {
+	mux := http.NewServeMux()
+
+	httpServer := &http.Server{
+		Addr:    listenAddr,
+		Handler: loggingMiddleware(mux),
+	}
+
+	streamableHTTPServer := server.NewStreamableHTTPServer(mcpServer,
+		server.WithStreamableHTTPServer(httpServer),
+		server.WithStateLess(true),
+	)
+	mux.Handle(mcpEndpoint, streamableHTTPServer)
+
+	mux.Handle("/", streamableHTTPServer)
+
+	mux.HandleFunc(healthEndpoint, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM)
+
+	serverErr := make(chan error, 1)
+	go func() {
+		log.Printf("HTTP server starting on %s with MCP endpoint at %s", listenAddr, mcpEndpoint)
+		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			serverErr <- err
+		}
+	}()
+
+	select {
+	case sig := <-sigChan:
+		log.Printf("Received signal %v, initiating graceful shutdown", sig)
+		cancel()
+	case <-ctx.Done():
+		log.Printf("Context cancelled, initiating graceful shutdown")
+	case err := <-serverErr:
+		log.Printf("HTTP server error: %v", err)
+		return err
+	}
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownCancel()
+
+	log.Printf("Shutting down HTTP server gracefully...")
+	if err := httpServer.Shutdown(shutdownCtx); err != nil {
+		log.Printf("HTTP server shutdown error: %v", err)
+		return err
+	}
+
+	log.Printf("HTTP server shutdown complete")
 	return nil
 }
