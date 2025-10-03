@@ -2,25 +2,50 @@ package prometheus
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"log/slog"
+	"net/http"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	promcfg "github.com/prometheus/common/config"
 )
 
 type PrometheusClient struct {
 	client v1.API
 }
 
-func NewPrometheusClient(prometheusURL string) (*PrometheusClient, error) {
+func NewPrometheusClient(prometheusURL, token string) (*PrometheusClient, error) {
 	if prometheusURL == "" {
 		prometheusURL = "http://localhost:9090"
 	}
 
-	client, err := api.NewClient(api.Config{
+	apiConfig := api.Config{
 		Address: prometheusURL,
-	})
+	}
+
+	use_tls := strings.HasPrefix(prometheusURL, "https://")
+	if use_tls {
+		certs, err := createCertPool()
+		if err != nil {
+			return nil, err
+		}
+
+		defaultRt := api.DefaultRoundTripper.(*http.Transport)
+		defaultRt.TLSClientConfig = &tls.Config{RootCAs: certs}
+
+		apiConfig.RoundTripper = promcfg.NewAuthorizationCredentialsRoundTripper(
+			"Bearer", promcfg.NewInlineSecret(token), defaultRt)
+	} else {
+		slog.Warn("Connecting to Prometheus without TLS")
+	}
+
+	client, err := api.NewClient(apiConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error creating prometheus client: %w", err)
 	}
@@ -64,4 +89,16 @@ func (p *PrometheusClient) ExecuteRangeQuery(ctx context.Context, query string, 
 	}
 
 	return response, nil
+}
+
+func createCertPool() (*x509.CertPool, error) {
+	certs := x509.NewCertPool()
+
+	pemData, err := os.ReadFile(`/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt`)
+	if err != nil {
+		slog.Error("Failed to read the CA certificate", "err", err)
+		return nil, err
+	}
+	certs.AppendCertsFromPEM(pemData)
+	return certs, nil
 }

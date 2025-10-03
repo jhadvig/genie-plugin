@@ -4,14 +4,46 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/inecas/obs-mcp/pkg/prometheus"
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
-func ListMetricsHandler(promClient *prometheus.PrometheusClient) func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+// getTokenFromCtx gets the authorization header from the
+// provided context
+func getTokenFromCtx(ctx context.Context) string {
+	k8sToken := ctx.Value(authHeaderStr)
+	if k8sToken == nil {
+		return ""
+	}
+	k8TokenStr, ok := k8sToken.(string)
+	if !ok {
+		slog.Warn("Couldn't parse token... ignoring.")
+		return ""
+	}
+	return k8TokenStr
+}
+
+func getPromClient(ctx context.Context, promURL string) (*prometheus.PrometheusClient, error) {
+	token := getTokenFromCtx(ctx)
+
+	promClient, err := prometheus.NewPrometheusClient(promURL, token)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create Prometheus client: %v", err)
+	}
+
+	return promClient, nil
+}
+
+func ListMetricsHandler(promURL string) func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	return func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		promClient, err := getPromClient(ctx, promURL)
+		if err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("failed to create Prometheus client: %s", err.Error())), nil
+		}
+
 		metrics, err := promClient.ListMetrics(ctx)
 		if err != nil {
 			return mcp.NewToolResultError(fmt.Sprintf("failed to list metrics: %s", err.Error())), nil
@@ -26,8 +58,13 @@ func ListMetricsHandler(promClient *prometheus.PrometheusClient) func(context.Co
 	}
 }
 
-func ExecuteRangeQueryHandler(promClient *prometheus.PrometheusClient) func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func ExecuteRangeQueryHandler(promURL string) func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	return func(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		promClient, err := getPromClient(ctx, promURL)
+		if err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("failed to create Prometheus client: %s", err.Error())), nil
+		}
+
 		// Get required query parameter
 		query, err := req.RequireString("query")
 		if err != nil {
