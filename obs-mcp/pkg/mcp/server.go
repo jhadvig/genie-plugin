@@ -12,19 +12,17 @@ import (
 	"time"
 
 	"github.com/mark3labs/mcp-go/server"
-
-	"github.com/inecas/obs-mcp/pkg/prometheus"
 )
 
 type authHeader string
 
 const (
-	authHeaderStr   authHeader = "kubernetes-authorization"
-	mcpEndpoint                = "/mcp"
-	healthEndpoint             = "/health"
+	authHeaderStr  authHeader = "kubernetes-authorization"
+	mcpEndpoint               = "/mcp"
+	healthEndpoint            = "/health"
 )
 
-func NewMCPServer(promClient *prometheus.PrometheusClient) (*server.MCPServer, error) {
+func NewMCPServer(promURL string) (*server.MCPServer, error) {
 	mcpServer := server.NewMCPServer(
 		"obs-mcp",
 		"1.0.0",
@@ -32,21 +30,21 @@ func NewMCPServer(promClient *prometheus.PrometheusClient) (*server.MCPServer, e
 		server.WithToolCapabilities(true),
 	)
 
-	if err := SetupTools(mcpServer, promClient); err != nil {
+	if err := SetupTools(mcpServer, promURL); err != nil {
 		return nil, err
 	}
 
 	return mcpServer, nil
 }
 
-func SetupTools(mcpServer *server.MCPServer, promClient *prometheus.PrometheusClient) error {
+func SetupTools(mcpServer *server.MCPServer, promURL string) error {
 	// Create tool definitions
 	listMetricsTool := CreateListMetricsTool()
 	executeRangeQueryTool := CreateExecuteRangeQueryTool()
 
 	// Create handlers
-	listMetricsHandler := ListMetricsHandler(promClient)
-	executeRangeQueryHandler := ExecuteRangeQueryHandler(promClient)
+	listMetricsHandler := ListMetricsHandler(promURL)
+	executeRangeQueryHandler := ExecuteRangeQueryHandler(promURL)
 
 	// Add tools to server
 	mcpServer.AddTool(listMetricsTool, listMetricsHandler)
@@ -86,6 +84,7 @@ func Serve(ctx context.Context, mcpServer *server.MCPServer, listenAddr string) 
 	streamableHTTPServer := server.NewStreamableHTTPServer(mcpServer,
 		server.WithStreamableHTTPServer(httpServer),
 		server.WithStateLess(true),
+		server.WithHTTPContextFunc(authFromRequest),
 	)
 	mux.Handle(mcpEndpoint, streamableHTTPServer)
 

@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/inecas/obs-mcp/pkg/mcp"
-	"github.com/inecas/obs-mcp/pkg/prometheus"
 	"github.com/mark3labs/mcp-go/server"
 )
 
@@ -17,16 +16,10 @@ func main() {
 	flag.Parse()
 
 	// Get Prometheus URL from environment variable
-	prometheusURL := os.Getenv("PROMETHEUS_URL")
-
-	// Create Prometheus client
-	promClient, err := prometheus.NewPrometheusClient(prometheusURL)
-	if err != nil {
-		log.Fatalf("Failed to create Prometheus client: %v", err)
-	}
+	promURL := os.Getenv("PROMETHEUS_URL")
 
 	// Create MCP server
-	mcpServer, err := mcp.NewMCPServer(promClient)
+	mcpServer, err := mcp.NewMCPServer(promURL)
 	if err != nil {
 		log.Fatalf("Failed to create MCP server: %v", err)
 	}
