@@ -7,15 +7,7 @@ import './utils/reactPolyfills';
 
 // Dashboard Layout component
 function DashboardLayout() {
-  const {
-    widgets,
-    activeDashboard,
-    hasDashboards,
-    manipulations,
-    hasManipulations,
-    manipulationExecutor,
-    widgetState,
-  } = useDashboards();
+  const { widgets, activeDashboard, hasDashboards } = useDashboards();
 
   const handleLayoutChange = (layout: any[]) => {
     // Here you could persist the layout changes if needed
@@ -36,8 +28,6 @@ function DashboardLayout() {
 
       <DashboardGrid
         widgets={widgets}
-        manipulationExecutor={manipulationExecutor}
-        widgetState={widgetState}
         onLayoutChange={handleLayoutChange}
         cols={12}
         rowHeight={60}
@@ -64,18 +54,6 @@ function DashboardLayout() {
               <strong>Dashboard ID:</strong> {activeDashboard.layout.layoutId}
               <br />
               <strong>Active Layout ID:</strong> {activeDashboard.activeLayoutId}
-            </>
-          )}
-          {hasManipulations && (
-            <>
-              <br />
-              <strong>Widget Manipulations:</strong> {manipulations.length} manipulation(s) applied
-              {manipulations.length > 0 && (
-                <>
-                  <br />
-                  <strong>Last Action:</strong> {manipulations[manipulations.length - 1].message}
-                </>
-              )}
             </>
           )}
         </div>

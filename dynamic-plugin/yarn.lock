@@ -1320,20 +1320,20 @@
   resolved "https://registry.yarnpkg.com/@redhat-cloud-services/ai-client-common/-/ai-client-common-0.13.0.tgz#62e71afff1c5becefa2ed6eaf9aed49df2bff380"
   integrity sha512-aeoSUsYyOKErYQDK3bf11bBPzd7xiJ9+Eqe8eQfTVaacjch0T/5B0urwcNGiSVyTq/dmNpyebNWputxfR8N+EA==
 
-"@redhat-cloud-services/ai-client-state@0.14.1", "@redhat-cloud-services/ai-client-state@^0.14.1":
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/ai-client-state/-/ai-client-state-0.14.1.tgz#92a3dc449f9d7256f580a914309b925c116c7d84"
-  integrity sha512-uqNb8xyi031imxC6mtH9pKfOKyW9OCWy8ehAQ7nMweI3woqcD6bS25NsVOfPPfeD647tfp5wqgPtNJ/zed3vnA==
+"@redhat-cloud-services/ai-client-state@0.15.0", "@redhat-cloud-services/ai-client-state@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/ai-client-state/-/ai-client-state-0.15.0.tgz#b78fa0a263c1d49bafeef0ee617284e6c3d0826d"
+  integrity sha512-K91WyVL9y3b4hOWw3dpTMGn+rcG3WpGqgj3BlSp9/fMA9osN37jHvhfgLZeA3K62Stza7uKEOolv4bZ2ZnQ4Uw==
   dependencies:
     "@redhat-cloud-services/ai-client-common" "0.13.0"
 
-"@redhat-cloud-services/ai-react-state@^0.14.1":
-  version "0.14.3"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/ai-react-state/-/ai-react-state-0.14.3.tgz#7e3718b0faf10ddff9050c3ee6a7275002e0b9ea"
-  integrity sha512-1dpY8Lwifn7bHIN4vUnIA1AY/kfshUEZjaJvFTHwOCr8lo8jQxRMTCOUvnMTauKmY33NQzM0aLeqXQIlUWO+VA==
+"@redhat-cloud-services/ai-react-state@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/ai-react-state/-/ai-react-state-0.15.0.tgz#330ee6de0c642de424864bf22b8bbab0a6ab675b"
+  integrity sha512-rCsPb4SvkJkEPW9FalUA/Ykl+kTmLmKuP9GGKAJklxlMHZw4Ak87iYxGYimTzv0SXxtRnra1Ltt85ND67/oeGA==
   dependencies:
     "@redhat-cloud-services/ai-client-common" "0.13.0"
-    "@redhat-cloud-services/ai-client-state" "0.14.1"
+    "@redhat-cloud-services/ai-client-state" "0.15.0"
 
 "@redhat-cloud-services/lightspeed-client@^0.14.2":
   version "0.14.2"

@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import ReactGridLayout from 'react-grid-layout';
 import { DashboardWidget } from '../../types/dashboard';
 import { WidgetRenderer } from './WidgetRenderer';
-import { useManipulationExecutor } from '../../hooks/useManipulationExecutor';
-import { useWidgetState } from '../../hooks/useWidgetState';
 
 interface DashboardGridProps {
   widgets: DashboardWidget[];
-  manipulationExecutor?: ReturnType<typeof useManipulationExecutor>;
-  widgetState?: ReturnType<typeof useWidgetState>;
   cols?: number;
   rowHeight?: number;
   width?: number;
@@ -20,8 +16,6 @@ interface DashboardGridProps {
 
 export function DashboardGrid({
   widgets,
-  manipulationExecutor,
-  widgetState,
   cols = 12,
   rowHeight = 60,
   width = 1200,
@@ -29,54 +23,6 @@ export function DashboardGrid({
   isResizable = true,
   onLayoutChange,
 }: DashboardGridProps) {
-  const executedManipulationsRef = useRef<Set<string>>(new Set());
-
-  // Execute pending manipulations
-  useEffect(() => {
-    if (!manipulationExecutor || !widgetState) return;
-
-    const nextManipulation = manipulationExecutor.getNextManipulation();
-    if (!nextManipulation) return;
-
-    // Prevent re-execution of the same manipulation
-    if (executedManipulationsRef.current.has(nextManipulation.id)) {
-      return;
-    }
-
-    console.log('Executing manipulation:', nextManipulation);
-
-    // Mark as executed immediately in our ref
-    executedManipulationsRef.current.add(nextManipulation.id);
-
-    // Apply the manipulation by updating widget positions
-    const { manipulation } = nextManipulation;
-
-    if (manipulation.widgets) {
-      // Update widget state with new positions
-      widgetState.updateWidgetPositions(manipulation.widgets);
-
-      // Mark manipulation as executed in the executor
-      manipulationExecutor.executeManipulation(nextManipulation.id);
-
-      // Trigger layout change callback if provided
-      if (onLayoutChange) {
-        const newLayout = manipulation.widgets.map((widget) => ({
-          i: widget.id,
-          x: widget.position.x,
-          y: widget.position.y,
-          w: widget.position.w,
-          h: widget.position.h,
-        }));
-        onLayoutChange(newLayout);
-      }
-    }
-  }, [
-    manipulationExecutor?.hasPendingManipulations,
-    widgetState,
-    onLayoutChange,
-    manipulationExecutor,
-  ]);
-
   // Create layout configuration from widgets
   const layout = widgets.map((widget) => ({
     i: widget.id,

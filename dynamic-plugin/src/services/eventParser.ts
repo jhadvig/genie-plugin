@@ -3,7 +3,6 @@ import {
   CreateDashboardResponse,
   DashboardWidget,
   ManipulateWidgetEvent,
-  ManipulateWidgetResponse,
   ManipulateWidgetArgumentsEvent,
   AddWidgetEvent,
   AddWidgetResponse,
@@ -69,51 +68,6 @@ export function parseCreateDashboardEvent(
     return response as CreateDashboardResponse;
   } catch (error) {
     console.error('Failed to parse dashboard response:', error);
-    return null;
-  }
-}
-
-export function isManipulateWidgetEvent(event: any): event is ManipulateWidgetEvent {
-  return (
-    event &&
-    event.event === 'tool_call' &&
-    event.data &&
-    event.data.token &&
-    typeof event.data.token === 'object' &&
-    event.data.token.tool_name === 'manipulate_widget' &&
-    event.data.token.response
-  );
-}
-
-export function parseManipulateWidgetEvent(
-  event: ManipulateWidgetEvent,
-): ManipulateWidgetResponse | null {
-  if (!isManipulateWidgetEvent(event)) {
-    return null;
-  }
-
-  try {
-    let response = event.data.token.response;
-
-    // Handle case where response is a JSON string
-    if (typeof response === 'string') {
-      response = JSON.parse(response);
-    }
-
-    // Validate the parsed response has required properties
-    if (!response || typeof response !== 'object') {
-      console.warn('Invalid manipulate widget response: not an object', response);
-      return null;
-    }
-
-    if (!Array.isArray(response.widgets)) {
-      console.warn('Invalid manipulate widget response: widgets is not an array', response);
-      return null;
-    }
-
-    return response as ManipulateWidgetResponse;
-  } catch (error) {
-    console.error('Failed to parse manipulate widget response:', error);
     return null;
   }
 }
@@ -232,41 +186,4 @@ export function extractWidgetsFromDashboard(
   dashboardResponse: CreateDashboardResponse,
 ): DashboardWidget[] {
   return dashboardResponse.widgets || [];
-}
-
-export class EventParser {
-  static parseToolCallEvents(events: any[]): {
-    dashboards: CreateDashboardResponse[];
-    widgetManipulations: ManipulateWidgetResponse[];
-    addedWidgets: DashboardWidget[];
-    otherEvents: any[];
-  } {
-    const dashboards: CreateDashboardResponse[] = [];
-    const widgetManipulations: ManipulateWidgetResponse[] = [];
-    const addedWidgets: DashboardWidget[] = [];
-    const otherEvents: any[] = [];
-
-    events.forEach((event) => {
-      if (isCreateDashboardEvent(event)) {
-        const dashboardResponse = parseCreateDashboardEvent(event);
-        if (dashboardResponse) {
-          dashboards.push(dashboardResponse);
-        }
-      } else if (isManipulateWidgetEvent(event)) {
-        const manipulateResponse = parseManipulateWidgetEvent(event);
-        if (manipulateResponse) {
-          widgetManipulations.push(manipulateResponse);
-        }
-      } else if (isAddWidgetEvent(event)) {
-        const addWidgetResponse = parseAddWidgetEvent(event);
-        if (addWidgetResponse && addWidgetResponse.widgets) {
-          addedWidgets.push(...addWidgetResponse.widgets);
-        }
-      } else {
-        otherEvents.push(event);
-      }
-    });
-
-    return { dashboards, widgetManipulations, addedWidgets, otherEvents };
-  }
 }
