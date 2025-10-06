@@ -135,9 +135,3 @@ export type ManipulateWidgetArgumentsEvent = {
     };
   };
 };
-
-export type DashboardState = {
-  dashboards: DashboardLayout[];
-  widgets: DashboardWidget[];
-  activeDashboard?: DashboardLayout;
-};
