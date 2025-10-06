@@ -186,13 +186,13 @@ func ManipulateWidgetHandler(layoutRepo *db.LayoutRepository) func(context.Conte
 
 			// Record the change
 			allChanges = append(allChanges, WidgetChange{
-				WidgetID:    widgetID,
-				Action:      "moved",
-				Breakpoint:  breakpoint,
-				WasTargeted: true,
-				Reason:      "direct move operation",
+				WidgetID:      widgetID,
+				Action:        "moved",
+				Breakpoint:    breakpoint,
+				WasTargeted:   true,
+				Reason:        "direct move operation",
 				PreviousState: map[string]interface{}{"x": oldWidget.X, "y": oldWidget.Y},
-				NewState:     map[string]interface{}{"x": x, "y": y},
+				NewState:      map[string]interface{}{"x": x, "y": y},
 			})
 
 			operationMessage = fmt.Sprintf("Moved widget '%s' to position (%d, %d)", widgetID, x, y)
@@ -217,13 +217,13 @@ func ManipulateWidgetHandler(layoutRepo *db.LayoutRepository) func(context.Conte
 
 			// Record the change
 			allChanges = append(allChanges, WidgetChange{
-				WidgetID:    widgetID,
-				Action:      "resized",
-				Breakpoint:  breakpoint,
-				WasTargeted: true,
-				Reason:      "direct resize operation",
+				WidgetID:      widgetID,
+				Action:        "resized",
+				Breakpoint:    breakpoint,
+				WasTargeted:   true,
+				Reason:        "direct resize operation",
 				PreviousState: map[string]interface{}{"w": oldWidget.W, "h": oldWidget.H},
-				NewState:     map[string]interface{}{"w": w, "h": h},
+				NewState:      map[string]interface{}{"w": w, "h": h},
 			})
 
 			operationMessage = fmt.Sprintf("Resized widget '%s' to %dx%d", widgetID, w, h)
@@ -764,12 +764,12 @@ func GetActiveDashboardHandler(layoutRepo *db.LayoutRepository) func(context.Con
 		if includeAllBreakpoints {
 			// Return full schema with all breakpoints
 			responseData = map[string]interface{}{
-				"layoutId":     activeLayout.LayoutID,
-				"name":         activeLayout.Name,
-				"description":  activeLayout.Description,
-				"breakpoints":  schema.Breakpoints,
-				"cols":         schema.Cols,
-				"layouts":      schema.Layouts,
+				"layoutId":          activeLayout.LayoutID,
+				"name":              activeLayout.Name,
+				"description":       activeLayout.Description,
+				"breakpoints":       schema.Breakpoints,
+				"cols":              schema.Cols,
+				"layouts":           schema.Layouts,
 				"globalConstraints": schema.GlobalConstraints,
 			}
 		} else {
@@ -785,12 +785,12 @@ func GetActiveDashboardHandler(layoutRepo *db.LayoutRepository) func(context.Con
 			}
 
 			responseData = map[string]interface{}{
-				"layoutId":    activeLayout.LayoutID,
-				"name":        activeLayout.Name,
-				"description": activeLayout.Description,
-				"breakpoint":  breakpoint,
-				"cols":        cols,
-				"widgets":     widgets,
+				"layoutId":          activeLayout.LayoutID,
+				"name":              activeLayout.Name,
+				"description":       activeLayout.Description,
+				"breakpoint":        breakpoint,
+				"cols":              cols,
+				"widgets":           widgets,
 				"globalConstraints": schema.GlobalConstraints,
 			}
 		}

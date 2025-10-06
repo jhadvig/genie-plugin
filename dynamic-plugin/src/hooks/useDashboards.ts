@@ -10,11 +10,14 @@ import {
   isAddWidgetEvent,
   parseAddWidgetEvent,
 } from '../services/eventParser';
+import { DashboardMCPClient } from '../services/dashboardMCPClient';
 
 export function useDashboards() {
   const streamChunk = useStreamChunk<LightSpeedCoreAdditionalProperties>();
+  console.log('streamChunk', streamChunk);
   const [dashboards, setDashboards] = useState<CreateDashboardResponse[]>([]);
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
+  const [dashboardMCPClient] = useState(() => new DashboardMCPClient());
 
   function handleToolCalls(toolCalls: any[]) {
     toolCalls.forEach((toolCall) => {
@@ -66,14 +69,24 @@ export function useDashboards() {
 
   useEffect(() => {
     if (streamChunk && streamChunk.additionalAttributes?.toolCalls) {
+      console.log('streamChunk.additionalAttributes.toolCalls', streamChunk.additionalAttributes.toolCalls);
       handleToolCalls(streamChunk.additionalAttributes.toolCalls);
     }
   }, [streamChunk]);
 
-  // Get the most recent dashboard as the active one
+  // Fetch active dashboard from MCP when no dashboards from messages
   const activeDashboard = useMemo(() => {
-    return dashboards.length > 0 ? dashboards[dashboards.length - 1] : null;
-  }, [dashboards]);
+      // const fetchDashboard = async () => {
+      //   try {
+      //     const activeDashboardResponse = await dashboardMCPClient.getActiveDashboard();
+      //     console.log('Active dashboard response:', activeDashboardResponse);
+      //     // widgetState.updateWidgetPositions(activeDashboardResponse.analysis.widgets);
+      //   } catch (error) {
+      //     console.error('Error fetching active dashboard:', error);
+      //   }
+      // };
+      return dashboards.length > 0 ? dashboards[dashboards.length - 1] : null;
+  }, [dashboards.length, dashboardMCPClient]);
 
   return {
     dashboards,
