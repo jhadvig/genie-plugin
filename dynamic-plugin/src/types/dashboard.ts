@@ -135,3 +135,37 @@ export type ManipulateWidgetArgumentsEvent = {
     };
   };
 };
+
+export type ActiveDashboardResponse = {
+  success: boolean;
+  operation: string;
+  activeLayoutId: string;
+  message: string;
+  timestamp: string;
+  analysis: DashboardAnalysis;
+};
+
+export type DashboardAnalysis = {
+  breakpoint: string;
+  cols: number;
+  description: string;
+  globalConstraints: GlobalConstraints;
+  layoutId: string;
+  name: string;
+  widgets: DashboardWidget[];
+};
+
+export type GlobalConstraints = {
+  maxItems: number;
+  defaultItemSize: {
+    w: number;
+    h: number;
+  };
+};
+
+export type Dashboard = {
+  id: string;
+  name: string;
+  description: string;
+  widgets: DashboardWidget[];
+};

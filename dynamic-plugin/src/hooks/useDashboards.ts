@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStreamChunk } from '@redhat-cloud-services/ai-react-state';
 import { LightSpeedCoreAdditionalProperties } from '@redhat-cloud-services/lightspeed-client';
 import { CreateDashboardResponse, DashboardWidget } from '../types/dashboard';
@@ -11,6 +11,7 @@ import {
   parseAddWidgetEvent,
 } from '../services/eventParser';
 import { DashboardMCPClient } from '../services/dashboardMCPClient';
+import DashboardUtils, { NormalizedDashboard } from '../components/utils/dashboard.utils';
 
 export function useDashboards() {
   const streamChunk = useStreamChunk<LightSpeedCoreAdditionalProperties>();
@@ -18,6 +19,7 @@ export function useDashboards() {
   const [dashboards, setDashboards] = useState<CreateDashboardResponse[]>([]);
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
   const [dashboardMCPClient] = useState(() => new DashboardMCPClient());
+  const [activeDashboard, setActiveDashboard] = useState<NormalizedDashboard | undefined>(undefined);
 
   function handleToolCalls(toolCalls: any[]) {
     toolCalls.forEach((toolCall) => {
@@ -74,18 +76,29 @@ export function useDashboards() {
     }
   }, [streamChunk]);
 
-  // Fetch active dashboard from MCP when no dashboards from messages
-  const activeDashboard = useMemo(() => {
-      // const fetchDashboard = async () => {
-      //   try {
-      //     const activeDashboardResponse = await dashboardMCPClient.getActiveDashboard();
-      //     console.log('Active dashboard response:', activeDashboardResponse);
-      //     // widgetState.updateWidgetPositions(activeDashboardResponse.analysis.widgets);
-      //   } catch (error) {
-      //     console.error('Error fetching active dashboard:', error);
-      //   }
-      // };
-      return dashboards.length > 0 ? dashboards[dashboards.length - 1] : null;
+  useEffect(() => {
+    if (dashboards.length > 0) {
+      const lastCreated = dashboards[dashboards.length - 1];
+      const normalized = DashboardUtils.normalizeResponse(lastCreated);
+      setActiveDashboard(normalized);
+    }
+  }, [dashboards.length]);
+
+  useEffect(() => {
+    async function fetchActive() {
+      try {
+        if (dashboards.length === 0) {
+          const resp = await dashboardMCPClient.getActiveDashboard();
+          if (resp) {
+            const normalizedActive = DashboardUtils.normalizeResponse(resp);
+            setActiveDashboard(normalizedActive);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching active dashboard:', error);
+      }
+    }
+    fetchActive();
   }, [dashboards.length, dashboardMCPClient]);
 
   return {

@@ -1,4 +1,4 @@
-import { DashboardWidget } from "src/types/dashboard";
+import { ActiveDashboardResponse } from "src/types/dashboard";
 
 export class DashboardMCPClient {
   private baseURL: string;
@@ -85,47 +85,7 @@ export class DashboardMCPClient {
     return content;
   }
 
-  async getActiveDashboard(): Promise<getActiveDashboardResponse> {
+  async getActiveDashboard(): Promise<ActiveDashboardResponse> {
     return await this.callTool('get_active_dashboard', {})
   }
-
-  async getDashboard(dashboardId: string): Promise<getDashboardResponse> {
-    return await this.callTool('get_dashboard', { dashboard_id: dashboardId })
-  }
 }
-
-export type getActiveDashboardResponse = {
-  success: boolean;
-  operation: string;
-  activeLayoutId: string;
-  message: string;
-  timestamp: string;
-  analysis: DashboardAnalysis;
-};
-
-export type DashboardAnalysis = {
-  breakpoint: string;
-  cols: number;
-  description: string;
-  globalConstraints: GlobalConstraints;
-  layoutId: string;
-  name: string;
-  widgets: DashboardWidget[];
-};
-
-export type GlobalConstraints = {
-  maxItems: number;
-  defaultItemSize: {
-    w: number;
-    h: number;
-  };
-};
-
-export type getDashboardResponse = {
-  success: boolean;
-  operation: string;
-  dashboardId: string;
-  message: string;
-  timestamp: string;
-  dashboard: DashboardAnalysis;
-};
