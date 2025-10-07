@@ -1,4 +1,4 @@
-import { ActiveDashboardResponse } from "src/types/dashboard";
+import { ActiveDashboardResponse, ListDashboardsResponse } from "src/types/dashboard";
 
 export class DashboardMCPClient {
   private baseURL: string;
@@ -87,5 +87,9 @@ export class DashboardMCPClient {
 
   async getActiveDashboard(): Promise<ActiveDashboardResponse> {
     return await this.callTool('get_active_dashboard', {})
+  }
+
+  async listDashboards(limit: number = 50, offset: number = 0): Promise<ListDashboardsResponse> {
+    return await this.callTool('list_dashboards', { limit: String(limit), offset: String(offset) })
   }
 }

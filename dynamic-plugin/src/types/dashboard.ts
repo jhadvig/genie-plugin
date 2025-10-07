@@ -169,3 +169,16 @@ export type Dashboard = {
   description: string;
   widgets: DashboardWidget[];
 };
+
+export type ListDashboardsResponse = {
+  success: boolean;
+  operation: string;
+  message: string;
+  timestamp: string;
+  layouts: Array<{
+    id: string;
+    layoutId: string;
+    name: string;
+    description: string;
+  }>;
+};

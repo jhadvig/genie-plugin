@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Gallery, GalleryItem, Card, CardTitle, CardBody, CardHeader } from '@patternfly/react-core';
-import { DashboardMCPClient } from '../services/DashboardMCPClient';
-import { GenieLayout } from './shared';
+import { DashboardMCPClient } from '../services/dashboardMCPClient';
+import {GenieLayout } from './shared';
 
 export default function GenieLibraryPage() {
   const [dashboards, setDashboards] = useState<DashboardListItem[]>([]);
