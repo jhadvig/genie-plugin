@@ -165,16 +165,3 @@ func CreateGetActiveDashboardTool() mcp.Tool {
 		),
 	)
 }
-
-// CreateListDashboardsTool creates the list_dashboards tool definition
-func CreateListDashboardsTool() mcp.Tool {
-    return mcp.NewTool("list_dashboards",
-        mcp.WithDescription("List all dashboards (aka: list layouts, show dashboards, list existing dashboards). Returns dashboard identifiers and metadata. Use this to enumerate dashboards; use get_active_dashboard to inspect the current one."),
-        mcp.WithString("limit",
-            mcp.Description("Optional limit (default: 50)"),
-        ),
-        mcp.WithString("offset",
-            mcp.Description("Optional offset (default: 0)"),
-        ),
-    )
-}
