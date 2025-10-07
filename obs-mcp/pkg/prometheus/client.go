@@ -25,6 +25,17 @@ func NewPrometheusClient(prometheusURL, token string) (*PrometheusClient, error)
 		prometheusURL = "http://localhost:9090"
 	}
 
+	if token == "" {
+		// TODO: temporary workaround for authentication.
+		slog.Info("Empty token - using service account instead")
+		tokenBytes, err := readTokenFromFile()
+		if err != nil {
+			slog.Error("Failed to read the service account token", "err", err)
+			return nil, err
+		}
+		token = string(tokenBytes)
+	}
+
 	apiConfig := api.Config{
 		Address: prometheusURL,
 	}
@@ -101,4 +112,8 @@ func createCertPool() (*x509.CertPool, error) {
 	}
 	certs.AppendCertsFromPEM(pemData)
 	return certs, nil
+}
+
+func readTokenFromFile() ([]byte, error) {
+	return os.ReadFile(`/var/run/secrets/kubernetes.io/serviceaccount/token`)
 }

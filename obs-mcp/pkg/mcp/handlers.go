@@ -14,8 +14,11 @@ import (
 // getTokenFromCtx gets the authorization header from the
 // provided context
 func getTokenFromCtx(ctx context.Context) string {
+	// TODO: we're ignoring user auth for now, just to see if someting improves
+	return ""
 	k8sToken := ctx.Value(authHeaderStr)
 	if k8sToken == nil {
+		slog.Warn("No token provided in context.")
 		return ""
 	}
 	k8TokenStr, ok := k8sToken.(string)
