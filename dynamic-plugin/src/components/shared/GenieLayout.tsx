@@ -117,13 +117,7 @@ export function GenieLayout({ title, children, mainContent }: GenieLayoutProps) 
             Left sidebar
           </div>
           <div className="content">
-            {/* This is a temporary layout to display the chat interface and the dashboard side by side */}
-            <div className="chat-interface">
-              {children}
-            </div>
-            <div className="dashboard">
-              {mainContent}
-            </div>
+           {children}
           </div>
           <div className="right-sidebar">Right sidebar</div>
           {/* Pinned Status at Bottom */}
