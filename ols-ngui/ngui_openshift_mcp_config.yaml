@@ -32,3 +32,5 @@ data_types:
   #   data_transformer: yaml
   # pods_top:
   #   data_transformer: yaml
+  resources_list:
+    data_transformer: yaml
