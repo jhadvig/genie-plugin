@@ -107,7 +107,8 @@
     "exposedModules": {
       "ExamplePage": "./components/ExamplePage",
       "GeniePage": "./components/GeniePage",
-      "GenieWidgetsPage": "./components/GenieWidgetsPage"
+      "GenieWidgetsPage": "./components/GenieWidgetsPage",
+      "GenieLibraryPage": "./components/GenieLibraryPage"
     },
     "dependencies": {
       "@console/pluginAPI": "*"
