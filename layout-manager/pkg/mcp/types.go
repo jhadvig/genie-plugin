@@ -45,6 +45,9 @@ type MCPResponse struct {
 	// For dashboard creation operations
 	Layout               *LayoutInfo            `json:"layout,omitempty"`
 
+    // For listing dashboards
+    Layouts              []LayoutInfo           `json:"layouts,omitempty"`
+
 	// For analysis operations
 	Analysis             map[string]interface{} `json:"analysis,omitempty"`
 
