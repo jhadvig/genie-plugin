@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStreamChunk } from '@redhat-cloud-services/ai-react-state';
 import { LightSpeedCoreAdditionalProperties } from '@redhat-cloud-services/lightspeed-client';
 import { CreateDashboardResponse, DashboardWidget } from '../types/dashboard';
@@ -18,7 +18,7 @@ export function useDashboards(dashboardId?: string) {
   console.log('streamChunk', streamChunk);
   const [dashboards, setDashboards] = useState<CreateDashboardResponse[]>([]);
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
-  const [dashboardMCPClient] = useState(() => new DashboardMCPClient());
+  const dashboardClient = useRef(new DashboardMCPClient());
   const [activeDashboard, setActiveDashboard] = useState<NormalizedDashboard | undefined>(undefined);
 
   function handleToolCalls(toolCalls: any[]) {
@@ -89,8 +89,8 @@ export function useDashboards(dashboardId?: string) {
       try {
         if (dashboards.length === 0) {
           const resp = dashboardId
-            ? await dashboardMCPClient.getDashboard(dashboardId)
-            : await dashboardMCPClient.getActiveDashboard();
+            ? await dashboardClient.current.getDashboard(dashboardId)
+            : await dashboardClient.current.getActiveDashboard();
           if (resp) {
             console.log('resp', resp);
             const normalizedActive = DashboardUtils.normalizeResponse(resp);
@@ -104,7 +104,7 @@ export function useDashboards(dashboardId?: string) {
       }
     }
     fetchActive();
-  }, [dashboards.length, dashboardMCPClient, dashboardId]);
+  }, [dashboards.length, dashboardClient, dashboardId]);
 
   return {
     dashboards,

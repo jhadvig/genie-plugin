@@ -106,4 +106,27 @@ export class DashboardMCPClient {
   async listDashboards(limit: number = 50, offset: number = 0): Promise<ListDashboardsResponse> {
     return await this.callTool('list_dashboards', { limit: String(limit), offset: String(offset) })
   }
+
+  async updateWidgetPositions(layout: any[]): Promise<void> {
+    // Update each widget's position individually using manipulate_widget
+    // We need to do both move and resize in separate operations
+    const promises = layout.flatMap(item => [
+      // Move operation
+      this.callTool('manipulate_widget', {
+        widget_id: item.i,
+        operation: 'move',
+        x: String(item.x),
+        y: String(item.y),
+      }),
+      // Resize operation
+      this.callTool('manipulate_widget', {
+        widget_id: item.i,
+        operation: 'resize',
+        w: String(item.w),
+        h: String(item.h),
+      })
+    ]);
+
+    await Promise.all(promises);
+  }
 }
