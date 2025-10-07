@@ -168,13 +168,30 @@ func CreateGetActiveDashboardTool() mcp.Tool {
 
 // CreateListDashboardsTool creates the list_dashboards tool definition
 func CreateListDashboardsTool() mcp.Tool {
-    return mcp.NewTool("list_dashboards",
-        mcp.WithDescription("List all dashboards (aka: list layouts, show dashboards, list existing dashboards). Returns dashboard identifiers and metadata. Use this to enumerate dashboards; use get_active_dashboard to inspect the current one."),
-        mcp.WithString("limit",
-            mcp.Description("Optional limit (default: 50)"),
-        ),
-        mcp.WithString("offset",
-            mcp.Description("Optional offset (default: 0)"),
-        ),
-    )
+	return mcp.NewTool("list_dashboards",
+		mcp.WithDescription("List all dashboards (aka: list layouts, show dashboards, list existing dashboards). Returns dashboard identifiers and metadata. Use this to enumerate dashboards; use get_active_dashboard to inspect the current one."),
+		mcp.WithString("limit",
+			mcp.Description("Optional limit (default: 50)"),
+		),
+		mcp.WithString("offset",
+			mcp.Description("Optional offset (default: 0)"),
+		),
+	)
+}
+
+// CreateGetDashboardTool creates the get_dashboard tool definition
+func CreateGetDashboardTool() mcp.Tool {
+	return mcp.NewTool("get_dashboard",
+		mcp.WithDescription("Get a specific dashboard by layout ID and set it as active (deactivating all other dashboards). This retrieves the dashboard schema and layout information."),
+		mcp.WithString("layout_id",
+			mcp.Required(),
+			mcp.Description("The layout ID of the dashboard to retrieve and activate"),
+		),
+		mcp.WithString("breakpoint",
+			mcp.Description("Breakpoint to return layout for (default: lg)"),
+		),
+		mcp.WithBoolean("include_all_breakpoints",
+			mcp.Description("Whether to include layouts for all breakpoints (default: false)"),
+		),
+	)
 }

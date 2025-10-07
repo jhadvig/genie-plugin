@@ -13,7 +13,7 @@ import {
 import { DashboardMCPClient } from '../services/dashboardClient';
 import DashboardUtils, { NormalizedDashboard } from '../components/utils/dashboard.utils';
 
-export function useDashboards() {
+export function useDashboards(dashboardId?: string) {
   const streamChunk = useStreamChunk<LightSpeedCoreAdditionalProperties>();
   console.log('streamChunk', streamChunk);
   const [dashboards, setDashboards] = useState<CreateDashboardResponse[]>([]);
@@ -88,7 +88,9 @@ export function useDashboards() {
     async function fetchActive() {
       try {
         if (dashboards.length === 0) {
-          const resp = await dashboardMCPClient.getActiveDashboard();
+          const resp = dashboardId
+            ? await dashboardMCPClient.getDashboard(dashboardId)
+            : await dashboardMCPClient.getActiveDashboard();
           if (resp) {
             console.log('resp', resp);
             const normalizedActive = DashboardUtils.normalizeResponse(resp);
@@ -102,7 +104,7 @@ export function useDashboards() {
       }
     }
     fetchActive();
-  }, [dashboards.length, dashboardMCPClient]);
+  }, [dashboards.length, dashboardMCPClient, dashboardId]);
 
   return {
     dashboards,

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { useDashboards } from '../hooks/useDashboards';
 import { DashboardGrid } from './Dashboard';
 import { ChatInterface, GenieLayout } from './shared';
@@ -7,7 +8,11 @@ import './utils/reactPolyfills';
 
 // Dashboard Layout component
 function DashboardLayout() {
-  const { widgets, activeDashboard, hasDashboards } = useDashboards();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const dashboardId = searchParams.get('dashboardId');
+
+  const { widgets, activeDashboard, hasDashboards } = useDashboards(dashboardId || undefined);
 
   const handleLayoutChange = (layout: any[]) => {
     // Here you could persist the layout changes if needed
@@ -69,15 +74,20 @@ export default function GenieWidgetsPage() {
   return (
     <GenieLayout
       title={t('Genie Widgets - AI Dashboard Assistant')}
-      mainContent={<DashboardLayout />}
     >
-      <ChatInterface
-        welcomeTitle={t("Hello! I'm Genie!")}
-        welcomeDescription={t(
-          'An AI assistant for OpenShift.',
-        )}
-        placeholder={t('Message Genie...')}
-      />
+      {/* This is a temporary layout to display the chat interface and the dashboard side by side */}
+      <div className="chat-interface">
+        <ChatInterface
+          welcomeTitle={t("Hello! I'm Genie!")}
+          welcomeDescription={t(
+            'An AI assistant for OpenShift.',
+          )}
+          placeholder={t('Message Genie...')}
+        />
+      </div>
+      <div className="dashboard">
+        <DashboardLayout />
+      </div>
     </GenieLayout>
   );
 }

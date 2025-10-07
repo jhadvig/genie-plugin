@@ -31,16 +31,18 @@ export default function GenieLibraryPage() {
           {dashboards.map((d) => {
             return (
               <GalleryItem key={d.id}>
-                <Card isCompact>
-                  <CardHeader>
-                    <CardTitle>{d.name || d.layoutId}</CardTitle>
-                  </CardHeader>
-                  <CardBody>
-                    {d.description && (
-                      <div>{d.description}</div>
-                    )}
-                  </CardBody>
-                </Card>
+                <a href={`/genie/widgets?dashboardId=${d.layoutId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Card isCompact isClickable>
+                    <CardHeader>
+                      <CardTitle>{d.name || d.layoutId}</CardTitle>
+                    </CardHeader>
+                    <CardBody>
+                      {d.description && (
+                        <div>{d.description}</div>
+                      )}
+                    </CardBody>
+                  </Card>
+                </a>
               </GalleryItem>
             );
           })}

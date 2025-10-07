@@ -1,4 +1,4 @@
-import { DashboardWidget } from "src/types/dashboard";
+import { ActiveDashboardResponse, ListDashboardsResponse } from "src/types/dashboard";
 
 export class DashboardMCPClient {
   private baseURL: string;
@@ -78,6 +78,12 @@ export class DashboardMCPClient {
     }
 
     const content = result?.result?.content?.[0] || result?.result;
+
+    // Check if this is an error response
+    if (content?.isError) {
+      throw new Error(`MCP Tool Error: ${content?.text || 'Unknown error'}`);
+    }
+
     const text  = content?.text;
     if (text) {
       return JSON.parse(text) as T;
@@ -85,65 +91,19 @@ export class DashboardMCPClient {
     return content;
   }
 
-  async getActiveDashboard(): Promise<getActiveDashboardResponse> {
+  async getActiveDashboard(): Promise<ActiveDashboardResponse> {
     return await this.callTool('get_active_dashboard', {})
   }
 
-  async getDashboard(dashboardId: string): Promise<getDashboardResponse> {
-    return await this.callTool('get_dashboard', { dashboard_id: dashboardId })
+  async getDashboard(dashboardId: string): Promise<ActiveDashboardResponse> {
+    return await this.callTool('get_dashboard', { layout_id: dashboardId })
+  }
+
+  async getDashboardById(dashboardId: string): Promise<ActiveDashboardResponse> {
+    return await this.callTool('get_dashboard', { layout_id: dashboardId })
   }
 
   async listDashboards(limit: number = 50, offset: number = 0): Promise<ListDashboardsResponse> {
     return await this.callTool('list_dashboards', { limit: String(limit), offset: String(offset) })
   }
 }
-
-export type getActiveDashboardResponse = {
-  success: boolean;
-  operation: string;
-  activeLayoutId: string;
-  message: string;
-  timestamp: string;
-  analysis: DashboardAnalysis;
-};
-
-export type DashboardAnalysis = {
-  breakpoint: string;
-  cols: number;
-  description: string;
-  globalConstraints: GlobalConstraints;
-  layoutId: string;
-  name: string;
-  widgets: DashboardWidget[];
-};
-
-export type GlobalConstraints = {
-  maxItems: number;
-  defaultItemSize: {
-    w: number;
-    h: number;
-  };
-};
-
-export type getDashboardResponse = {
-  success: boolean;
-  operation: string;
-  dashboardId: string;
-  message: string;
-  timestamp: string;
-  dashboard: DashboardAnalysis;
-};
-
-export type ListDashboardsResponse = {
-  success: boolean;
-  operation: string;
-  message: string;
-  timestamp: string;
-  layouts: Array<{
-    id: string;
-    layoutId: string;
-    name: string;
-    description: string;
-  }>;
-};
-
