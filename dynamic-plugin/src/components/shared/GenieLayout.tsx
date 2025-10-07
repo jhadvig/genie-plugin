@@ -8,6 +8,8 @@ import '../genie.css';
 import '@patternfly/chatbot/dist/css/main.css';
 // Import react-grid-layout CSS
 import 'react-grid-layout/css/styles.css';
+import GenieLogo from '../../assets/GenieLogo.svg';
+import { HomeIcon } from '@patternfly/react-icons';
 
 interface GenieLayoutProps {
   title: string;
@@ -80,7 +82,7 @@ export function GenieLayout({ title, children, mainContent }: GenieLayoutProps) 
 
   return (
     <AIStateProvider stateManager={stateManager}>
-      <div className="genie-standalone">
+      <div className="genie">
         {/* @ts-ignore - React 17 compatibility with react-helmet */}
         <Helmet>
           <title>{title}</title>
@@ -88,38 +90,65 @@ export function GenieLayout({ title, children, mainContent }: GenieLayoutProps) 
         </Helmet>
 
         {/* Main Content Area */}
-        <main className="genie-main">
-          {mainContent}
-          <div className="genie-container">
-            <div className="genie-content">{children}</div>
+        <main>
+          <header>
+            <div className="header-container">
+              <div className="logo">
+                <img src={GenieLogo} alt="Red Hat Genie" />
+              </div>
+              <nav aria-label="Primary navigation">
+                <ul>
+                  <li><a href="/genie/widgets" className="active"><HomeIcon /></a></li>
+                  <li><a href="#">AI & Automation</a></li>
+                  <li><a href="#">Infrastructure</a></li>
+                  <li><a href="#">Analytics</a></li>
+                  <li><a href="#">Security</a></li>
+                  <li><a href="#">Marketplace</a></li>
+                  <li><a href="#">Develop</a></li>
+                  <li><a href="#">News</a></li>
+                  <li><a href="#">Support</a></li>
+                </ul>
+              </nav>
+            </div>
+          </header>
+          <div className="left-sidebar">
+            Left sidebar
           </div>
-        </main>
-
-        {/* Pinned Status at Bottom */}
-        <div className="genie-status-bottom">
-          <div className="genie-container">
-            <div className="genie-status">
-              <p>
-                <strong>📡 Health Check:</strong> <code>localhost:8080/readiness</code>
-                <span
-                  className={`genie-health-status ${
-                    connectionStatus.loading
-                      ? 'loading'
-                      : connectionStatus.success
-                      ? 'success'
-                      : 'error'
-                  }`}
-                >
-                  {connectionStatus.loading
-                    ? '🔄 Testing...'
-                    : connectionStatus.success
-                    ? '✅ Connected'
-                    : '❌ Failed'}
-                </span>
-              </p>
+          <div className="content">
+            {/* This is a temporary layout to display the chat interface and the dashboard side by side */}
+            <div className="chat-interface">
+              {children}
+            </div>
+            <div className="dashboard">
+              {mainContent}
             </div>
           </div>
-        </div>
+          <div className="right-sidebar">Right sidebar</div>
+          {/* Pinned Status at Bottom */}
+          <div className="genie-status-bottom">
+            <div className="genie-container">
+              <div className="genie-status">
+                <p>
+                  <strong>📡 Health Check:</strong> <code>localhost:8080/readiness</code>
+                  <span
+                    className={`genie-health-status ${connectionStatus.loading
+                        ? 'loading'
+                        : connectionStatus.success
+                          ? 'success'
+                          : 'error'
+                      }`}
+                  >
+                    {connectionStatus.loading
+                      ? '🔄 Testing...'
+                      : connectionStatus.success
+                        ? '✅ Connected'
+                        : '❌ Failed'}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     </AIStateProvider>
   );
