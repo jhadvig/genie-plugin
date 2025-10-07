@@ -844,6 +844,9 @@ func ListDashboardsHandler(layoutRepo *db.LayoutRepository) func(context.Context
                 LayoutID:    l.LayoutID,
                 Name:        l.Name,
                 Description: l.Description,
+                IsActive:    l.IsActive,
+                CreatedAt:   l.CreatedAt,
+                UpdatedAt:   l.UpdatedAt,
             })
         }
 

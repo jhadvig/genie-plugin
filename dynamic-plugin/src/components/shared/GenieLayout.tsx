@@ -100,7 +100,7 @@ export function GenieLayout({ title, children, mainContent }: GenieLayoutProps) 
               <nav aria-label="Primary navigation">
                 <ul>
                   <li><a href="/genie/widgets" className="active"><HomeIcon /></a></li>
-                  <li><a href="/genie/library" className="active"><BookIcon /></a></li>
+                  <li><a href="/genie/library"><BookIcon /></a></li>
                   <li><a href="#">AI & Automation</a></li>
                   <li><a href="#">Infrastructure</a></li>
                   <li><a href="#">Analytics</a></li>

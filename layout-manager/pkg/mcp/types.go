@@ -68,10 +68,13 @@ type WidgetInfo struct {
 
 // LayoutInfo represents layout information in responses
 type LayoutInfo struct {
-	ID          string `json:"id"`          // UUID
-	LayoutID    string `json:"layoutId"`    // Human-readable ID
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	ID          string    `json:"id"`          // UUID
+	LayoutID    string    `json:"layoutId"`    // Human-readable ID
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	IsActive    bool      `json:"isActive"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
 // FoundWidget represents a widget found by search (deprecated - use WidgetInfo)
