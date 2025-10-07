@@ -72,11 +72,11 @@ export default function GenieWidgetsPage() {
       mainContent={<DashboardLayout />}
     >
       <ChatInterface
-        welcomeTitle={t("Hello! I'm Genie")}
+        welcomeTitle={t("Hello! I'm Genie!")}
         welcomeDescription={t(
-          'Your AI assistant for OpenShift. Ask me to create dashboards and widgets!',
+          'An AI assistant for OpenShift.',
         )}
-        placeholder={t('Ask me to create a dashboard...')}
+        placeholder={t('Message Genie...')}
       />
     </GenieLayout>
   );
