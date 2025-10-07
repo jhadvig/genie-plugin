@@ -14,18 +14,22 @@
 
 3. Run NGUI
 
-   Use `quay.io/lkrzyzanek/next_gen_ui_mcp:dev` image
-
    ```sh
    export OPENAI_API_KEY="sk-..."
    podman run --rm -it -p 9200:9200 \
+      -v $PWD/ols-ngui:/opt/app-root/config:z \
       --env MCP_PORT="9200" \
-      --env NGUI_MODEL="gpt-4o" \
+      --env NGUI_MODEL="gpt-4o-mini" \
       --env NGUI_PROVIDER_API_KEY=$OPENAI_API_KEY \
-      quay.io/lkrzyzanek/next_gen_ui_mcp:dev
+      --env NGUI_CONFIG_PATH="/opt/app-root/config/ngui_openshift_mcp_config.yaml" \
+      quay.io/next-gen-ui/mcp
    ``` 
 
-    Or from git source: `python libs/next_gen_ui_mcp --provider langchain --model gpt-4o-mini  --port 9200 --transport streamable-http`
+Or from git source:
+    
+```sh
+PYTHONPATH=./libs python libs/next_gen_ui_mcp --provider langchain --model gpt-4o-mini  --port 9200 --transport streamable-http --config-path /Users/lkrzyzan/git/genie/genie-plugin/ols-ngui/ngui_openshift_mcp_config.yaml
+```
 
 ### Start OLS
 
