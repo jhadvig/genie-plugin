@@ -10,7 +10,7 @@ import {
   isAddWidgetEvent,
   parseAddWidgetEvent,
 } from '../services/eventParser';
-import { DashboardMCPClient } from '../services/dashboardMCPClient';
+import { DashboardMCPClient } from '../services/dashboardClient';
 import DashboardUtils, { NormalizedDashboard } from '../components/utils/dashboard.utils';
 
 export function useDashboards() {
