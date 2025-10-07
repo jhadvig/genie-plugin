@@ -812,6 +812,55 @@ func GetActiveDashboardHandler(layoutRepo *db.LayoutRepository) func(context.Con
 	}
 }
 
+// ListDashboardsHandler handles the list_dashboards tool
+func ListDashboardsHandler(layoutRepo *db.LayoutRepository) func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+    return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        log.Printf("[MCP] list_dashboards called")
+
+        // Parse pagination params (strings by tool schema)
+        limitStr := request.GetString("limit", "50")
+        offsetStr := request.GetString("offset", "0")
+
+        limit, err := strconv.Atoi(limitStr)
+        if err != nil || limit <= 0 {
+            limit = 50
+        }
+        offset, err := strconv.Atoi(offsetStr)
+        if err != nil || offset < 0 {
+            offset = 0
+        }
+
+        // Query repository
+        layouts, err := layoutRepo.List(limit, offset)
+        if err != nil {
+            return mcp.NewToolResultError(fmt.Sprintf("Failed to list dashboards: %v", err)), nil
+        }
+
+        // Map to LayoutInfo slice
+        list := make([]LayoutInfo, 0, len(layouts))
+        for _, l := range layouts {
+            list = append(list, LayoutInfo{
+                ID:          l.ID.String(),
+                LayoutID:    l.LayoutID,
+                Name:        l.Name,
+                Description: l.Description,
+            })
+        }
+
+        // Build response
+        response := MCPResponse{
+            Success:   true,
+            Operation: "list_dashboards",
+            Message:   fmt.Sprintf("Returned %d dashboard(s)", len(list)),
+            Timestamp: time.Now(),
+            Layouts:   list,
+        }
+
+        responseJSON, _ := json.Marshal(response)
+        return mcp.NewToolResultText(string(responseJSON)), nil
+    }
+}
+
 // boolPtr returns a pointer to a bool value
 func boolPtr(b bool) *bool {
 	return &b

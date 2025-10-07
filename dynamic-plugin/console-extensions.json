@@ -32,5 +32,13 @@
       "path": "/genie/widgets",
       "component": { "$codeRef": "GenieWidgetsPage" }
     }
+  },
+  {
+    "type": "console.page/route/standalone",
+    "properties": {
+      "exact": true,
+      "path": "/genie/library",
+      "component": { "$codeRef": "GenieLibraryPage" }
+    }
   }
 ]
