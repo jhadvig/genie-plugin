@@ -10,6 +10,17 @@ export type NormalizedDashboard = {
   widgets: DashboardWidget[];
 };
 
+type RawWidget = Partial<DashboardWidget> & {
+  i?: string;
+  id?: string;
+  x?: number;
+  y?: number;
+  w?: number;
+  h?: number;
+  position?: { x?: number; y?: number; w?: number; h?: number };
+  persesComponent?: string;
+};
+
 class DashboardUtils {
   static normalizeResponse(
     dashboard: CreateDashboardResponse | ActiveDashboardResponse | undefined,
@@ -18,6 +29,7 @@ class DashboardUtils {
 
     const maybeActive = dashboard as ActiveDashboardResponse;
     if (maybeActive.analysis && maybeActive.activeLayoutId) {
+      console.log('maybeActive', maybeActive);
       return {
         activeLayoutId: maybeActive.activeLayoutId,
         layout: {
@@ -46,30 +58,38 @@ class DashboardUtils {
   static normalizeWidgets(widgets?: DashboardWidget[]): DashboardWidget[] {
     if (!widgets || widgets.length === 0) return [];
 
-    return widgets
-      .filter((w) => w && (w as any).id != null)
-      .map((w) => {
+    const safeNumber = (value: unknown, fallback: number): number => {
+      const num = typeof value === 'number' ? value : Number(value);
+      return Number.isFinite(num) ? num : fallback;
+    };
+
+    return (widgets as RawWidget[])
+      .filter((w): w is RawWidget => w != null && (w.id != null || w.i != null))
+      .map((w): DashboardWidget => {
         const defaultPos = { x: 0, y: 0, w: 4, h: 4 };
-        const pos = (w as any).position ?? defaultPos;
-        const safeNumber = (value: unknown, fallback: number) => {
-          const num = typeof value === 'number' ? value : Number(value);
-          return Number.isFinite(num) ? num : fallback;
-        };
+        const pos = w.position ?? w;
 
         const normalizedPosition = {
-          x: safeNumber((pos as any).x, defaultPos.x),
-          y: safeNumber((pos as any).y, defaultPos.y),
-          w: Math.max(1, safeNumber((pos as any).w, defaultPos.w)),
-          h: Math.max(1, safeNumber((pos as any).h, defaultPos.h)),
+          x: safeNumber(pos.x, defaultPos.x),
+          y: safeNumber(pos.y, defaultPos.y),
+          w: Math.max(1, safeNumber(pos.w, defaultPos.w)),
+          h: Math.max(1, safeNumber(pos.h, defaultPos.h)),
         };
 
+        const componentType = w.componentType ?? 'chart';
+        const existingProps = w.props ?? {};
+        const persesComponent = w.persesComponent ?? existingProps.persesComponent ?? (componentType === 'chart' ? 'PersesTimeSeries' : undefined);
+
         return {
-          id: String((w as any).id),
-          componentType: (w as any).componentType ?? 'chart',
+          id: String(w.id ?? w.i),
+          componentType,
           position: normalizedPosition,
-          props: (w as any).props ?? {},
-          breakpoint: (w as any).breakpoint ?? 'lg',
-        } as DashboardWidget;
+          props: {
+            ...existingProps,
+            ...(persesComponent && { persesComponent }),
+          },
+          breakpoint: w.breakpoint ?? 'lg',
+        };
       });
   }
 }

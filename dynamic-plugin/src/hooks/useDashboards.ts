@@ -41,23 +41,23 @@ export function useDashboards() {
       } else if (isManipulateWidgetArgumentsEvent(toolCall)) {
         const manipulationArgs = parseManipulateWidgetArgumentsEvent(toolCall);
         if (manipulationArgs) {
-          // Find the widget and update its position directly
-          setWidgets((prev) =>
-            prev.map((w) =>
-              w.id === manipulationArgs.widgetId
-                ? {
-                    ...w,
-                    position: {
-                      ...w.position,
-                      x: manipulationArgs.position.x,
-                      y: manipulationArgs.position.y,
-                      ...(manipulationArgs.position.w && { w: manipulationArgs.position.w }),
-                      ...(manipulationArgs.position.h && { h: manipulationArgs.position.h }),
-                    },
-                  }
-                : w,
-            ),
-          );
+          // Find the widget and update its position directly, ensuring defaults
+          setWidgets((prev) => {
+            const next = prev.map((w) => {
+              if (w.id !== manipulationArgs.widgetId) return w;
+              const currentPos = w.position ?? { x: 0, y: 0, w: 4, h: 4 };
+              return {
+                ...w,
+                position: {
+                  x: manipulationArgs.position.x ?? currentPos.x,
+                  y: manipulationArgs.position.y ?? currentPos.y,
+                  w: manipulationArgs.position.w ?? currentPos.w,
+                  h: manipulationArgs.position.h ?? currentPos.h,
+                },
+              } as DashboardWidget;
+            });
+            return next;
+          });
         }
       } else if (isAddWidgetEvent(toolCall)) {
         const addWidgetResponse = parseAddWidgetEvent(toolCall);
@@ -90,8 +90,11 @@ export function useDashboards() {
         if (dashboards.length === 0) {
           const resp = await dashboardMCPClient.getActiveDashboard();
           if (resp) {
+            console.log('resp', resp);
             const normalizedActive = DashboardUtils.normalizeResponse(resp);
+            console.log('normalizedActive', normalizedActive);
             setActiveDashboard(normalizedActive);
+            setWidgets(normalizedActive?.widgets ?? []);
           }
         }
       } catch (error) {
