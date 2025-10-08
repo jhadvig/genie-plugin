@@ -32,6 +32,10 @@ export function useDashboards(dashboardId?: string) {
         return;
       }
 
+      const toolName = (toolCall as any).data.token.tool_name;
+      console.log('Tool called:', toolName);
+      console.log('Tool call data:', toolCall);
+
       if (isCreateDashboardEvent(toolCall)) {
         const dashboardResponse = parseCreateDashboardEvent(toolCall);
         if (dashboardResponse) {
@@ -110,6 +114,6 @@ export function useDashboards(dashboardId?: string) {
     dashboards,
     widgets,
     activeDashboard,
-    hasDashboards: dashboards.length > 0,
+    hasDashboards: dashboards.length > 0 || activeDashboard,
   };
 }
