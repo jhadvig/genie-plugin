@@ -1,0 +1,36 @@
+# Next Gen UI Configuration for Openshift MCP
+# 1. yaml transformation for all
+---
+input_data_json_wrapping: true
+
+data_types:
+  namespaces_list:
+    data_transformer: yaml
+    components:
+      - component: table
+        configuration:
+          title: Namespaces
+          fields:
+            - name: Name
+              data_path: $[*].metadata.name
+            - name: Created
+              data_path: $[*].metadata.creationTimestamp
+            - name: Status
+              data_path: $[*].status.phase
+  projects_list:
+    data_transformer: yaml
+  events_list:
+    data_transformer: yaml
+  pods_get:
+    data_transformer: yaml
+  pods_list:
+    data_transformer: yaml
+  pods_list_in_namespace:
+    data_transformer: yaml
+  # returning CSV data!!!
+  # pods_log:
+  #   data_transformer: yaml
+  # pods_top:
+  #   data_transformer: yaml
+  resources_list:
+    data_transformer: yaml

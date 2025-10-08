@@ -9,6 +9,9 @@
   "files.associations": {
     "**/console-extensions.json": "jsonc"
   },
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/RedHat-UX/next-gen-ui-agent/refs/heads/main/spec/config/agent_config.schema.json":  ["ngui_*.yaml", "ngui_*.yml"]
+  },
   "json.schemas": [
     {
       "fileMatch": ["**/console-extensions.json"],
