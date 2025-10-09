@@ -19,7 +19,9 @@ export function useDashboards(dashboardId?: string) {
   const [dashboards, setDashboards] = useState<CreateDashboardResponse[]>([]);
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
   const dashboardClient = useRef(new DashboardMCPClient());
-  const [activeDashboard, setActiveDashboard] = useState<NormalizedDashboard | undefined>(undefined);
+  const [activeDashboard, setActiveDashboard] = useState<NormalizedDashboard | undefined>(
+    undefined,
+  );
 
   function handleToolCalls(toolCalls: any[]) {
     toolCalls.forEach((toolCall) => {
@@ -75,7 +77,10 @@ export function useDashboards(dashboardId?: string) {
 
   useEffect(() => {
     if (streamChunk && streamChunk.additionalAttributes?.toolCalls) {
-      console.log('streamChunk.additionalAttributes.toolCalls', streamChunk.additionalAttributes.toolCalls);
+      console.log(
+        'streamChunk.additionalAttributes.toolCalls',
+        streamChunk.additionalAttributes.toolCalls,
+      );
       handleToolCalls(streamChunk.additionalAttributes.toolCalls);
     }
   }, [streamChunk]);
