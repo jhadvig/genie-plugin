@@ -230,7 +230,18 @@ class DefaultStreamingHandler implements ISimpleStreamingHandler<string | Stream
       if (!additionalAttributes.toolCalls) {
         additionalAttributes.toolCalls = [];
       }
-      additionalAttributes.toolCalls.push(event);
+      const event_data = (event as any).data;
+      additionalAttributes.toolCalls.push({
+        event: 'tool_result',
+        data: {
+          token: {
+            tool_name: event_data.tool_name,
+            response: event_data.content,
+            artifact: event_data.artifact,
+            status: event_data.status,
+          },
+        },
+      });
     } else if (isErrorEvent(event)) {
       // Handle error events
       const error = new Error(event.data.response);
