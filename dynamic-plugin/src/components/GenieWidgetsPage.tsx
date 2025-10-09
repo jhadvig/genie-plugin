@@ -17,22 +17,25 @@ function DashboardLayout() {
   const dashboardClient = useRef(new DashboardMCPClient());
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleLayoutChange = useCallback((layout: any[]) => {
-    if (!activeDashboard?.layout?.layoutId) return;
+  const handleLayoutChange = useCallback(
+    (layout: any[]) => {
+      if (!activeDashboard?.layout?.layoutId) return;
 
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-
-    saveTimeoutRef.current = setTimeout(async () => {
-      try {
-        await dashboardClient.current.updateWidgetPositions(layout);
-        console.log('Layout saved successfully');
-      } catch (error) {
-        console.error('Failed to save layout:', error);
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
       }
-    }, 1000); // wait 1 second after user stops dragging to save the layout
-  }, [activeDashboard?.layout?.layoutId]);
+
+      saveTimeoutRef.current = setTimeout(async () => {
+        try {
+          await dashboardClient.current.updateWidgetPositions(layout);
+          console.log('Layout saved successfully');
+        } catch (error) {
+          console.error('Failed to save layout:', error);
+        }
+      }, 1000); // wait 1 second after user stops dragging to save the layout
+    },
+    [activeDashboard?.layout?.layoutId],
+  );
 
   return (
     <div style={{ padding: '20px' }}>
@@ -88,16 +91,12 @@ export default function GenieWidgetsPage() {
   const { t } = useTranslation('plugin__genie-plugin');
 
   return (
-    <GenieLayout
-      title={t('Genie Widgets - AI Dashboard Assistant')}
-    >
+    <GenieLayout title={t('Genie Widgets - AI Dashboard Assistant')}>
       {/* This is a temporary layout to display the chat interface and the dashboard side by side */}
       <div className="chat-interface">
         <ChatInterface
           welcomeTitle={t("Hello! I'm Genie!")}
-          welcomeDescription={t(
-            'An AI assistant for OpenShift.',
-          )}
+          welcomeDescription={t('An AI assistant for OpenShift.')}
           placeholder={t('Message Genie...')}
         />
       </div>

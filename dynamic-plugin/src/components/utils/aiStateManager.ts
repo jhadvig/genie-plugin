@@ -1,8 +1,9 @@
 import { createClientStateManager } from '@redhat-cloud-services/ai-client-state';
-import { LightspeedClient } from '@redhat-cloud-services/lightspeed-client';
+// import { LightspeedClient } from '@redhat-cloud-services/lightspeed-client';
+import { OLSClient } from './olsClient';
 
 // Initialize state manager outside React scope (following Red Hat Cloud Services pattern)
-const client = new LightspeedClient({
+const client = new OLSClient({
   baseUrl: 'http://localhost:8080',
   fetchFunction: (input, init) => fetch(input, init),
 });
