@@ -36,6 +36,20 @@ export function WidgetRenderer({ widget }: WidgetRendererProps) {
           </div>
         );
 
+      case 'ngui':
+        return (
+          <div>
+            {widget.props.title && (
+              <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'bold' }}>
+                {widget.props.title}
+              </h3>
+            )}
+            <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>
+              {widget.props.content || 'No content available'}
+            </p>
+          </div>
+        );
+
       case 'chart':
         return (
           <div>
