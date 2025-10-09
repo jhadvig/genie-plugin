@@ -87,6 +87,10 @@ export function useDashboards(dashboardId?: string) {
 
   useEffect(() => {
     if (streamChunk && streamChunk.additionalAttributes?.toolCalls) {
+      if (streamChunk && streamChunk.answer !== '') {
+        console.log('stream chunk from Answer. Do not call tool_calls');
+        return;
+      }
       console.log(
         'streamChunk.additionalAttributes.toolCalls',
         streamChunk.additionalAttributes.toolCalls,
