@@ -1,17 +1,38 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { useDashboards } from '../hooks/useDashboards';
 import { DashboardGrid } from './Dashboard';
 import { ChatInterface, GenieLayout } from './shared';
+import { DashboardMCPClient } from '../services/dashboardClient';
 import './utils/reactPolyfills';
 
 // Dashboard Layout component
 function DashboardLayout() {
-  const { widgets, activeDashboard, hasDashboards } = useDashboards();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const dashboardId = searchParams.get('dashboardId');
 
-  const handleLayoutChange = (layout: any[]) => {
-    // Here you could persist the layout changes if needed
-  };
+  const { widgets, activeDashboard, hasDashboards } = useDashboards(dashboardId || undefined);
+  const dashboardClient = useRef(new DashboardMCPClient());
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleLayoutChange = useCallback((layout: any[]) => {
+    if (!activeDashboard?.layout?.layoutId) return;
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        await dashboardClient.current.updateWidgetPositions(layout);
+        console.log('Layout saved successfully');
+      } catch (error) {
+        console.error('Failed to save layout:', error);
+      }
+    }, 1000); // wait 1 second after user stops dragging to save the layout
+  }, [activeDashboard?.layout?.layoutId]);
 
   return (
     <div style={{ padding: '20px' }}>
@@ -69,15 +90,20 @@ export default function GenieWidgetsPage() {
   return (
     <GenieLayout
       title={t('Genie Widgets - AI Dashboard Assistant')}
-      mainContent={<DashboardLayout />}
     >
-      <ChatInterface
-        welcomeTitle={t("Hello! I'm Genie")}
-        welcomeDescription={t(
-          'Your AI assistant for OpenShift. Ask me to create dashboards and widgets!',
-        )}
-        placeholder={t('Ask me to create a dashboard...')}
-      />
+      {/* This is a temporary layout to display the chat interface and the dashboard side by side */}
+      <div className="chat-interface">
+        <ChatInterface
+          welcomeTitle={t("Hello! I'm Genie!")}
+          welcomeDescription={t(
+            'An AI assistant for OpenShift.',
+          )}
+          placeholder={t('Message Genie...')}
+        />
+      </div>
+      <div className="dashboard">
+        <DashboardLayout />
+      </div>
     </GenieLayout>
   );
 }

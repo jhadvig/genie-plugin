@@ -80,7 +80,7 @@ func (r *LayoutRepository) List(limit, offset int) ([]models.Layout, error) {
 func (r *LayoutRepository) SetActiveLayout(layoutID string) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		// Deactivate all layouts
-		if err := tx.Model(&models.Layout{}).Update("is_active", false).Error; err != nil {
+		if err := tx.Model(&models.Layout{}).Where("1 = 1").Update("is_active", false).Error; err != nil {
 			return err
 		}
 

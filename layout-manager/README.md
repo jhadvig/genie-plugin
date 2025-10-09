@@ -85,6 +85,12 @@ Get insights about dashboard structure
 
 ### 8. `batch_widget_operations`
 Execute multiple operations in sequence
+### 9. `list_dashboards`
+List dashboards from the database (active first, then newest)
+```
+"List dashboards"
+"Show all dashboards"
+```
 ```
 "Resize widget-abc to 6x4, then move widget-def to x=0, y=3"
 ```

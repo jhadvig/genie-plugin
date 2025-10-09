@@ -186,13 +186,13 @@ func ManipulateWidgetHandler(layoutRepo *db.LayoutRepository) func(context.Conte
 
 			// Record the change
 			allChanges = append(allChanges, WidgetChange{
-				WidgetID:    widgetID,
-				Action:      "moved",
-				Breakpoint:  breakpoint,
-				WasTargeted: true,
-				Reason:      "direct move operation",
+				WidgetID:      widgetID,
+				Action:        "moved",
+				Breakpoint:    breakpoint,
+				WasTargeted:   true,
+				Reason:        "direct move operation",
 				PreviousState: map[string]interface{}{"x": oldWidget.X, "y": oldWidget.Y},
-				NewState:     map[string]interface{}{"x": x, "y": y},
+				NewState:      map[string]interface{}{"x": x, "y": y},
 			})
 
 			operationMessage = fmt.Sprintf("Moved widget '%s' to position (%d, %d)", widgetID, x, y)
@@ -217,13 +217,13 @@ func ManipulateWidgetHandler(layoutRepo *db.LayoutRepository) func(context.Conte
 
 			// Record the change
 			allChanges = append(allChanges, WidgetChange{
-				WidgetID:    widgetID,
-				Action:      "resized",
-				Breakpoint:  breakpoint,
-				WasTargeted: true,
-				Reason:      "direct resize operation",
+				WidgetID:      widgetID,
+				Action:        "resized",
+				Breakpoint:    breakpoint,
+				WasTargeted:   true,
+				Reason:        "direct resize operation",
 				PreviousState: map[string]interface{}{"w": oldWidget.W, "h": oldWidget.H},
-				NewState:     map[string]interface{}{"w": w, "h": h},
+				NewState:      map[string]interface{}{"w": w, "h": h},
 			})
 
 			operationMessage = fmt.Sprintf("Resized widget '%s' to %dx%d", widgetID, w, h)
@@ -764,12 +764,12 @@ func GetActiveDashboardHandler(layoutRepo *db.LayoutRepository) func(context.Con
 		if includeAllBreakpoints {
 			// Return full schema with all breakpoints
 			responseData = map[string]interface{}{
-				"layoutId":     activeLayout.LayoutID,
-				"name":         activeLayout.Name,
-				"description":  activeLayout.Description,
-				"breakpoints":  schema.Breakpoints,
-				"cols":         schema.Cols,
-				"layouts":      schema.Layouts,
+				"layoutId":          activeLayout.LayoutID,
+				"name":              activeLayout.Name,
+				"description":       activeLayout.Description,
+				"breakpoints":       schema.Breakpoints,
+				"cols":              schema.Cols,
+				"layouts":           schema.Layouts,
 				"globalConstraints": schema.GlobalConstraints,
 			}
 		} else {
@@ -785,12 +785,12 @@ func GetActiveDashboardHandler(layoutRepo *db.LayoutRepository) func(context.Con
 			}
 
 			responseData = map[string]interface{}{
-				"layoutId":    activeLayout.LayoutID,
-				"name":        activeLayout.Name,
-				"description": activeLayout.Description,
-				"breakpoint":  breakpoint,
-				"cols":        cols,
-				"widgets":     widgets,
+				"layoutId":          activeLayout.LayoutID,
+				"name":              activeLayout.Name,
+				"description":       activeLayout.Description,
+				"breakpoint":        breakpoint,
+				"cols":              cols,
+				"widgets":           widgets,
 				"globalConstraints": schema.GlobalConstraints,
 			}
 		}
@@ -810,6 +810,144 @@ func GetActiveDashboardHandler(layoutRepo *db.LayoutRepository) func(context.Con
 		responseJSON, _ := json.Marshal(response)
 		return mcp.NewToolResultText(string(responseJSON)), nil
 	}
+}
+
+// ListDashboardsHandler handles the list_dashboards tool
+func ListDashboardsHandler(layoutRepo *db.LayoutRepository) func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+    return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        log.Printf("[MCP] list_dashboards called")
+
+        // Parse pagination params (strings by tool schema)
+        limitStr := request.GetString("limit", "50")
+        offsetStr := request.GetString("offset", "0")
+
+        limit, err := strconv.Atoi(limitStr)
+        if err != nil || limit <= 0 {
+            limit = 50
+        }
+        offset, err := strconv.Atoi(offsetStr)
+        if err != nil || offset < 0 {
+            offset = 0
+        }
+
+        // Query repository
+        layouts, err := layoutRepo.List(limit, offset)
+        if err != nil {
+            return mcp.NewToolResultError(fmt.Sprintf("Failed to list dashboards: %v", err)), nil
+        }
+
+        // Map to LayoutInfo slice
+        list := make([]LayoutInfo, 0, len(layouts))
+        for _, l := range layouts {
+            list = append(list, LayoutInfo{
+                ID:          l.ID.String(),
+                LayoutID:    l.LayoutID,
+                Name:        l.Name,
+                Description: l.Description,
+                IsActive:    l.IsActive,
+                CreatedAt:   l.CreatedAt,
+                UpdatedAt:   l.UpdatedAt,
+            })
+        }
+
+        // Build response
+        response := MCPResponse{
+            Success:   true,
+            Operation: "list_dashboards",
+            Message:   fmt.Sprintf("Returned %d dashboard(s)", len(list)),
+            Timestamp: time.Now(),
+            Layouts:   list,
+        }
+
+        responseJSON, _ := json.Marshal(response)
+        return mcp.NewToolResultText(string(responseJSON)), nil
+    }
+}
+
+// GetDashboardHandler handles the get_dashboard tool
+func GetDashboardHandler(layoutRepo *db.LayoutRepository) func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+    return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        log.Printf("[MCP] get_dashboard called")
+
+        // Parse request parameters
+        layoutID, err := request.RequireString("layout_id")
+        if err != nil {
+            return mcp.NewToolResultError("layout_id parameter is required"), nil
+        }
+
+        breakpoint := request.GetString("breakpoint", "lg")
+        includeAllBreakpoints := request.GetBool("include_all_breakpoints", false)
+
+        log.Printf("[MCP] get_dashboard: layoutID=%s, breakpoint=%s, includeAll=%v", layoutID, breakpoint, includeAllBreakpoints)
+
+        // Get the dashboard by layout ID
+        dashboard, err := layoutRepo.GetByLayoutID(layoutID)
+        if err != nil {
+            return mcp.NewToolResultError(fmt.Sprintf("Dashboard not found: %v", err)), nil
+        }
+
+        // Set this dashboard as active and deactivate all others
+        if err := layoutRepo.SetActiveLayout(layoutID); err != nil {
+            return mcp.NewToolResultError(fmt.Sprintf("Failed to set dashboard as active: %v", err)), nil
+        }
+
+        log.Printf("[MCP] get_dashboard: set dashboard '%s' as active", layoutID)
+
+        // Get the schema directly
+        schema := dashboard.Schema.Data()
+
+        // Prepare response data
+        var responseData map[string]interface{}
+
+        if includeAllBreakpoints {
+            // Return full schema with all breakpoints
+            responseData = map[string]interface{}{
+                "layoutId":          dashboard.LayoutID,
+                "name":              dashboard.Name,
+                "description":       dashboard.Description,
+                "breakpoints":       schema.Breakpoints,
+                "cols":              schema.Cols,
+                "layouts":           schema.Layouts,
+                "globalConstraints": schema.GlobalConstraints,
+            }
+        } else {
+            // Return only the specified breakpoint
+            widgets, exists := schema.Layouts[breakpoint]
+            if !exists {
+                widgets = []models.LayoutItem{}
+            }
+
+            cols, colsExist := schema.Cols[breakpoint]
+            if !colsExist {
+                cols = 12 // Default
+            }
+
+            responseData = map[string]interface{}{
+                "layoutId":          dashboard.LayoutID,
+                "name":              dashboard.Name,
+                "description":       dashboard.Description,
+                "breakpoint":        breakpoint,
+                "cols":              cols,
+                "widgets":           widgets,
+                "globalConstraints": schema.GlobalConstraints,
+            }
+        }
+
+        // Create response
+        response := MCPResponse{
+            Success:        true,
+            Operation:      "get_dashboard",
+            ActiveLayoutID: dashboard.LayoutID,
+            Analysis:       responseData,
+            Message:        fmt.Sprintf("Retrieved and activated dashboard '%s' for breakpoint '%s'", dashboard.Name, breakpoint),
+            Timestamp:      time.Now(),
+        }
+
+        log.Printf("[MCP] get_dashboard result: returned and activated dashboard %s", dashboard.LayoutID)
+
+        responseJSON, _ := json.Marshal(response)
+        return mcp.NewToolResultText(string(responseJSON)), nil
+    }
 }
 
 // boolPtr returns a pointer to a bool value

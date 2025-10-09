@@ -69,7 +69,7 @@ export function ChatInterface({
   };
 
   return (
-    <Chatbot displayMode={ChatbotDisplayMode.docked}>
+    <Chatbot displayMode={ChatbotDisplayMode.embedded}>
       <ChatbotContent>
         <ChatbotWelcomePrompt
           title={welcomeTitle || t("Hello! I'm Genie")}
