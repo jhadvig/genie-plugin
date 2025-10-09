@@ -11,6 +11,24 @@ import (
 	"github.com/layout-manager/api/pkg/mcp"
 )
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set headers to allow all origins, methods, and headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Expose-Headers", "*")
+		// Handle preflight requests (OPTIONS method)
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Pass control to the next handler
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	log.Println("Layout Manager MCP Server starting...")
 
@@ -48,9 +66,11 @@ func main() {
 
 	// Create MCP HTTP server
 	mcpMux := http.NewServeMux()
+
+	corsHandler := corsMiddleware(mcpMux)
 	mcpHTTPServer := &http.Server{
 		Addr:    mcpAddr,
-		Handler: mcpMux,
+		Handler: corsHandler,
 	}
 
 	// Create streamable HTTP server from MCP server
