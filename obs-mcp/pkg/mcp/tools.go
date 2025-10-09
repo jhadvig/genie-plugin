@@ -5,9 +5,14 @@ import (
 )
 
 func CreateListMetricsTool() mcp.Tool {
-	return mcp.NewTool("list_metrics",
+	tool := mcp.NewTool("list_metrics",
 		mcp.WithDescription("List all available metrics in Prometheus"),
 	)
+	// workaround for tool with no parameter
+	// see https://github.com/containers/kubernetes-mcp-server/pull/341/files#diff-8f8a99cac7a7cbb9c14477d40539efa1494b62835603244ba9f10e6be1c7e44c
+	tool.InputSchema = mcp.ToolInputSchema{}
+	tool.RawInputSchema = []byte(`{"type":"object","properties":{}}`)
+	return tool
 }
 
 func CreateExecuteRangeQueryTool() mcp.Tool {
