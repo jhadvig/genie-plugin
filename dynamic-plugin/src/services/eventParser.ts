@@ -6,6 +6,7 @@ import {
   ManipulateWidgetArgumentsEvent,
   AddWidgetEvent,
   AddWidgetResponse,
+  GenerateUIEvent,
 } from '../types/dashboard';
 
 export type ToolCallEvent =
@@ -13,6 +14,7 @@ export type ToolCallEvent =
   | ManipulateWidgetEvent
   | ManipulateWidgetArgumentsEvent
   | AddWidgetEvent
+  | GenerateUIEvent
   | any;
 
 export function isCreateDashboardEvent(event: any): event is CreateDashboardEvent {
@@ -180,6 +182,55 @@ export function parseManipulateWidgetArgumentsEvent(event: ManipulateWidgetArgum
     console.error('Failed to parse manipulate widget arguments event:', error);
     return null;
   }
+}
+
+export function isGenerateUIEvent(event: any): event is GenerateUIEvent {
+  return (
+    event &&
+    event.event === 'tool_result' &&
+    event.data &&
+    event.data.token &&
+    typeof event.data.token === 'object' &&
+    event.data.token.tool_name === 'generate_ui' &&
+    (event.data.token.artifact || event.data.token.response)
+  );
+}
+
+type NguiResponseObject = {
+  id: string;
+  content: string;
+};
+
+export function parseGenerateUIEvent(event: GenerateUIEvent): AddWidgetResponse | null {
+  if (!isGenerateUIEvent(event)) {
+    return null;
+  }
+  const ngui_response: NguiResponseObject[] = JSON.parse(event.data.token.artifact);
+  const result = {
+    widgets: ngui_response.map((ngui_block) => {
+      console.log('NGUI BLOCK:', ngui_block);
+      const component = JSON.parse(ngui_block.content);
+      console.log('NGUI component:', component);
+      return {
+        componentType: 'ngui',
+        id: ngui_block.id,
+        widget_id: ngui_block.id,
+        props: {
+          title: component.title,
+          content: ngui_block.content,
+        },
+        position: {
+          x: 1,
+          y: 1,
+          w: 3,
+          h: 3,
+        },
+        breakpoint: '',
+      } as DashboardWidget;
+    }),
+  };
+
+  return result as unknown as AddWidgetResponse;
 }
 
 export function extractWidgetsFromDashboard(

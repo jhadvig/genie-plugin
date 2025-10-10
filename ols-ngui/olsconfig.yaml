@@ -69,6 +69,12 @@ mcp_servers:
       url: http://localhost:9100/mcp
       timeout: 60
       sse_read_timeout: 60
+  - name: layout-manager
+    transport: streamable_http
+    streamable_http:
+      url: http://localhost:9081/mcp
+      timeout: 60
+      sse_read_timeout: 60
   - name: next-gen-ui
     transport: streamable_http
     streamable_http:

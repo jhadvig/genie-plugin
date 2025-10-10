@@ -9,6 +9,8 @@ import {
   parseManipulateWidgetArgumentsEvent,
   isAddWidgetEvent,
   parseAddWidgetEvent,
+  isGenerateUIEvent,
+  parseGenerateUIEvent,
 } from '../services/eventParser';
 import { DashboardMCPClient } from '../services/dashboardClient';
 import DashboardUtils, { NormalizedDashboard } from '../components/utils/dashboard.utils';
@@ -31,6 +33,7 @@ export function useDashboards(dashboardId?: string) {
         typeof (toolCall as any).data.token !== 'object' ||
         !(toolCall as any).data.token.tool_name
       ) {
+        console.log('Tool call is empty or invalid', toolCall);
         return;
       }
 
@@ -71,17 +74,28 @@ export function useDashboards(dashboardId?: string) {
           // Add all widgets from the response (usually just one)
           setWidgets((prev) => [...prev, ...(addWidgetResponse.widgets ?? [])]);
         }
+      } else if (isGenerateUIEvent(toolCall)) {
+        console.log('NGUI widget', toolCall.data.token.artifact);
+        const generateUIResponse = parseGenerateUIEvent(toolCall);
+        if (generateUIResponse) {
+          // Add all widgets from the response (usually just one)
+          setWidgets((prev) => [...prev, ...(generateUIResponse.widgets ?? [])]);
+        }
       }
     });
   }
 
   useEffect(() => {
     if (streamChunk && streamChunk.additionalAttributes?.toolCalls) {
-      console.log(
-        'streamChunk.additionalAttributes.toolCalls',
-        streamChunk.additionalAttributes.toolCalls,
-      );
-      handleToolCalls(streamChunk.additionalAttributes.toolCalls);
+      if (streamChunk && streamChunk.answer !== '') {
+        console.log('stream chunk from Answer. Do not call tool_calls');
+      } else {
+        console.log(
+          'streamChunk.additionalAttributes.toolCalls',
+          streamChunk.additionalAttributes.toolCalls,
+        );
+        handleToolCalls(streamChunk.additionalAttributes.toolCalls);
+      }
     }
   }, [streamChunk]);
 

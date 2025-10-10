@@ -1,6 +1,6 @@
 export type DashboardWidget = {
   id: string;
-  componentType: 'text' | 'chart';
+  componentType: 'text' | 'chart' | 'ngui';
   position: {
     x: number;
     y: number;
@@ -113,6 +113,18 @@ export type AddWidgetEvent = {
     token: {
       tool_name: 'add_widget';
       response: AddWidgetResponse;
+    };
+  };
+};
+
+export type GenerateUIEvent = {
+  event: 'tool_result';
+  data: {
+    id: number;
+    token: {
+      tool_name: 'generate_ui';
+      response: string;
+      artifact: string;
     };
   };
 };
