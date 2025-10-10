@@ -89,13 +89,13 @@ export function useDashboards(dashboardId?: string) {
     if (streamChunk && streamChunk.additionalAttributes?.toolCalls) {
       if (streamChunk && streamChunk.answer !== '') {
         console.log('stream chunk from Answer. Do not call tool_calls');
-        return;
+      } else {
+        console.log(
+          'streamChunk.additionalAttributes.toolCalls',
+          streamChunk.additionalAttributes.toolCalls,
+        );
+        handleToolCalls(streamChunk.additionalAttributes.toolCalls);
       }
-      console.log(
-        'streamChunk.additionalAttributes.toolCalls',
-        streamChunk.additionalAttributes.toolCalls,
-      );
-      handleToolCalls(streamChunk.additionalAttributes.toolCalls);
     }
   }, [streamChunk]);
 
