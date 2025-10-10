@@ -205,6 +205,11 @@ export function parseGenerateUIEvent(event: GenerateUIEvent): AddWidgetResponse 
   if (!isGenerateUIEvent(event)) {
     return null;
   }
+  if (event.data.token.status == 'error') {
+    console.error('Error in NGUI TOOL', event.data.token);
+    return null;
+  }
+
   const ngui_response: NguiResponseObject[] = JSON.parse(event.data.token.artifact);
   const result = {
     widgets: ngui_response.map((ngui_block) => {
@@ -220,10 +225,10 @@ export function parseGenerateUIEvent(event: GenerateUIEvent): AddWidgetResponse 
           content: ngui_block.content,
         },
         position: {
-          x: 1,
-          y: 1,
-          w: 3,
-          h: 3,
+          x: 0,
+          y: 0,
+          w: 6,
+          h: 10,
         },
         breakpoint: '',
       } as DashboardWidget;

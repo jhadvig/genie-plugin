@@ -27,9 +27,27 @@ data_types:
     data_transformer: yaml
   pods_list_in_namespace:
     data_transformer: yaml
+    components:
+      - component: table
+        configuration:
+          title: Pods
+          fields:
+            - name: Name
+              data_path: $[*].metadata.name
+            - name: Status
+              data_path: $[*].status.phase
+            - name: Started
+              data_path: $[*].status.containerStatuses[*].started
+            - name: Restarts
+              data_path: $[*].status.containerStatuses[*].restartCount
+            - name: Created
+              data_path: $[*].metadata.creationTimestamp
+
   # returning CSV data!!!
-  # pods_log:
-  #   data_transformer: yaml
+  pods_log:
+    data_transformer: yaml
+    components:
+      - component: text
   # pods_top:
   #   data_transformer: yaml
   resources_list:

@@ -125,6 +125,7 @@ export type GenerateUIEvent = {
       tool_name: 'generate_ui';
       response: string;
       artifact: string;
+      status: string;
     };
   };
 };
