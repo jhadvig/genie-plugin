@@ -1,5 +1,6 @@
 import React from 'react';
 import { DashboardWidget } from '../../types/dashboard';
+import DynamicComponent from 'dynamicui';
 
 const componentMapper = {
   PersesTimeSeries: React.lazy(() => import('../PersesBindings/PersesWidgets/PersesTimeSeries')),
@@ -37,18 +38,20 @@ export function WidgetRenderer({ widget }: WidgetRendererProps) {
         );
 
       case 'ngui':
-        return (
-          <div>
-            {widget.props.title && (
-              <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'bold' }}>
-                {widget.props.title}
-              </h3>
-            )}
-            <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>
-              {widget.props.content || 'No content available'}
-            </p>
-          </div>
-        );
+        console.log(JSON.parse(widget.props.content));
+        return <DynamicComponent config={JSON.parse(widget.props.content)} />;
+      // return (
+      //   <div>
+      //     {widget.props.title && (
+      //       <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'bold' }}>
+      //         {widget.props.title}
+      //       </h3>
+      //     )}
+      //     <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.4' }}>
+      //       {widget.props.content || 'No content available'}
+      //     </p>
+      //   </div>
+      // );
 
       case 'chart':
         return (
@@ -71,7 +74,8 @@ export function WidgetRenderer({ widget }: WidgetRendererProps) {
               </div>
               {widget.props.query && (
                 <div style={{ marginBottom: '8px' }}>
-                  <strong>Query:</strong> <code style={{ fontSize: '11px' }}>{widget.props.query}</code>
+                  <strong>Query:</strong>{' '}
+                  <code style={{ fontSize: '11px' }}>{widget.props.query}</code>
                 </div>
               )}
               {widget.props.duration && (
