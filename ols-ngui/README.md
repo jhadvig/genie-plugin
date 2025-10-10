@@ -72,3 +72,37 @@ curl --request POST \
 ```
 
 You can change `"media_type": "application/json",` to `"media_type": "text/plain",`
+
+
+## Conversation Examples
+
+### Openshift Namespace to Pod
+
+```
+what are my namespaces, generate ui
+
+what pods are running in openshift-lightspeed namespace, generate ui
+    what pods are running in openshift-lightspeed namespace
+
+tell me all details about pod lightspeed-app-server-8d87bd889-rhxm4, generate ui
+	generate again the component about that pod
+
+what is restart policy for that pod?
+what is restart policy for that pod, generate ui
+    ^ This is fully generated one card component
+```
+
+### Unknown data - Dashboards
+
+```
+what pods are running in openshift-lightspeed namespace, generate ui
+
+what are my dashboards? generate ui
+	what are my dashboards? Include all possible information, generate ui
+```
+
+### Perses
+
+```
+create a dashboard called Libor POC and add a widget showing me the CPU usage for the pods in my openshift-monitoring namespace over the last hour
+```
