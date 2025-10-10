@@ -56,11 +56,11 @@ const TimeSeries = ({ query }: PersesTableProps) => {
       : [];
 
   return (
-    <div ref={boxRef} style={{ width: '100%', height: '400px' }}>
+    <div ref={boxRef} style={{ width: '100%', height: '100%', overflow: 'auto' }}>
       <DataQueriesProvider definitions={definitions} options={{ suggestedStepMs, mode: 'range' }}>
         <Panel
           panelOptions={{
-            hideHeader: true,
+            hideHeader: false,
           }}
           definition={{
             kind: 'Panel',
@@ -92,7 +92,7 @@ const PersesTable = (props: PersesTableProps) => {
   );
   return (
     <PersesWidgetWrapper>
-      <TimeRangeProvider timeRange={timeRange} refreshInterval="0s">
+      <TimeRangeProvider timeRange={timeRange} refreshInterval="6s">
         <TimeSeries {...timeSeriesProps} />
       </TimeRangeProvider>
     </PersesWidgetWrapper>

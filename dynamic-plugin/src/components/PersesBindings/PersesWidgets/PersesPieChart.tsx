@@ -6,11 +6,11 @@ import {
   useSuggestedStepMs,
 } from '@perses-dev/plugin-system';
 import { DEFAULT_PROM } from '@perses-dev/prometheus-plugin';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import useResizeObserver from 'use-resize-observer';
 import PersesWidgetWrapper from '../PersesWidgetWrapper';
 
-type PersesTimeSeriesProps = {
+type PersesPieChartProps = {
   duration: string;
   end: string;
   query: string;
@@ -34,9 +34,10 @@ const useTimeRange = (start?: string, end?: string, duration?: string) => {
   return result;
 };
 
-const TimeSeries = ({ query }: PersesTimeSeriesProps) => {
+const TimeSeries = ({ query }: PersesPieChartProps) => {
   const datasource = DEFAULT_PROM;
-  const { width, ref: boxRef } = useResizeObserver();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const { width } = useResizeObserver({ ref: panelRef });
   const suggestedStepMs = useSuggestedStepMs(width);
 
   const definitions =
@@ -56,7 +57,7 @@ const TimeSeries = ({ query }: PersesTimeSeriesProps) => {
       : [];
 
   return (
-    <div ref={boxRef} style={{ width: '100%', height: '100%' }}>
+    <div ref={panelRef} style={{ width: '100%', height: '100%' }}>
       <DataQueriesProvider definitions={definitions} options={{ suggestedStepMs, mode: 'range' }}>
         <Panel
           panelOptions={{
@@ -68,11 +69,11 @@ const TimeSeries = ({ query }: PersesTimeSeriesProps) => {
               queries: [],
               display: { name: '' },
               plugin: {
-                kind: 'TimeSeriesChart',
+                kind: 'PieChart',
                 spec: {
-                  visual: {
-                    stack: 'all',
-                  },
+                  calculation: 'last',
+                  legend: { placement: 'right' },
+                  value: { placement: 'center' },
                 },
               },
             },
@@ -83,7 +84,7 @@ const TimeSeries = ({ query }: PersesTimeSeriesProps) => {
   );
 };
 
-const PersesTimeSeries = (props: PersesTimeSeriesProps) => {
+const PersesPieChart = (props: PersesPieChartProps) => {
   const timeSeriesProps = props;
   const timeRange = useTimeRange(
     timeSeriesProps.start,
@@ -99,4 +100,4 @@ const PersesTimeSeries = (props: PersesTimeSeriesProps) => {
   );
 };
 
-export default PersesTimeSeries;
+export default PersesPieChart;

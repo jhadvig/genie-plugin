@@ -154,7 +154,7 @@ export const MockedTimeSeries = (props: TimeSeriesProps) => {
           <TimeRangeProvider timeRange={persesTimeRange}>
             <VariableProvider>
               <DatasourceStoreProvider datasourceApi={datasourceApi}>
-                <div style={{ width: '500px', height: '200px' }}>
+                <div style={{ width: '100%', height: '100%' }}>
                   <TimeRangeProvider timeRange={timeRange} refreshInterval="0s">
                     <TimeSeries {...timeSeriesProps} />
                   </TimeRangeProvider>
