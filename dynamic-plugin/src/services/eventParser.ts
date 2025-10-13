@@ -216,13 +216,19 @@ export function parseGenerateUIEvent(event: GenerateUIEvent): AddWidgetResponse 
       console.log('NGUI BLOCK:', ngui_block);
       const component = JSON.parse(ngui_block.content);
       console.log('NGUI component:', component);
+      let componentType = 'ngui';
+      let content = ngui_block.content;
+      if (component.component == 'text') {
+        componentType = 'text';
+        const ngui_content = JSON.parse(ngui_block.content);
+        content = ngui_content.data;
+      }
       return {
-        componentType: 'ngui',
-        id: ngui_block.id,
-        widget_id: ngui_block.id,
+        componentType: componentType,
+        id: 'widget-' + ngui_block.id,
         props: {
           title: component.title,
-          content: ngui_block.content,
+          content: content,
         },
         position: {
           x: 0,
@@ -230,7 +236,7 @@ export function parseGenerateUIEvent(event: GenerateUIEvent): AddWidgetResponse 
           w: 6,
           h: 10,
         },
-        breakpoint: '',
+        breakpoint: '-',
       } as DashboardWidget;
     }),
   };

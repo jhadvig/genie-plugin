@@ -90,6 +90,9 @@ tell me all details about pod lightspeed-app-server-8d87bd889-rhxm4, generate ui
 what is restart policy for that pod?
 what is restart policy for that pod, generate ui
     ^ This is fully generated one card component
+
+show me logs of pod lightspeed-app-server-8d87bd889-rhxm4 in openshift-lightspeed namespace, container openshift-mcp-server, generate ui
+
 ```
 
 ### Unknown data - Dashboards

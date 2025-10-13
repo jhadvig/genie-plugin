@@ -26,4 +26,8 @@ Follow these steps to get up and running:
 3. Kube MCP, NGUI & OLS - [ols-ngui/README.md](./ols-ngui/README.md)
 4. Openshift Console - [dynamic-plugin/README.md](./dynamic-plugin/README.md)
 
-Go to [http://localhost:9000/genie/widgets](http://localhost:9000/genie/widgets).
+Disalbe CORS and open [http://localhost:9000/genie/widgets](http://localhost:9000/genie/widgets).
+
+```sh
+open -na Google\ Chrome --args --user-data-dir=/tmp/temporary-chrome-profile-dir --disable-web-security --disable-site-isolation-trials "http://localhost:9000/genie/widgets"
+```

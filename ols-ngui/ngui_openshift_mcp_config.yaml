@@ -45,7 +45,7 @@ data_types:
 
   # returning CSV data!!!
   pods_log:
-    data_transformer: yaml
+    data_transformer: noop
     components:
       - component: text
   # pods_top:
