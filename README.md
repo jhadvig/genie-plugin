@@ -17,3 +17,13 @@ Follow these steps to get up and running:
 4. Start the console UI: in the `dynamic-plugin` package, run `yarn start-console`.
 5. Start the UI plugin by running `yarn start` in the `dynamic-plugin` directory.
 6. Open your browser and navigate to `http://localhost:9000/genie/widgets`.
+
+
+## Getting Started - OLS, Kube MCP, Persers MCP, Next Gen MCP, Layout Manager MCP
+
+1. Perses MCP - [obs-mcp/README.md](./obs-mcp/README.md)
+2. Layout Manager MCP - [layout-manager/README.md](./layout-manager/README.md)
+3. Kube MCP, NGUI & OLS - [ols-ngui/README.md](./ols-ngui/README.md)
+4. Openshift Console - [dynamic-plugin/README.md](./dynamic-plugin/README.md)
+
+Go to [http://localhost:9000/genie/widgets](http://localhost:9000/genie/widgets).
