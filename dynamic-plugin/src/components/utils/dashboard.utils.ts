@@ -18,7 +18,6 @@ type RawWidget = Partial<DashboardWidget> & {
   w?: number;
   h?: number;
   position?: { x?: number; y?: number; w?: number; h?: number };
-  persesComponent?: string;
 };
 
 class DashboardUtils {
@@ -76,9 +75,8 @@ class DashboardUtils {
           h: Math.max(1, safeNumber(pos.h, defaultPos.h)),
         };
 
-        const componentType = w.componentType ?? 'chart';
+        const componentType = w.componentType ?? 'TimeSeriesChart';
         const existingProps = w.props ?? {};
-        const persesComponent = w.persesComponent ?? existingProps.persesComponent ?? (componentType === 'chart' ? 'PersesTimeSeries' : undefined);
 
         return {
           id: String(w.id ?? w.i),
@@ -86,7 +84,6 @@ class DashboardUtils {
           position: normalizedPosition,
           props: {
             ...existingProps,
-            ...(persesComponent && { persesComponent }),
           },
           breakpoint: w.breakpoint ?? 'lg',
         };

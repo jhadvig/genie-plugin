@@ -1,6 +1,7 @@
 package mcp
 
 import (
+	"github.com/layout-manager/api/pkg/models"
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
@@ -56,6 +57,9 @@ func CreateManipulateWidgetTool() mcp.Tool {
 
 // CreateAddWidgetTool creates the add_widget tool definition
 func CreateAddWidgetTool() mcp.Tool {
+	// Get component types from the registry to ensure the LLM only uses valid types
+	componentTypes := models.GetComponentTypes()
+
 	return mcp.NewTool("add_widget",
 		mcp.WithDescription("Add new widgets to the active dashboard. RECOMMENDED: Call get_active_dashboard first to understand the current layout and find the best position for the new widget to avoid overlaps."),
 		mcp.WithString("widget_description",
@@ -65,7 +69,7 @@ func CreateAddWidgetTool() mcp.Tool {
 		mcp.WithString("component_type",
 			mcp.Required(),
 			mcp.Description("Type of component to create"),
-			mcp.Enum("TimeSeriesChart", "Table", "PieChart"),
+			mcp.Enum(componentTypes...),
 		),
 		mcp.WithString("position_hint",
 			mcp.Description("Optional position hint (e.g., 'top right', 'bottom left', 'next to the sales chart')"),

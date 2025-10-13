@@ -113,7 +113,6 @@ export function parseAddWidgetEvent(event: AddWidgetEvent): AddWidgetResponse | 
 
     // Add Perses component type for chart widgets and extract title from message if needed
     response.widgets.forEach((widget) => {
-      if (widget.componentType === 'chart') {
         // Extract title from the response message if not already present
         let title = widget.props.title;
         if (!title && response.message) {
@@ -126,10 +125,8 @@ export function parseAddWidgetEvent(event: AddWidgetEvent): AddWidgetResponse | 
 
         widget.props = {
           ...widget.props,
-          persesComponent: 'PersesTimeSeries',
           ...(title && { title }),
         };
-      }
     });
 
     return response as AddWidgetResponse;
