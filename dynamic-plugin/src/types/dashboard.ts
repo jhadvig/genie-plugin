@@ -1,16 +1,13 @@
 export type DashboardWidget = {
   id: string;
-  componentType: 'text' | 'chart' | 'ngui';
+  componentType: 'text' | 'ngui' | 'TimeSeriesChart' | 'Table' | 'PieChart';
   position: {
     x: number;
     y: number;
     w: number;
     h: number;
   };
-  props: Record<string, any> & {
-    // For chart widgets, we might have a specific Perses component
-    persesComponent?: string;
-  };
+  props: Record<string, any>;
   // Optional breakpoint for responsive layouts
   breakpoint: string;
 };

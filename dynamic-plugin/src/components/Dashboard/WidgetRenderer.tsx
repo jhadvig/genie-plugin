@@ -51,49 +51,6 @@ export function WidgetRenderer({ widget }: WidgetRendererProps) {
             </p>
           </div>
         );
-
-      case 'chart':
-        return (
-          <div>
-            <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'bold' }}>
-              {widget.props.title || widget.props.description || 'Chart Widget'}
-            </h3>
-            <div
-              style={{
-                backgroundColor: '#e9ecef',
-                padding: '20px',
-                borderRadius: '4px',
-                textAlign: 'left',
-                fontSize: '12px',
-                color: '#6c757d',
-              }}
-            >
-              <div style={{ textAlign: 'center', marginBottom: '10px' }}>
-                📊 {widget.props.persesComponent || 'Chart'} Chart
-              </div>
-              {widget.props.query && (
-                <div style={{ marginBottom: '8px' }}>
-                  <strong>Query:</strong>{' '}
-                  <code style={{ fontSize: '11px' }}>{widget.props.query}</code>
-                </div>
-              )}
-              {widget.props.duration && (
-                <div style={{ marginBottom: '8px' }}>
-                  <strong>Duration:</strong> {widget.props.duration}
-                </div>
-              )}
-              {widget.props.step && (
-                <div style={{ marginBottom: '8px' }}>
-                  <strong>Step:</strong> {widget.props.step}
-                </div>
-              )}
-              <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                <small>(PersesTimeSeries component not loaded)</small>
-              </div>
-            </div>
-          </div>
-        );
-
       default:
         return (
           <div>

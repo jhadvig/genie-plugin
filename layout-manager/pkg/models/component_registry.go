@@ -1,5 +1,7 @@
 package models
 
+import "strings"
+
 // ComponentDefinition represents a component type definition with constraints
 type ComponentDefinition struct {
 	Type        string                 `json:"type"`
@@ -12,11 +14,11 @@ type ComponentDefinition struct {
 
 // ComponentRegistry holds predefined component types with their constraints
 var ComponentRegistry = map[string]ComponentDefinition{
-	"chart": {
-		Type:        "chart",
-		Name:        "Chart Widget",
-		Description: "Data visualization charts",
-		DefaultSize: ItemSize{W: 4, H: 3},
+	"TimeSeriesChart": {
+		Type:        "TimeSeriesChart",
+		Name:        "Time Series Chart",
+		Description: "Data visualization for time-series data.",
+		DefaultSize: ItemSize{W: 6, H: 4},
 		Constraints: ItemConstraints{
 			MinW: 2, MaxW: 12,
 			MinH: 2, MaxH: 8,
@@ -31,8 +33,9 @@ var ComponentRegistry = map[string]ComponentDefinition{
 				},
 				"chartType": map[string]interface{}{
 					"type":        "string",
-					"enum":        []string{"line", "bar", "pie", "area", "scatter"},
+					"enum":        []string{"line", "bar", "area", "scatter"},
 					"description": "Type of chart visualization",
+					"default":     "line",
 				},
 				"dataSource": map[string]interface{}{
 					"type":        "string",
@@ -46,8 +49,32 @@ var ComponentRegistry = map[string]ComponentDefinition{
 			},
 		},
 	},
-	"table": {
-		Type:        "table",
+	"PieChart": {
+		Type:        "PieChart",
+		Name:        "Pie Chart",
+		Description: "Pie chart for proportional data.",
+		DefaultSize: ItemSize{W: 4, H: 4},
+		Constraints: ItemConstraints{
+			MinW: 2, MaxW: 6,
+			MinH: 2, MaxH: 6,
+			AspectRatio: &AspectRatio{Min: 1.0, Max: 1.0},
+		},
+		PropSchema: map[string]interface{}{
+			"type": "object",
+			"properties": map[string]interface{}{
+				"title": map[string]interface{}{
+					"type":        "string",
+					"description": "Chart title",
+				},
+				"dataSource": map[string]interface{}{
+					"type":        "string",
+					"description": "Data source URL or endpoint",
+				},
+			},
+		},
+	},
+	"Table": {
+		Type:        "Table",
 		Name:        "Data Table",
 		Description: "Tabular data display",
 		DefaultSize: ItemSize{W: 6, H: 4},
@@ -226,6 +253,48 @@ var ComponentRegistry = map[string]ComponentDefinition{
 			},
 		},
 	},
+}
+
+var componentSynonymMap = map[string]string{
+	// Chart synonyms
+	"chart":           "TimeSeriesChart",
+	"timeseries":      "TimeSeriesChart",
+	"timeserieschart": "TimeSeriesChart",
+	"time series":     "TimeSeriesChart",
+	"time-series":     "TimeSeriesChart",
+	"time_series":     "TimeSeriesChart",
+	"linechart":       "TimeSeriesChart",
+	"line chart":      "TimeSeriesChart",
+	"line-chart":      "TimeSeriesChart",
+	"line_graph":      "TimeSeriesChart",
+	"line graph":      "TimeSeriesChart",
+	"graph":           "TimeSeriesChart",
+	// Table synonyms
+	"table":        "Table",
+	"datatable":    "Table",
+	"data-table":   "Table",
+	"data_table":   "Table",
+	"tablewidget":  "Table",
+	"table widget": "Table",
+	// Pie chart synonyms
+	"pie":         "PieChart",
+	"piechart":    "PieChart",
+	"pie chart":   "PieChart",
+	"pie_chart":   "PieChart",
+	"pie-chart":   "PieChart",
+	"donut":       "PieChart",
+	"donut chart": "PieChart",
+	"donut_chart": "PieChart",
+	"donut-chart": "PieChart",
+}
+
+// MapComponentSynonym maps a generic component name to a specific type
+func MapComponentSynonym(synonym string) (string, bool) {
+	specificType, exists := componentSynonymMap[strings.ToLower(synonym)]
+	if !exists {
+		return "", false
+	}
+	return specificType, true
 }
 
 // GetComponentTypes returns a list of all available component types
