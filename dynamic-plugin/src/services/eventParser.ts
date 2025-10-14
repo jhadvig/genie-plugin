@@ -230,20 +230,33 @@ export function parseGenerateUIEvent(
         console.log('NGUI BLOCK:', ngui_block);
         const component = JSON.parse(ngui_block.content);
         console.log('NGUI component:', component);
-        let componentType = 'ngui';
-        let content = ngui_block.content;
         if (component.component == 'text') {
-          componentType = 'text';
+          // Custom component
           const ngui_content = JSON.parse(ngui_block.content);
-          content = ngui_content.data;
+          return {
+            componentType: 'text',
+            id: ngui_block.id,
+            props: {
+              title: component.title,
+              ngui_id: ngui_block.id,
+              content: ngui_content.data,
+            },
+            position: {
+              x: 0,
+              y: 0,
+              w: 6,
+              h: 10,
+            },
+            breakpoint: 'lg',
+          } as DashboardWidget;
         }
         return {
-          componentType: componentType,
+          componentType: 'ngui',
           id: ngui_block.id,
           props: {
             title: component.title,
             ngui_id: ngui_block.id,
-            ngui_content: content,
+            ngui_content: ngui_block.content,
           },
           position: {
             x: 0,

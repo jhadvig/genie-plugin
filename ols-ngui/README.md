@@ -76,7 +76,13 @@ You can change `"media_type": "application/json",` to `"media_type": "text/plain
 
 ## Conversation Examples
 
+### Create a new dashboard
+```
+hi
+
 Create a new empty dashboard called "Trying Stuff #1" and activate it.
+```
+
 
 ### Openshift Namespace to Pod
 
@@ -100,7 +106,7 @@ show me logs of pod lightspeed-app-server-8d87bd889-rhxm4 in openshift-lightspee
 ### Unknown data - Dashboards
 
 ```
-what pods are running in openshift-lightspeed namespace, generate ui
+hi
 
 what are my dashboards? generate ui
 	what are my dashboards? Include all possible information, generate ui
