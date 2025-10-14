@@ -26,7 +26,7 @@ export function useDashboards(dashboardId?: string) {
   );
 
   function handleToolCalls(toolCalls: any[]) {
-    toolCalls.forEach((toolCall) => {
+    toolCalls.forEach(async (toolCall) => {
       // Skip events with empty or invalid tokens
       if (
         !(toolCall as any)?.data?.token ||
@@ -76,9 +76,24 @@ export function useDashboards(dashboardId?: string) {
         }
       } else if (isGenerateUIEvent(toolCall)) {
         console.log('NGUI widget', toolCall.data.token.artifact);
-        const generateUIResponse = parseGenerateUIEvent(toolCall);
+        const client = new DashboardMCPClient('http://localhost:9081/mcp');
+        let dashboardWidgets = [];
+        try {
+          const dashboardWidgetsResponse = await client.findWidgets();
+          dashboardWidgets = dashboardWidgetsResponse.widgets;
+        } catch (e) {
+          console.log('cannot perform  findWidgets');
+        }
+
+        const generateUIResponse = parseGenerateUIEvent(toolCall, dashboardWidgets);
+
+        generateUIResponse.widgets.forEach(async (ngui_widget) => {
+          const dashboard_widget = await client.addWidget(ngui_widget);
+          ngui_widget.id = dashboard_widget.widgets[0].id;
+        });
         if (generateUIResponse) {
           // Add all widgets from the response (usually just one)
+          console.log('Adding NGUI widgets', generateUIResponse.widgets);
           setWidgets((prev) => [...prev, ...(generateUIResponse.widgets ?? [])]);
         }
       }

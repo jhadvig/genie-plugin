@@ -40,8 +40,13 @@ export function WidgetRenderer({ widget }: WidgetRendererProps) {
         );
 
       case 'ngui':
-        console.log(JSON.parse(widget.props.content));
-        return <DynamicComponent config={JSON.parse(widget.props.content)} />;
+        if (widget.props.ngui_content) {
+          const c = JSON.parse(widget.props.ngui_content);
+          console.log(c);
+          return <DynamicComponent config={c} />;
+        } else {
+          return <div>No data</div>;
+        }
 
       case 'chart':
         return (

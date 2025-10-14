@@ -37,9 +37,9 @@ data_types:
             - name: Status
               data_path: $[*].status.phase
             - name: Started
-              data_path: $[*].status.containerStatuses[*].started
+              data_path: $.[*].status.containerStatuses[0].started
             - name: Restarts
-              data_path: $[*].status.containerStatuses[*].restartCount
+              data_path: $[*].status.containerStatuses[0].restartCount
             - name: Created
               data_path: $[*].metadata.creationTimestamp
 

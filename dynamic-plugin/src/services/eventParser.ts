@@ -201,7 +201,10 @@ type NguiResponseObject = {
   content: string;
 };
 
-export function parseGenerateUIEvent(event: GenerateUIEvent): AddWidgetResponse | null {
+export function parseGenerateUIEvent(
+  event: GenerateUIEvent,
+  dashboardWidgets: DashboardWidget[] | null,
+): AddWidgetResponse | null {
   if (!isGenerateUIEvent(event)) {
     return null;
   }
@@ -212,33 +215,45 @@ export function parseGenerateUIEvent(event: GenerateUIEvent): AddWidgetResponse 
 
   const ngui_response: NguiResponseObject[] = JSON.parse(event.data.token.artifact);
   const result = {
-    widgets: ngui_response.map((ngui_block) => {
-      console.log('NGUI BLOCK:', ngui_block);
-      const component = JSON.parse(ngui_block.content);
-      console.log('NGUI component:', component);
-      let componentType = 'ngui';
-      let content = ngui_block.content;
-      if (component.component == 'text') {
-        componentType = 'text';
-        const ngui_content = JSON.parse(ngui_block.content);
-        content = ngui_content.data;
-      }
-      return {
-        componentType: componentType,
-        id: 'widget-' + ngui_block.id,
-        props: {
-          title: component.title,
-          content: content,
-        },
-        position: {
-          x: 0,
-          y: 0,
-          w: 6,
-          h: 10,
-        },
-        breakpoint: '-',
-      } as DashboardWidget;
-    }),
+    widgets: ngui_response
+      .filter((ngui_block) => {
+        if (
+          dashboardWidgets &&
+          dashboardWidgets.find((w) => w.props && w.props.ngui_id === ngui_block.id)
+        ) {
+          console.log('NGUI component already present in dashboard');
+          return false;
+        }
+        return true;
+      })
+      .map((ngui_block) => {
+        console.log('NGUI BLOCK:', ngui_block);
+        const component = JSON.parse(ngui_block.content);
+        console.log('NGUI component:', component);
+        let componentType = 'ngui';
+        let content = ngui_block.content;
+        if (component.component == 'text') {
+          componentType = 'text';
+          const ngui_content = JSON.parse(ngui_block.content);
+          content = ngui_content.data;
+        }
+        return {
+          componentType: componentType,
+          id: ngui_block.id,
+          props: {
+            title: component.title,
+            ngui_id: ngui_block.id,
+            ngui_content: content,
+          },
+          position: {
+            x: 0,
+            y: 0,
+            w: 6,
+            h: 10,
+          },
+          breakpoint: 'lg',
+        } as DashboardWidget;
+      }),
   };
 
   return result as unknown as AddWidgetResponse;

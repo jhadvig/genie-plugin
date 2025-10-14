@@ -10,9 +10,12 @@ export type DashboardWidget = {
   props: Record<string, any> & {
     // For chart widgets, we might have a specific Perses component
     persesComponent?: string;
+    ngui_id?: string;
+    ngui_content?: string;
   };
   // Optional breakpoint for responsive layouts
   breakpoint: string;
+  description?: string;
 };
 
 export type DashboardLayout = {
@@ -94,6 +97,15 @@ export type ManipulateWidgetEvent = {
       response: ManipulateWidgetResponse;
     };
   };
+};
+
+export type FindWidgetsResponse = {
+  success: boolean;
+  operation: string;
+  activeLayoutId: string;
+  message: string;
+  timestamp: string;
+  widgets: DashboardWidget[];
 };
 
 export type AddWidgetResponse = {

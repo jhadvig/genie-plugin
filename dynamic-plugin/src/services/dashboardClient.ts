@@ -1,4 +1,9 @@
-import { ActiveDashboardResponse, ListDashboardsResponse } from 'src/types/dashboard';
+import {
+  ActiveDashboardResponse,
+  ListDashboardsResponse,
+  FindWidgetsResponse,
+  DashboardWidget,
+} from 'src/types/dashboard';
 
 export class DashboardMCPClient {
   private baseURL: string;
@@ -94,7 +99,12 @@ export class DashboardMCPClient {
 
     const text = content?.text;
     if (text) {
-      return JSON.parse(text) as T;
+      console.log('Dashboard MCP Reposne. tool name=%s', name, { text });
+      try {
+        return JSON.parse(text) as T;
+      } catch (e) {
+        throw Error('Cannot parse MCP result, error=' + e + 'error' + text);
+      }
     }
     return content;
   }
@@ -113,6 +123,18 @@ export class DashboardMCPClient {
 
   async listDashboards(limit = 50, offset = 0): Promise<ListDashboardsResponse> {
     return await this.callTool('list_dashboards', { limit: String(limit), offset: String(offset) });
+  }
+  async findWidgets(): Promise<FindWidgetsResponse> {
+    return await this.callTool('find_widgets', {
+      description: '',
+    });
+  }
+  async addWidget(widget: DashboardWidget): Promise<FindWidgetsResponse> {
+    return await this.callTool('add_widget', {
+      component_type: widget.componentType,
+      props: JSON.stringify(widget.props),
+      widget_description: 'no description',
+    });
   }
 
   async updateWidgetPositions(layout: any[]): Promise<void> {

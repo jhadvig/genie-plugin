@@ -76,6 +76,8 @@ You can change `"media_type": "application/json",` to `"media_type": "text/plain
 
 ## Conversation Examples
 
+Create a new empty dashboard called "Trying Stuff #1" and activate it.
+
 ### Openshift Namespace to Pod
 
 ```
