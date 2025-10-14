@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { useDashboards } from '../hooks/useDashboards';
 import { DashboardGrid } from './Dashboard';
-import { ChatInterface, GenieLayout } from './shared';
+import { ChatInterface, EditableInline, GenieLayout } from './shared';
 import { DashboardMCPClient } from '../services/dashboardClient';
 import './utils/reactPolyfills';
 
@@ -38,12 +38,37 @@ function DashboardLayout() {
     <div style={{ padding: '20px' }}>
       {activeDashboard && activeDashboard.layout && (
         <div style={{ marginBottom: '20px' }}>
-          <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', fontWeight: 'bold' }}>
-            {activeDashboard.layout.name || 'Untitled Dashboard'}
-          </h2>
-          <p style={{ margin: '0 0 20px 0', color: '#666', fontSize: '14px' }}>
-            {activeDashboard.layout.description || 'No description available'}
-          </p>
+          <EditableInline
+            value={activeDashboard.layout.name || 'Untitled Dashboard'}
+            isTitle
+            onConfirm={async (updatedTitle) => {
+              try {
+                await dashboardClient.current.setDashboardMetadata(
+                  activeDashboard.activeLayoutId,
+                  updatedTitle,
+                  undefined,
+                );
+                window.dispatchEvent(new CustomEvent('dashboard-metadata-updated'));
+              } catch (e) {
+                console.error('Failed to update dashboard name:', e);
+              }
+            }}
+          />
+          <EditableInline
+            value={activeDashboard.layout.description || 'No description available'}
+            onConfirm={async (updatedDescription) => {
+              try {
+                await dashboardClient.current.setDashboardMetadata(
+                  activeDashboard.activeLayoutId,
+                  undefined,
+                  updatedDescription,
+                );
+                window.dispatchEvent(new CustomEvent('dashboard-metadata-updated'));
+              } catch (e) {
+                console.error('Failed to update dashboard description:', e);
+              }
+            }}
+          />
         </div>
       )}
 

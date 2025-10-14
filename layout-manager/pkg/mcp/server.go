@@ -32,6 +32,7 @@ func SetupTools(mcpServer *server.MCPServer, layoutRepo *db.LayoutRepository, br
 	configureWidgetTool := CreateConfigureWidgetTool()
 	createDashboardTool := CreateDashboardTool()
     getActiveDashboardTool := CreateGetActiveDashboardTool()
+    setDashboardMetadataTool := CreateSetDashboardMetadataTool()
     listDashboardsTool := CreateListDashboardsTool()
     getDashboardTool := CreateGetDashboardTool()
 
@@ -44,6 +45,7 @@ func SetupTools(mcpServer *server.MCPServer, layoutRepo *db.LayoutRepository, br
 	configureWidgetHandler := ConfigureWidgetHandler(layoutRepo)
 	createDashboardHandler := CreateDashboardHandler(layoutRepo)
     getActiveDashboardHandler := GetActiveDashboardHandler(layoutRepo)
+    setDashboardMetadataHandler := SetDashboardMetadataHandler(layoutRepo)
     listDashboardsHandler := ListDashboardsHandler(layoutRepo)
     getDashboardHandler := GetDashboardHandler(layoutRepo)
 
@@ -56,6 +58,7 @@ func SetupTools(mcpServer *server.MCPServer, layoutRepo *db.LayoutRepository, br
 	mcpServer.AddTool(configureWidgetTool, configureWidgetHandler)
 	mcpServer.AddTool(createDashboardTool, createDashboardHandler)
 	mcpServer.AddTool(getActiveDashboardTool, getActiveDashboardHandler)
+    mcpServer.AddTool(setDashboardMetadataTool, setDashboardMetadataHandler)
     mcpServer.AddTool(listDashboardsTool, listDashboardsHandler)
     mcpServer.AddTool(getDashboardTool, getDashboardHandler)
 

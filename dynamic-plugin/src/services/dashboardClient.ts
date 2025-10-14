@@ -129,4 +129,11 @@ export class DashboardMCPClient {
 
     await Promise.all(promises);
   }
+
+  async setDashboardMetadata(layoutId: string, name?: string, description?: string): Promise<any> {
+    const args: Record<string, string> = { layout_id: layoutId };
+    if (name) args.name = name;
+    if (description) args.description = description;
+    return await this.callTool('set_dashboard_metadata', args);
+  }
 }

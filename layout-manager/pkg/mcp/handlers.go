@@ -812,6 +812,60 @@ func GetActiveDashboardHandler(layoutRepo *db.LayoutRepository) func(context.Con
 	}
 }
 
+
+// SetDashboardMetadataHandler handles the set_dashboard_metadata tool
+func SetDashboardMetadataHandler(layoutRepo *db.LayoutRepository) func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+    return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        log.Printf("[MCP] set_dashboard_metadata called")
+
+        layoutID := request.GetString("layout_id", "")
+        if layoutID == "" {
+            layoutID = request.GetString("dashboard_id", "")
+        }
+        if layoutID == "" {
+            return mcp.NewToolResultError("layout_id (or dashboard_id) parameter is required"), nil
+        }
+        newName := request.GetString("name", "")
+        newDescription := request.GetString("description", "")
+
+        layout, err := layoutRepo.GetByLayoutID(layoutID)
+        if err != nil {
+            return mcp.NewToolResultError(fmt.Sprintf("Dashboard not found: %v", err)), nil
+        }
+
+        if newName == "" && newDescription == "" {
+            return mcp.NewToolResultError("At least one of name or description must be provided"), nil
+        }
+
+        if newName != "" {
+            layout.Name = newName
+        }
+        if newDescription != "" {
+            layout.Description = newDescription
+        }
+
+        if err := layoutRepo.Update(layout); err != nil {
+            return mcp.NewToolResultError(fmt.Sprintf("Failed to update dashboard: %v", err)), nil
+        }
+
+        response := MCPResponse{
+            Success:   true,
+            Operation: "set_dashboard_metadata",
+            Message:   fmt.Sprintf("Set metadata for dashboard '%s'", layoutID),
+            Timestamp: time.Now(),
+            Layout: &LayoutInfo{
+                ID:          layout.ID.String(),
+                LayoutID:    layout.LayoutID,
+                Name:        layout.Name,
+                Description: layout.Description,
+            },
+        }
+
+        responseJSON, _ := json.Marshal(response)
+        return mcp.NewToolResultText(string(responseJSON)), nil
+    }
+}
+
 // ListDashboardsHandler handles the list_dashboards tool
 func ListDashboardsHandler(layoutRepo *db.LayoutRepository) func(context.Context, mcp.CallToolRequest) (*mcp.CallToolResult, error) {
     return func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {

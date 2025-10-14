@@ -70,6 +70,26 @@ export function useDashboards(dashboardId?: string) {
           setWidgets((prev) => [...prev, ...(addWidgetResponse.widgets ?? [])]);
         }
       }
+
+      // If chatbot updated dashboard metadata, refetch the active dashboard to reflect changes
+      if (
+        toolName === 'set_dashboard_metadata'
+      ) {
+        (async () => {
+          try {
+            const resp = dashboardId
+              ? await dashboardClient.current.getDashboard(dashboardId)
+              : await dashboardClient.current.getActiveDashboard();
+            if (resp) {
+              const normalizedActive = DashboardUtils.normalizeResponse(resp as any);
+              setActiveDashboard(normalizedActive);
+              setWidgets(normalizedActive?.widgets ?? []);
+            }
+          } catch (e) {
+            console.error('Error refetching after metadata update:', e);
+          }
+        })();
+      }
     });
   }
 
@@ -79,6 +99,31 @@ export function useDashboards(dashboardId?: string) {
       handleToolCalls(streamChunk.additionalAttributes.toolCalls);
     }
   }, [streamChunk]);
+
+  // Listen for manual refresh events (e.g., after inline save) and refetch active dashboard
+  useEffect(() => {
+    async function refetchActive() {
+      try {
+        const resp = dashboardId
+          ? await dashboardClient.current.getDashboard(dashboardId)
+          : await dashboardClient.current.getActiveDashboard();
+        if (resp) {
+          const normalizedActive = DashboardUtils.normalizeResponse(resp as any);
+          setActiveDashboard(normalizedActive);
+          setWidgets(normalizedActive?.widgets ?? []);
+        }
+      } catch (e) {
+        console.error('Error refetching active dashboard (manual event):', e);
+      }
+    }
+
+    const handler = () => {
+      console.log('dashboard-metadata-updated event received: refetching');
+      refetchActive();
+    };
+    window.addEventListener('dashboard-metadata-updated', handler);
+    return () => window.removeEventListener('dashboard-metadata-updated', handler);
+  }, [dashboardId]);
 
   useEffect(() => {
     if (dashboards.length > 0) {
