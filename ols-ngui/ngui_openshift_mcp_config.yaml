@@ -2,6 +2,7 @@
 # 1. yaml transformation for all
 ---
 input_data_json_wrapping: true
+unsupported_components: true
 
 data_types:
   namespaces_list:
@@ -47,7 +48,7 @@ data_types:
   pods_log:
     data_transformer: noop
     components:
-      - component: text
+      - component: log
   # pods_top:
   #   data_transformer: yaml
   resources_list:

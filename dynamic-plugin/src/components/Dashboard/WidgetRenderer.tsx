@@ -47,6 +47,17 @@ export function WidgetRenderer({ widget }: WidgetRendererProps) {
         } else {
           return <div>No data</div>;
         }
+      case 'log':
+        return (
+          <div>
+            {widget.props.title && (
+              <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'bold' }}>
+                {widget.props.title}
+              </h3>
+            )}
+            <pre>{widget.props.content || 'No content available'}</pre>
+          </div>
+        );
 
       case 'chart':
         return (

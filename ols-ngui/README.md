@@ -87,6 +87,10 @@ Create a new empty dashboard called "Trying Stuff #1" and activate it.
 ### Openshift Namespace to Pod
 
 ```
+hi
+
+Create a new empty dashboard called "Demo dashboard" and activate it.
+
 what are my namespaces, generate ui
 
 what pods are running in openshift-lightspeed namespace, generate ui
@@ -94,13 +98,25 @@ what pods are running in openshift-lightspeed namespace, generate ui
 
 tell me all details about pod lightspeed-app-server-8d87bd889-rhxm4, generate ui
 	generate again the component about that pod
+    tell me all details about pod lightspeed-app-server-8d87bd889-rhxm4 in namespace openshift-lightspeed, generate ui
 
 what is restart policy for that pod?
 what is restart policy for that pod, generate ui
     ^ This is fully generated one card component
 
 show me logs of pod lightspeed-app-server-8d87bd889-rhxm4 in openshift-lightspeed namespace, container openshift-mcp-server, generate ui
+```
 
+### Openshift Lightspeed Service Dashboard
+
+```
+hi
+
+Create a new empty dashboard called "Openshift Lightspeed Service" and activate it.
+
+What pods are running in namespace "openshift-lightspeed", generate ui
+
+Show me logs for pod next-gen-ui-mcp-695cbd79bb-npcdm, generate ui
 ```
 
 ### Unknown data - Dashboards
@@ -108,8 +124,16 @@ show me logs of pod lightspeed-app-server-8d87bd889-rhxm4 in openshift-lightspee
 ```
 hi
 
+Create a new empty dashboard called "My Dashboards" and activate it.
+
+
 what are my dashboards? generate ui
 	what are my dashboards? Include all possible information, generate ui
+
+what are my dashboards? generate ui and use table
+
+what are my dashboards? generate ui and use set of cards
+
 ```
 
 ### Perses

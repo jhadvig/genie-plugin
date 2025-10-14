@@ -230,11 +230,11 @@ export function parseGenerateUIEvent(
         console.log('NGUI BLOCK:', ngui_block);
         const component = JSON.parse(ngui_block.content);
         console.log('NGUI component:', component);
-        if (component.component == 'text') {
+        if (component.component === 'text' || component.component === 'log') {
           // Custom component
           const ngui_content = JSON.parse(ngui_block.content);
           return {
-            componentType: 'text',
+            componentType: component.component,
             id: ngui_block.id,
             props: {
               title: component.title,
@@ -244,7 +244,7 @@ export function parseGenerateUIEvent(
             position: {
               x: 0,
               y: 0,
-              w: 6,
+              w: 5,
               h: 10,
             },
             breakpoint: 'lg',

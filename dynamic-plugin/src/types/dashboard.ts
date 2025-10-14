@@ -1,6 +1,6 @@
 export type DashboardWidget = {
   id: string;
-  componentType: 'text' | 'chart' | 'ngui';
+  componentType: 'text' | 'chart' | 'ngui' | 'log';
   position: {
     x: number;
     y: number;

@@ -87,12 +87,13 @@ export function useDashboards(dashboardId?: string) {
 
         const generateUIResponse = parseGenerateUIEvent(toolCall, dashboardWidgets);
 
-        generateUIResponse.widgets.forEach(async (ngui_widget) => {
-          const dashboard_widget = await client.addWidget(ngui_widget);
-          ngui_widget.id = dashboard_widget.widgets[0].id;
-        });
         if (generateUIResponse) {
           // Add all widgets from the response (usually just one)
+          generateUIResponse.widgets.forEach(async (ngui_widget) => {
+            const dashboard_widget = await client.addWidget(ngui_widget);
+            ngui_widget.id = dashboard_widget.widgets[0].id;
+          });
+
           console.log('Adding NGUI widgets', generateUIResponse.widgets);
           setWidgets((prev) => [...prev, ...(generateUIResponse.widgets ?? [])]);
         }
