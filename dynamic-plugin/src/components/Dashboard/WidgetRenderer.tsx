@@ -1,6 +1,6 @@
 import React from 'react';
 import { DashboardWidget } from '../../types/dashboard';
-import DynamicComponent from 'dynamicui';
+import DynamicComponent from '@rhngui/patternfly-react-renderer';
 
 const componentMapper = {
   TimeSeriesChart: React.lazy(() => import('../PersesBindings/PersesWidgets/PersesTimeSeries')),
