@@ -1,8 +1,11 @@
 import React from 'react';
 import { DashboardWidget } from '../../types/dashboard';
+import DynamicComponent from '@rhngui/patternfly-react-renderer';
 
 const componentMapper = {
-  PersesTimeSeries: React.lazy(() => import('../PersesBindings/PersesWidgets/PersesTimeSeries')),
+  TimeSeriesChart: React.lazy(() => import('../PersesBindings/PersesWidgets/PersesTimeSeries')),
+  Table: React.lazy(() => import('../PersesBindings/PersesWidgets/PersesTable')),
+  PieChart: React.lazy(() => import('../PersesBindings/PersesWidgets/PersesPieChart')),
 };
 
 interface WidgetRendererProps {
@@ -10,7 +13,7 @@ interface WidgetRendererProps {
 }
 
 export function WidgetRenderer({ widget }: WidgetRendererProps) {
-  const Component = componentMapper[widget.props?.persesComponent];
+  const Component = componentMapper[widget?.componentType];
   if (Component) {
     return (
       <React.Suspense fallback={<div>Loading widget...</div>}>
@@ -36,6 +39,26 @@ export function WidgetRenderer({ widget }: WidgetRendererProps) {
           </div>
         );
 
+      case 'ngui':
+        if (widget.props.ngui_content) {
+          const c = JSON.parse(widget.props.ngui_content);
+          console.log(c);
+          return <DynamicComponent config={c} />;
+        } else {
+          return <div>No data</div>;
+        }
+      case 'log':
+        return (
+          <div>
+            {widget.props.title && (
+              <h3 style={{ margin: '0 0 10px 0', fontSize: '16px', fontWeight: 'bold' }}>
+                {widget.props.title}
+              </h3>
+            )}
+            <pre>{widget.props.content || 'No content available'}</pre>
+          </div>
+        );
+
       case 'chart':
         return (
           <div>
@@ -57,7 +80,8 @@ export function WidgetRenderer({ widget }: WidgetRendererProps) {
               </div>
               {widget.props.query && (
                 <div style={{ marginBottom: '8px' }}>
-                  <strong>Query:</strong> <code style={{ fontSize: '11px' }}>{widget.props.query}</code>
+                  <strong>Query:</strong>{' '}
+                  <code style={{ fontSize: '11px' }}>{widget.props.query}</code>
                 </div>
               )}
               {widget.props.duration && (

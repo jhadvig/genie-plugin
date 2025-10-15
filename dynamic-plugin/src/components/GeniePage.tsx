@@ -64,7 +64,7 @@ import ReactGridLayout from 'react-grid-layout';
 
 // Initialize state manager outside React scope (following Red Hat Cloud Services pattern)
 const client = new LightspeedClient({
-  baseUrl: 'http://localhost:8080',
+  baseUrl: 'http://localhost:9001/ols',
   fetchFunction: (input, init) => fetch(input, init),
 });
 

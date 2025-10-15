@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useMemo } from 'react';
 
 import { DatasourceStoreProvider, VariableProvider } from '@perses-dev/dashboards';
-import { ChartsProvider } from '@perses-dev/components';
+import { ChartsProvider, SnackbarProvider } from '@perses-dev/components';
 import { PluginRegistry, TimeRangeProvider } from '@perses-dev/plugin-system';
 import { generateChartsTheme, getTheme } from '@perses-dev/components';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -28,17 +28,22 @@ const PersesWidgetWrapper = ({ children }: PropsWithChildren<Record<string, unkn
   }, [t]);
   return (
     <ChartsProvider chartsTheme={chartsTheme}>
-      <PluginRegistry pluginLoader={pluginLoader}>
-        <QueryClientProvider client={persesQueryClient}>
-          <TimeRangeProvider timeRange={persesTimeRange}>
-            <VariableProvider>
-              <DatasourceStoreProvider datasourceApi={datasourceApi}>
-                <div style={{ width: '500px', height: '200px' }}>{children}</div>
-              </DatasourceStoreProvider>
-            </VariableProvider>
-          </TimeRangeProvider>
-        </QueryClientProvider>
-      </PluginRegistry>
+      <SnackbarProvider
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        variant="default"
+      >
+        <PluginRegistry pluginLoader={pluginLoader}>
+          <QueryClientProvider client={persesQueryClient}>
+            <TimeRangeProvider timeRange={persesTimeRange}>
+              <VariableProvider>
+                <DatasourceStoreProvider datasourceApi={datasourceApi}>
+                  <div style={{ width: '100%', height: '100%' }}>{children}</div>
+                </DatasourceStoreProvider>
+              </VariableProvider>
+            </TimeRangeProvider>
+          </QueryClientProvider>
+        </PluginRegistry>
+      </SnackbarProvider>
     </ChartsProvider>
   );
 };

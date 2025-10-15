@@ -1,9 +1,10 @@
 import { createClientStateManager } from '@redhat-cloud-services/ai-client-state';
-import { LightspeedClient } from '@redhat-cloud-services/lightspeed-client';
+// import { LightspeedClient } from '@redhat-cloud-services/lightspeed-client';
+import { OLSClient } from './olsClient';
 
 // Initialize state manager outside React scope (following Red Hat Cloud Services pattern)
-const client = new LightspeedClient({
-  baseUrl: 'http://localhost:8080',
+const client = new OLSClient({
+  baseUrl: `${window.location.origin}/api/proxy/plugin/genie-plugin/lightspeed/`, // Always use bridge proxy
   fetchFunction: (input, init) => fetch(input, init),
 });
 

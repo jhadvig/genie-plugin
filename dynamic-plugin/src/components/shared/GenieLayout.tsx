@@ -8,9 +8,9 @@ import '../genie.css';
 import '@patternfly/chatbot/dist/css/main.css';
 // Import react-grid-layout CSS
 import 'react-grid-layout/css/styles.css';
-import GenieLogo from '../../assets/GenieLogo.svg';
+import RedHatLogo from '../../assets/RedHatLogo.svg';
 import { HomeIcon } from '@patternfly/react-icons';
-import { BookIcon } from '@patternfly/react-icons';
+import { BookIcon } from '@patternfly/react-icons'; 
 
 interface GenieLayoutProps {
   title: string;
@@ -25,7 +25,7 @@ async function testConnection(): Promise<{ success: boolean; message: string }> 
 
     for (const endpoint of healthEndpoints) {
       try {
-        const response = await fetch(`http://localhost:8080${endpoint}`, {
+        const response = await fetch(`http://localhost:9000/api/proxy/plugin/genie-plugin/lightspeed/${endpoint}`, {
           method: 'GET',
           headers: {
             Accept: 'application/json',
@@ -95,7 +95,7 @@ export function GenieLayout({ title, children, mainContent }: GenieLayoutProps) 
           <header>
             <div className="header-container">
               <div className="logo">
-                <img src={GenieLogo} alt="Red Hat Genie" />
+                <img src={RedHatLogo} alt="Red Hat Genie" />
               </div>
               <nav aria-label="Primary navigation">
                 <ul>

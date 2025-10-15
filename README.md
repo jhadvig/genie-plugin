@@ -12,7 +12,22 @@ Before starting, ensure you have the following:
 Follow these steps to get up and running:
 
 1. Set up the obs-mcp server. For details, see the [obs-mcp README](./obs-mcp/README.md).
-2. Once the server is running, connect it to your Lightspeed Core (LSC) instance.
-3. Start the console UI: in the `dynamic-plugin` package, run `yarn start-console`.
-4. Start the UI plugin by running `yarn start` in the `dynamic-plugin` directory.
-5. Open your browser and navigate to `http://localhost:9000/genie`.
+2. Set up the layout-manager mcp server. For details, see the [layout-manager mcp](./layout-manager/README.md)
+3. Once the servers are running, connect it to your Lightspeed Core (LSC) instance.
+4. Start the console UI: in the `dynamic-plugin` package, run `yarn start-console`.
+5. Start the UI plugin by running `yarn start` in the `dynamic-plugin` directory.
+6. Open your browser and navigate to `http://localhost:9000/genie/widgets`.
+
+
+## Getting Started - OLS, Kube MCP, Persers MCP, Next Gen MCP, Layout Manager MCP
+
+1. Perses MCP - [obs-mcp/README.md](./obs-mcp/README.md)
+2. Layout Manager MCP - [layout-manager/README.md](./layout-manager/README.md)
+3. Kube MCP, NGUI & OLS - [ols-ngui/README.md](./ols-ngui/README.md)
+4. Openshift Console - [dynamic-plugin/README.md](./dynamic-plugin/README.md)
+
+Disalbe CORS and open [http://localhost:9000/genie/widgets](http://localhost:9000/genie/widgets).
+
+```sh
+open -na Google\ Chrome --args --user-data-dir=/tmp/temporary-chrome-profile-dir --disable-web-security --disable-site-isolation-trials "http://localhost:9000/genie/widgets"
+```

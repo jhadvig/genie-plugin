@@ -9,6 +9,8 @@ import {
   parseManipulateWidgetArgumentsEvent,
   isAddWidgetEvent,
   parseAddWidgetEvent,
+  isGenerateUIEvent,
+  parseGenerateUIEvent,
 } from '../services/eventParser';
 import { DashboardMCPClient } from '../services/dashboardClient';
 import DashboardUtils, { NormalizedDashboard } from '../components/utils/dashboard.utils';
@@ -19,16 +21,19 @@ export function useDashboards(dashboardId?: string) {
   const [dashboards, setDashboards] = useState<CreateDashboardResponse[]>([]);
   const [widgets, setWidgets] = useState<DashboardWidget[]>([]);
   const dashboardClient = useRef(new DashboardMCPClient());
-  const [activeDashboard, setActiveDashboard] = useState<NormalizedDashboard | undefined>(undefined);
+  const [activeDashboard, setActiveDashboard] = useState<NormalizedDashboard | undefined>(
+    undefined,
+  );
 
   function handleToolCalls(toolCalls: any[]) {
-    toolCalls.forEach((toolCall) => {
+    toolCalls.forEach(async (toolCall) => {
       // Skip events with empty or invalid tokens
       if (
         !(toolCall as any)?.data?.token ||
         typeof (toolCall as any).data.token !== 'object' ||
         !(toolCall as any).data.token.tool_name
       ) {
+        console.log('Tool call is empty or invalid', toolCall);
         return;
       }
 
@@ -69,6 +74,29 @@ export function useDashboards(dashboardId?: string) {
           // Add all widgets from the response (usually just one)
           setWidgets((prev) => [...prev, ...(addWidgetResponse.widgets ?? [])]);
         }
+      } else if (isGenerateUIEvent(toolCall)) {
+        console.log('NGUI widget', toolCall.data.token.artifact);
+        const client = new DashboardMCPClient('http://localhost:9081/mcp');
+        let dashboardWidgets = [];
+        try {
+          const dashboardWidgetsResponse = await client.findWidgets();
+          dashboardWidgets = dashboardWidgetsResponse.widgets;
+        } catch (e) {
+          console.log('cannot perform  findWidgets');
+        }
+
+        const generateUIResponse = parseGenerateUIEvent(toolCall, dashboardWidgets);
+
+        if (generateUIResponse) {
+          // Add all widgets from the response (usually just one)
+          generateUIResponse.widgets.forEach(async (ngui_widget) => {
+            const dashboard_widget = await client.addWidget(ngui_widget);
+            ngui_widget.id = dashboard_widget.widgets[0].id;
+          });
+
+          console.log('Adding NGUI widgets', generateUIResponse.widgets);
+          setWidgets((prev) => [...prev, ...(generateUIResponse.widgets ?? [])]);
+        }
       }
 
       // If chatbot updated dashboard metadata, refetch the active dashboard to reflect changes
@@ -93,15 +121,8 @@ export function useDashboards(dashboardId?: string) {
     });
   }
 
-  useEffect(() => {
-    if (streamChunk && streamChunk.additionalAttributes?.toolCalls) {
-      console.log('streamChunk.additionalAttributes.toolCalls', streamChunk.additionalAttributes.toolCalls);
-      handleToolCalls(streamChunk.additionalAttributes.toolCalls);
-    }
-  }, [streamChunk]);
-
-  // Listen for manual refresh events (e.g., after inline save) and refetch active dashboard
-  useEffect(() => {
+   // Listen for manual refresh events (e.g., after inline save) and refetch active dashboard
+   useEffect(() => {
     async function refetchActive() {
       try {
         const resp = dashboardId
@@ -124,6 +145,20 @@ export function useDashboards(dashboardId?: string) {
     window.addEventListener('dashboard-metadata-updated', handler);
     return () => window.removeEventListener('dashboard-metadata-updated', handler);
   }, [dashboardId]);
+
+  useEffect(() => {
+    if (streamChunk && streamChunk.additionalAttributes?.toolCalls) {
+      if (streamChunk && streamChunk.answer !== '') {
+        console.log('stream chunk from Answer. Do not call tool_calls');
+      } else {
+        console.log(
+          'streamChunk.additionalAttributes.toolCalls',
+          streamChunk.additionalAttributes.toolCalls,
+        );
+        handleToolCalls(streamChunk.additionalAttributes.toolCalls);
+      }
+    }
+  }, [streamChunk]);
 
   useEffect(() => {
     if (dashboards.length > 0) {

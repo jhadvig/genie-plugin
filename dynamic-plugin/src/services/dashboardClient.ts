@@ -1,11 +1,16 @@
-import { ActiveDashboardResponse, ListDashboardsResponse } from "src/types/dashboard";
+import {
+  ActiveDashboardResponse,
+  ListDashboardsResponse,
+  FindWidgetsResponse,
+  DashboardWidget,
+} from 'src/types/dashboard';
 
 export class DashboardMCPClient {
   private baseURL: string;
   private requestId = 0;
   private sessionId: string | null = null;
 
-  constructor(baseURL: string = 'http://localhost:9081/mcp') {
+  constructor(baseURL = `${window.location.origin}/api/proxy/plugin/genie-plugin/dashboard-mcp/`) {
     this.baseURL = baseURL;
   }
 
@@ -34,21 +39,28 @@ export class DashboardMCPClient {
       throw new Error(`Failed to initialize MCP client: ${response.statusText}`);
     }
 
+    const result = await response.json();
+    if (result.error) {
+      throw new Error(`MCP initialization error: ${result.error.message}`);
+    }
+
+    console.log({ h: Array.from(response.headers.keys()), result });
     // Extract session ID from response header
     this.sessionId = response.headers.get('Mcp-Session-Id');
     if (!this.sessionId) {
       throw new Error('Server did not return a session ID');
     }
-
-    const result = await response.json();
-    if (result.error) {
-      throw new Error(`MCP initialization error: ${result.error.message}`);
-    }
   }
 
   private async callTool<T>(name: string, args: Record<string, any>): Promise<T> {
+    console.log('Calling tool:', name, args);
     if (!this.sessionId) {
-      await this.initialize();
+      console.log('Session ID not found, initializing...');
+      try {
+        await this.initialize();
+      } catch (error) {
+        console.error('Failed to initialize MCP client:', error);
+      }
     }
     const response = await fetch(this.baseURL, {
       method: 'POST',
@@ -59,13 +71,14 @@ export class DashboardMCPClient {
       body: JSON.stringify({
         jsonrpc: '2.0',
         id: this.requestId++,
-        method: "tools/call",
+        method: 'tools/call',
         params: {
           name: name,
           arguments: args,
         },
       }),
     });
+    console.log({ response });
 
     if (!response.ok) {
       throw new Error(`Failed to call tool ${name}: ${response.statusText}`);
@@ -84,33 +97,50 @@ export class DashboardMCPClient {
       throw new Error(`MCP Tool Error: ${content?.text || 'Unknown error'}`);
     }
 
-    const text  = content?.text;
+    const text = content?.text;
     if (text) {
-      return JSON.parse(text) as T;
+      console.log('Dashboard MCP Reposne. tool name=%s', name, { text });
+      try {
+        return JSON.parse(text) as T;
+      } catch (e) {
+        throw Error('Cannot parse MCP result, error=' + e + 'error' + text);
+      }
     }
     return content;
   }
 
   async getActiveDashboard(): Promise<ActiveDashboardResponse> {
-    return await this.callTool('get_active_dashboard', {})
+    return await this.callTool('get_active_dashboard', {});
   }
 
   async getDashboard(dashboardId: string): Promise<ActiveDashboardResponse> {
-    return await this.callTool('get_dashboard', { layout_id: dashboardId })
+    return await this.callTool('get_dashboard', { layout_id: dashboardId });
   }
 
   async getDashboardById(dashboardId: string): Promise<ActiveDashboardResponse> {
-    return await this.callTool('get_dashboard', { layout_id: dashboardId })
+    return await this.callTool('get_dashboard', { layout_id: dashboardId });
   }
 
-  async listDashboards(limit: number = 50, offset: number = 0): Promise<ListDashboardsResponse> {
-    return await this.callTool('list_dashboards', { limit: String(limit), offset: String(offset) })
+  async listDashboards(limit = 50, offset = 0): Promise<ListDashboardsResponse> {
+    return await this.callTool('list_dashboards', { limit: String(limit), offset: String(offset) });
+  }
+  async findWidgets(): Promise<FindWidgetsResponse> {
+    return await this.callTool('find_widgets', {
+      description: '',
+    });
+  }
+  async addWidget(widget: DashboardWidget): Promise<FindWidgetsResponse> {
+    return await this.callTool('add_widget', {
+      component_type: widget.componentType,
+      props: JSON.stringify(widget.props),
+      widget_description: 'no description',
+    });
   }
 
   async updateWidgetPositions(layout: any[]): Promise<void> {
     // Update each widget's position individually using manipulate_widget
     // We need to do both move and resize in separate operations
-    const promises = layout.flatMap(item => [
+    const promises = layout.flatMap((item) => [
       // Move operation
       this.callTool('manipulate_widget', {
         widget_id: item.i,
@@ -124,7 +154,7 @@ export class DashboardMCPClient {
         operation: 'resize',
         w: String(item.w),
         h: String(item.h),
-      })
+      }),
     ]);
 
     await Promise.all(promises);

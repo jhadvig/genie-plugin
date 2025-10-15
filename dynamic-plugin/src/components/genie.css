@@ -416,6 +416,10 @@
         gap: 1rem;
         align-items: center;
 
+        & > .logo img {
+          width: 135px;
+        }
+
         & > nav {
           margin: 0 auto;
 

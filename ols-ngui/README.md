@@ -10,22 +10,26 @@
 
 2. Run Openshift MCP Server with YAML output
 
-    `npx kubernetes-mcp-server@latest --port 8081 --list-output yaml`
+    `npx kubernetes-mcp-server@latest --port 8081 --list-output yaml --read-only --toolsets core`
 
 3. Run NGUI
-
-   Use `quay.io/lkrzyzanek/next_gen_ui_mcp:dev` image
 
    ```sh
    export OPENAI_API_KEY="sk-..."
    podman run --rm -it -p 9200:9200 \
+      -v $PWD/ols-ngui:/opt/app-root/config:z \
       --env MCP_PORT="9200" \
-      --env NGUI_MODEL="gpt-4o" \
+      --env NGUI_MODEL="gpt-4o-mini" \
       --env NGUI_PROVIDER_API_KEY=$OPENAI_API_KEY \
-      quay.io/lkrzyzanek/next_gen_ui_mcp:dev
+      --env NGUI_CONFIG_PATH="/opt/app-root/config/ngui_openshift_mcp_config.yaml" \
+      quay.io/next-gen-ui/mcp
    ``` 
 
-    Or from git source: `python libs/next_gen_ui_mcp --provider langchain --model gpt-4o-mini  --port 9200 --transport streamable-http`
+Or from git source:
+    
+```sh
+PYTHONPATH=./libs python libs/next_gen_ui_mcp --provider langchain --model gpt-4o-mini  --port 9200 --transport streamable-http --config-path /Users/lkrzyzan/git/genie/genie-plugin/ols-ngui/ngui_openshift_mcp_config.yaml
+```
 
 ### Start OLS
 
@@ -68,3 +72,72 @@ curl --request POST \
 ```
 
 You can change `"media_type": "application/json",` to `"media_type": "text/plain",`
+
+
+## Conversation Examples
+
+### Create a new dashboard
+```
+hi
+
+Create a new empty dashboard called "Trying Stuff #1" and activate it.
+```
+
+
+### Openshift Namespace to Pod
+
+```
+hi
+
+Create a new empty dashboard called "Demo dashboard" and activate it.
+
+what are my namespaces, generate ui
+
+what pods are running in openshift-lightspeed namespace, generate ui
+    what pods are running in openshift-lightspeed namespace
+
+tell me all details about pod lightspeed-app-server-8d87bd889-rhxm4, generate ui
+	generate again the component about that pod
+    tell me all details about pod lightspeed-app-server-8d87bd889-rhxm4 in namespace openshift-lightspeed, generate ui
+
+what is restart policy for that pod?
+what is restart policy for that pod, generate ui
+    ^ This is fully generated one card component
+
+show me logs of pod lightspeed-app-server-8d87bd889-rhxm4 in openshift-lightspeed namespace, container openshift-mcp-server, generate ui
+```
+
+### Openshift Lightspeed Service Dashboard
+
+```
+hi
+
+Create a new empty dashboard called "Openshift Lightspeed Service" and activate it.
+
+What pods are running in namespace "openshift-lightspeed", generate ui
+
+Show me logs for pod next-gen-ui-mcp-695cbd79bb-npcdm, generate ui
+```
+
+### Unknown data - Dashboards
+
+```
+hi
+
+Create a new empty dashboard called "My Dashboards" and activate it.
+
+
+what are my dashboards? generate ui
+	what are my dashboards? Include all possible information, generate ui
+
+what are my dashboards? generate ui and use table
+
+what are my dashboards? generate ui and use set of cards
+
+```
+
+### Perses
+
+```
+create a dashboard called Libor POC and add a widget showing me the CPU usage for the pods in my openshift-monitoring namespace over the last hour
+```

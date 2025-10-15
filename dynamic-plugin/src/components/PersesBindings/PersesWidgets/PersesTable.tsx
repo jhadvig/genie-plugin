@@ -10,7 +10,7 @@ import React, { useMemo } from 'react';
 import useResizeObserver from 'use-resize-observer';
 import PersesWidgetWrapper from '../PersesWidgetWrapper';
 
-type PersesTimeSeriesProps = {
+type PersesTableProps = {
   duration: string;
   end: string;
   query: string;
@@ -34,7 +34,7 @@ const useTimeRange = (start?: string, end?: string, duration?: string) => {
   return result;
 };
 
-const TimeSeries = ({ query }: PersesTimeSeriesProps) => {
+const TimeSeries = ({ query }: PersesTableProps) => {
   const datasource = DEFAULT_PROM;
   const { width, ref: boxRef } = useResizeObserver();
   const suggestedStepMs = useSuggestedStepMs(width);
@@ -56,11 +56,11 @@ const TimeSeries = ({ query }: PersesTimeSeriesProps) => {
       : [];
 
   return (
-    <div ref={boxRef} style={{ width: '100%', height: '100%' }}>
+    <div ref={boxRef} style={{ width: '100%', height: '100%', overflow: 'auto' }}>
       <DataQueriesProvider definitions={definitions} options={{ suggestedStepMs, mode: 'range' }}>
         <Panel
           panelOptions={{
-            hideHeader: true,
+            hideHeader: false,
           }}
           definition={{
             kind: 'Panel',
@@ -68,7 +68,7 @@ const TimeSeries = ({ query }: PersesTimeSeriesProps) => {
               queries: [],
               display: { name: '' },
               plugin: {
-                kind: 'TimeSeriesChart',
+                kind: 'Table',
                 spec: {
                   visual: {
                     stack: 'all',
@@ -83,7 +83,7 @@ const TimeSeries = ({ query }: PersesTimeSeriesProps) => {
   );
 };
 
-const PersesTimeSeries = (props: PersesTimeSeriesProps) => {
+const PersesTable = (props: PersesTableProps) => {
   const timeSeriesProps = props;
   const timeRange = useTimeRange(
     timeSeriesProps.start,
@@ -99,4 +99,4 @@ const PersesTimeSeries = (props: PersesTimeSeriesProps) => {
   );
 };
 
-export default PersesTimeSeries;
+export default PersesTable;

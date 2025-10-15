@@ -1,6 +1,6 @@
 export type DashboardWidget = {
   id: string;
-  componentType: 'text' | 'chart';
+  componentType: 'text' | 'chart' | 'ngui' | 'log';
   position: {
     x: number;
     y: number;
@@ -10,9 +10,12 @@ export type DashboardWidget = {
   props: Record<string, any> & {
     // For chart widgets, we might have a specific Perses component
     persesComponent?: string;
+    ngui_id?: string;
+    ngui_content?: string;
   };
   // Optional breakpoint for responsive layouts
   breakpoint: string;
+  description?: string;
 };
 
 export type DashboardLayout = {
@@ -96,6 +99,15 @@ export type ManipulateWidgetEvent = {
   };
 };
 
+export type FindWidgetsResponse = {
+  success: boolean;
+  operation: string;
+  activeLayoutId: string;
+  message: string;
+  timestamp: string;
+  widgets: DashboardWidget[];
+};
+
 export type AddWidgetResponse = {
   success: boolean;
   operation: string;
@@ -113,6 +125,19 @@ export type AddWidgetEvent = {
     token: {
       tool_name: 'add_widget';
       response: AddWidgetResponse;
+    };
+  };
+};
+
+export type GenerateUIEvent = {
+  event: 'tool_result';
+  data: {
+    id: number;
+    token: {
+      tool_name: 'generate_ui';
+      response: string;
+      artifact: string;
+      status: string;
     };
   };
 };

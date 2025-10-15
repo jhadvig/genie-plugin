@@ -16,8 +16,11 @@ export default function GenieLibraryPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
+
   useEffect(() => {
-    const client = new DashboardMCPClient('http://localhost:9081/mcp');
+    const client = new DashboardMCPClient(
+      `${window.location.origin}/api/proxy/plugin/genie-plugin/dashboard-mcp/`,
+    );
     client
       .listDashboards()
       .then(({ layouts }) => {
@@ -130,13 +133,11 @@ export default function GenieLibraryPage() {
 }
 
 export type DashboardListItem = {
-    id: string;
-    layoutId: string;
-    name: string;
-    description: string;
-    isActive?: boolean;
-    createdAt?: string;
-    updatedAt?: string;
-  };
-
-
+  id: string;
+  layoutId: string;
+  name: string;
+  description: string;
+  isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
