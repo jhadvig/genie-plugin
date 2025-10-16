@@ -61,13 +61,13 @@ BRIDGE_PLUGIN_PROXY="{\"services\": [{\"consoleAPIPath\": \"/api/proxy/plugin/mo
 # Prefer podman if installed. Otherwise, fall back to docker.
 if [ -x "$(command -v podman)" ]; then
     if [ "$(uname -s)" = "Linux" ]; then
-        # Use host networking on Linux
-        podman run --pull always --platform $CONSOLE_IMAGE_PLATFORM --rm --network=host --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        echo "Use host networking on Linux"
+        podman run --pull always --platform $CONSOLE_IMAGE_PLATFORM --rm --network=host --env-file <(set | grep BRIDGE) --env BRIDGE_PLUGIN_PROXY="${BRIDGE_PLUGIN_PROXY}" $CONSOLE_IMAGE
     else
-        # Use port mapping for Podman on macOS/Windows
-        podman run --pull always --platform $CONSOLE_IMAGE_PLATFORM --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) $CONSOLE_IMAGE
+        echo "Use port mapping for Podman on macOS/Windows"
+        podman run --pull always --platform $CONSOLE_IMAGE_PLATFORM --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) --env BRIDGE_PLUGIN_PROXY="${BRIDGE_PLUGIN_PROXY}" $CONSOLE_IMAGE
     fi
 else
-    # Use Docker with port mapping
+    echo "Use Docker with port mapping"
     docker run --pull always --platform $CONSOLE_IMAGE_PLATFORM --rm -p "$CONSOLE_PORT":9000 --env-file <(set | grep BRIDGE) --env BRIDGE_PLUGIN_PROXY="${BRIDGE_PLUGIN_PROXY}" $CONSOLE_IMAGE
 fi
