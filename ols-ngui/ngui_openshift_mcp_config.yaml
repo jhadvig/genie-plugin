@@ -6,43 +6,47 @@ unsupported_components: true
 
 data_types:
   namespaces_list:
-    data_transformer: yaml
+    data_transformer: fwctable
     components:
       - component: table
         configuration:
           title: Namespaces
           fields:
             - name: Name
-              data_path: $[*].metadata.name
-            - name: Created
-              data_path: $[*].metadata.creationTimestamp
+              data_path: $[*].NAME
             - name: Status
-              data_path: $[*].status.phase
+              data_path: $[*].STATUS
+            - name: Age
+              data_path: $[*].AGE
+            # - name: Labels
+            #   data_path: $[*].LABELS
   projects_list:
-    data_transformer: yaml
+    data_transformer: fwctable
   events_list:
-    data_transformer: yaml
+    data_transformer: fwctable
   pods_get:
-    data_transformer: yaml
+    data_transformer: fwctable
   pods_list:
-    data_transformer: yaml
+    data_transformer: fwctable
   pods_list_in_namespace:
-    data_transformer: yaml
+    data_transformer: fwctable
     components:
       - component: table
         configuration:
           title: Pods
           fields:
             - name: Name
-              data_path: $[*].metadata.name
+              data_path: $[*].NAME
             - name: Status
-              data_path: $[*].status.phase
-            - name: Started
-              data_path: $.[*].status.containerStatuses[0].started
-            - name: Restarts
-              data_path: $[*].status.containerStatuses[0].restartCount
-            - name: Created
-              data_path: $[*].metadata.creationTimestamp
+              data_path: $[*].STATUS
+            - name: Ready
+              data_path: $[*].READY
+            - name: Age
+              data_path: $[*].AGE
+            - name: IP
+              data_path: $[*].IP
+            - name: Node
+              data_path: $[*].NODE
 
   # returning CSV data!!!
   pods_log:
@@ -52,4 +56,4 @@ data_types:
   # pods_top:
   #   data_transformer: yaml
   resources_list:
-    data_transformer: yaml
+    data_transformer: fwctable

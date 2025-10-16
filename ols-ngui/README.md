@@ -8,9 +8,9 @@
 
     `oc login ...`
 
-2. Run Openshift MCP Server with YAML output
+2. Run Openshift MCP Server with TABLE (default) output
 
-    `npx kubernetes-mcp-server@latest --port 8081 --list-output yaml --read-only --toolsets core`
+    `npx kubernetes-mcp-server@latest --port 8081 --list-output table --read-only --toolsets core`
 
 3. Run NGUI
 
