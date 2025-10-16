@@ -111,7 +111,9 @@ export default function GenieLibraryPage() {
               setSaving(true);
               setSaveError(null);
               try {
-                const client = new DashboardMCPClient('http://localhost:9081/mcp');
+                const client = new DashboardMCPClient(
+                  `${window.location.origin}/api/proxy/plugin/genie-plugin/dashboard-mcp/`,
+                );
                 await client.setDashboardMetadata(renameTarget.layoutId, draftName.trim(), draftDesc || undefined);
                 setDashboards((prev) => prev.map((row) => row.id === renameTarget.id ? { ...row, name: draftName.trim(), description: draftDesc } : row));
                 setIsRenameOpen(false);

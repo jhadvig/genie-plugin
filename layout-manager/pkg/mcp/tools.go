@@ -200,10 +200,12 @@ func CreateGetDashboardTool() mcp.Tool {
 // CreateSetDashboardMetadataTool creates a fresh tool to update dashboard name and/or description
 func CreateSetDashboardMetadataTool() mcp.Tool {
     return mcp.NewTool("set_dashboard_metadata",
-        mcp.WithDescription("Set dashboard name and/or description by layout_id. Examples: 'rename dashboard to \"System Overview\"', 'update description to \"KPI overview for Q4\"', 'set name to \"My Dashboard\" and description to \"Main cluster KPIs\"'."),
+        mcp.WithDescription("Set dashboard name and/or description. Target selection: prefer 'layout_id'; if missing, you MAY use 'dashboard_name'; if neither provided, default to the ACTIVE dashboard."),
         mcp.WithString("layout_id",
-            mcp.Required(),
-            mcp.Description("The dashboard layout_id to update"),
+            mcp.Description("Optional: dashboard layout_id to update (preferred when available)"),
+        ),
+        mcp.WithString("dashboard_name",
+            mcp.Description("Optional: dashboard name to target when layout_id is not provided"),
         ),
         mcp.WithString("name",
             mcp.Description("Optional new name"),

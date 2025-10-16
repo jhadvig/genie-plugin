@@ -822,13 +822,21 @@ func SetDashboardMetadataHandler(layoutRepo *db.LayoutRepository) func(context.C
         if layoutID == "" {
             layoutID = request.GetString("dashboard_id", "")
         }
-        if layoutID == "" {
-            return mcp.NewToolResultError("layout_id (or dashboard_id) parameter is required"), nil
-        }
+        dashboardName := request.GetString("dashboard_name", request.GetString("dashboard", ""))
+
         newName := request.GetString("name", "")
         newDescription := request.GetString("description", "")
 
-        layout, err := layoutRepo.GetByLayoutID(layoutID)
+        var layout *models.Layout
+        var err error
+        switch {
+        case layoutID != "":
+            layout, err = layoutRepo.GetByLayoutID(layoutID)
+        case dashboardName != "":
+            layout, err = layoutRepo.GetByNameInsensitive(dashboardName)
+        default:
+            layout, err = layoutRepo.GetActiveLayout()
+        }
         if err != nil {
             return mcp.NewToolResultError(fmt.Sprintf("Dashboard not found: %v", err)), nil
         }
@@ -851,7 +859,7 @@ func SetDashboardMetadataHandler(layoutRepo *db.LayoutRepository) func(context.C
         response := MCPResponse{
             Success:   true,
             Operation: "set_dashboard_metadata",
-            Message:   fmt.Sprintf("Set metadata for dashboard '%s'", layoutID),
+            Message:   fmt.Sprintf("Set metadata for dashboard '%s'", layout.LayoutID),
             Timestamp: time.Now(),
             Layout: &LayoutInfo{
                 ID:          layout.ID.String(),
