@@ -25,7 +25,7 @@ data_types:
   events_list:
     data_transformer: fwctable
   pods_get:
-    data_transformer: fwctable
+    data_transformer: yaml
   pods_list:
     data_transformer: fwctable
   pods_list_in_namespace:
