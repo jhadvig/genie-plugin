@@ -207,3 +207,29 @@ export type ListDashboardsResponse = {
     description: string;
   }>;
 };
+
+export type SetDashboardMetadataEvent = {
+  event: 'tool_call' | 'tool_result';
+  data: {
+    id: number;
+    role?: 'tool_execution';
+    token: {
+      tool_name: 'set_dashboard_metadata';
+      arguments?: {
+        layout_id?: string;
+        dashboard_id?: string;
+        name?: string;
+        description?: string;
+      };
+      response?:
+        | string
+        | {
+            layout?: {
+              layoutId?: string;
+              name?: string;
+              description?: string;
+            };
+          };
+    };
+  };
+};

@@ -5,6 +5,7 @@ import { useDashboards } from '../hooks/useDashboards';
 import { DashboardGrid } from './Dashboard';
 import { ChatInterface, EditableInline, GenieLayout } from './shared';
 import { DashboardMCPClient } from '../services/dashboardClient';
+import DashboardUtils from './utils/dashboard.utils';
 import './utils/reactPolyfills';
 
 // Dashboard Layout component
@@ -13,7 +14,7 @@ function DashboardLayout() {
   const searchParams = new URLSearchParams(location.search);
   const dashboardId = searchParams.get('dashboardId');
 
-  const { widgets, activeDashboard, hasDashboards } = useDashboards(dashboardId || undefined);
+  const { widgets, activeDashboard, hasDashboards, setActiveDashboard } = useDashboards(dashboardId || undefined);
   const dashboardClient = useRef(new DashboardMCPClient());
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -37,6 +38,33 @@ function DashboardLayout() {
     [activeDashboard?.layout?.layoutId],
   );
 
+  const onConfirm = (field: 'title' | 'description') =>
+    async (updatedValue: string) => {
+      try {
+        const resp: any = await dashboardClient.current.setDashboardMetadata(
+          activeDashboard.activeLayoutId,
+          field === 'title' ? updatedValue : undefined,
+          field === 'description' ? updatedValue : undefined,
+        );
+
+        const layout = resp?.layout || resp?.Layout;
+        const layoutIdFromResp = layout?.layoutId || layout?.LayoutID;
+        const nameFromResp = layout?.name || layout?.Name;
+        const descFromResp = layout?.description || layout?.Description;
+
+        DashboardUtils.applyDashboardMetadataUpdate(setActiveDashboard, {
+          layoutId: layoutIdFromResp,
+          name: field === 'title' ? (nameFromResp ?? updatedValue) : undefined,
+          description: field === 'description' ? (descFromResp ?? updatedValue) : undefined,
+        });
+      } catch (e) {
+        console.error(
+          `Failed to update dashboard ${field === 'title' ? 'name' : 'description'}:`,
+          e,
+        );
+      }
+    };
+
   return (
     <div style={{ padding: '20px' }}>
       {activeDashboard && activeDashboard.layout && (
@@ -44,33 +72,11 @@ function DashboardLayout() {
           <EditableInline
             value={activeDashboard.layout.name || 'Untitled Dashboard'}
             isTitle
-            onConfirm={async (updatedTitle) => {
-              try {
-                await dashboardClient.current.setDashboardMetadata(
-                  activeDashboard.activeLayoutId,
-                  updatedTitle,
-                  undefined,
-                );
-                window.dispatchEvent(new CustomEvent('dashboard-metadata-updated'));
-              } catch (e) {
-                console.error('Failed to update dashboard name:', e);
-              }
-            }}
+            onConfirm={onConfirm('title')}
           />
           <EditableInline
             value={activeDashboard.layout.description || 'No description available'}
-            onConfirm={async (updatedDescription) => {
-              try {
-                await dashboardClient.current.setDashboardMetadata(
-                  activeDashboard.activeLayoutId,
-                  undefined,
-                  updatedDescription,
-                );
-                window.dispatchEvent(new CustomEvent('dashboard-metadata-updated'));
-              } catch (e) {
-                console.error('Failed to update dashboard description:', e);
-              }
-            }}
+            onConfirm={onConfirm('description')}
           />
         </div>
       )}

@@ -7,6 +7,7 @@ import {
   AddWidgetEvent,
   AddWidgetResponse,
   GenerateUIEvent,
+  SetDashboardMetadataEvent,
 } from '../types/dashboard';
 
 export type ToolCallEvent =
@@ -276,4 +277,46 @@ export function extractWidgetsFromDashboard(
   dashboardResponse: CreateDashboardResponse,
 ): DashboardWidget[] {
   return dashboardResponse.widgets || [];
+}
+
+export function isSetDashboardMetadata(event: any): event is SetDashboardMetadataEvent {
+  const t = event?.data?.token;
+  return !!(
+    event &&
+    t &&
+    t.tool_name === 'set_dashboard_metadata' &&
+    (t.arguments || t.response)
+  );
+}
+
+export function parseSetDashboardMetadata(
+  event: SetDashboardMetadataEvent,
+): { layoutId?: string; name?: string; description?: string } | null {
+  if (!isSetDashboardMetadata(event)) return null;
+  try {
+    const token = event.data.token;
+    // Prefer optimistic arguments
+    const args = token.arguments;
+    if (args && (args.name != null || args.description != null)) {
+      return {
+        layoutId: args.layout_id || args.dashboard_id,
+        name: args.name,
+        description: args.description,
+      };
+    }
+
+    // Fallback to response
+    const responsePayload = token.response;
+    const response = typeof responsePayload === 'string' ? JSON.parse(responsePayload) : responsePayload;
+    const layout = (response as any)?.layout;
+    if (!layout) return null;
+    return {
+      layoutId: layout.layoutId,
+      name: layout.name,
+      description: layout.description,
+    };
+  } catch (error) {
+    console.error('Failed to parse set_dashboard_metadata event:', error);
+    return null;
+  }
 }

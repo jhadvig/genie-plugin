@@ -822,7 +822,6 @@ func SetDashboardMetadataHandler(layoutRepo *db.LayoutRepository) func(context.C
         if layoutID == "" {
             layoutID = request.GetString("dashboard_id", "")
         }
-        dashboardName := request.GetString("dashboard_name", request.GetString("dashboard", ""))
 
         newName := request.GetString("name", "")
         newDescription := request.GetString("description", "")
@@ -832,8 +831,6 @@ func SetDashboardMetadataHandler(layoutRepo *db.LayoutRepository) func(context.C
         switch {
         case layoutID != "":
             layout, err = layoutRepo.GetByLayoutID(layoutID)
-        case dashboardName != "":
-            layout, err = layoutRepo.GetByNameInsensitive(dashboardName)
         default:
             layout, err = layoutRepo.GetActiveLayout()
         }

@@ -92,6 +92,24 @@ class DashboardUtils {
         };
       });
   }
+
+  static applyDashboardMetadataUpdate(
+    setActiveDashboard: (updater: (prev: NormalizedDashboard | undefined) => NormalizedDashboard | undefined) => void,
+    meta: { layoutId?: string; name?: string; description?: string },
+  ) {
+    setActiveDashboard((prev) => {
+      if (!prev) return prev;
+      if (meta.layoutId && prev.layout.layoutId !== meta.layoutId) return prev;
+      return {
+        ...prev,
+        layout: {
+          ...prev.layout,
+          ...(meta.name !== undefined ? { name: meta.name } : {}),
+          ...(meta.description !== undefined ? { description: meta.description } : {}),
+        },
+      };
+    });
+  }
 }
 
 export default DashboardUtils;
