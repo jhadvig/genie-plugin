@@ -47,15 +47,10 @@ function DashboardLayout() {
           field === 'description' ? updatedValue : undefined,
         );
 
-        const layout = resp?.layout || resp?.Layout;
-        const layoutIdFromResp = layout?.layoutId || layout?.LayoutID;
-        const nameFromResp = layout?.name || layout?.Name;
-        const descFromResp = layout?.description || layout?.Description;
-
         DashboardUtils.applyDashboardMetadataUpdate(setActiveDashboard, {
-          layoutId: layoutIdFromResp,
-          name: field === 'title' ? (nameFromResp ?? updatedValue) : undefined,
-          description: field === 'description' ? (descFromResp ?? updatedValue) : undefined,
+          layoutId: resp?.layout?.layoutId,
+          name: field === 'title' ? (resp?.layout?.name ?? updatedValue) : undefined,
+          description: field === 'description' ? (resp?.layout?.description ?? updatedValue) : undefined,
         });
       } catch (e) {
         console.error(
