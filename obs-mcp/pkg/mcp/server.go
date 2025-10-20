@@ -14,15 +14,19 @@ import (
 	"github.com/mark3labs/mcp-go/server"
 )
 
-type authHeader string
+// ObsMCPOptions contains configuration options for the MCP server
+type ObsMCPOptions struct {
+	AuthMode AuthMode
+	PromURL  string
+	Insecure bool
+}
 
 const (
-	authHeaderStr  authHeader = "kubernetes-authorization"
-	mcpEndpoint               = "/mcp"
-	healthEndpoint            = "/health"
+	mcpEndpoint    = "/mcp"
+	healthEndpoint = "/health"
 )
 
-func NewMCPServer(promURL string) (*server.MCPServer, error) {
+func NewMCPServer(opts ObsMCPOptions) (*server.MCPServer, error) {
 	mcpServer := server.NewMCPServer(
 		"obs-mcp",
 		"1.0.0",
@@ -30,21 +34,21 @@ func NewMCPServer(promURL string) (*server.MCPServer, error) {
 		server.WithToolCapabilities(true),
 	)
 
-	if err := SetupTools(mcpServer, promURL); err != nil {
+	if err := SetupTools(mcpServer, opts); err != nil {
 		return nil, err
 	}
 
 	return mcpServer, nil
 }
 
-func SetupTools(mcpServer *server.MCPServer, promURL string) error {
+func SetupTools(mcpServer *server.MCPServer, opts ObsMCPOptions) error {
 	// Create tool definitions
 	listMetricsTool := CreateListMetricsTool()
 	executeRangeQueryTool := CreateExecuteRangeQueryTool()
 
 	// Create handlers
-	listMetricsHandler := ListMetricsHandler(promURL)
-	executeRangeQueryHandler := ExecuteRangeQueryHandler(promURL)
+	listMetricsHandler := ListMetricsHandler(opts)
+	executeRangeQueryHandler := ExecuteRangeQueryHandler(opts)
 
 	// Add tools to server
 	mcpServer.AddTool(listMetricsTool, listMetricsHandler)
@@ -54,12 +58,12 @@ func SetupTools(mcpServer *server.MCPServer, promURL string) error {
 }
 
 func authFromRequest(ctx context.Context, r *http.Request) context.Context {
-	authHeaderValue := r.Header.Get(string(authHeaderStr))
+	authHeaderValue := r.Header.Get(string(AuthHeaderKey))
 	token, found := strings.CutPrefix(authHeaderValue, "Bearer ")
 	if !found {
 		return ctx
 	}
-	return context.WithValue(ctx, authHeaderStr, token)
+	return context.WithValue(ctx, AuthHeaderKey, token)
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {

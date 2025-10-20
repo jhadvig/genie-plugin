@@ -23,6 +23,6 @@ WORKDIR /app
 COPY --from=builder /app/obs-mcp /app/obs-mcp
 USER 65532:65532
 
-ENTRYPOINT ["/app/obs-mcp", "--listen", ":8080"]
+ENTRYPOINT ["/app/obs-mcp", "--listen", ":8080", "--auth-mode", "header"]
 
 EXPOSE 8080
