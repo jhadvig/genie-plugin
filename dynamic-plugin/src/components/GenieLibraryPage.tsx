@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Table, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
-import { Button, Modal, ModalVariant, Form, FormGroup, TextInput, Alert, Spinner } from '@patternfly/react-core';
+import { Button, Modal, ModalVariant, Form, FormGroup, TextInput, Alert, Spinner, ModalHeader } from '@patternfly/react-core';
 import { DashboardMCPClient } from '../services/dashboardClient';
 import {GenieLayout } from './shared';
 
@@ -94,6 +94,7 @@ export default function GenieLibraryPage() {
             {saveError}
           </Alert>
         )}
+        <ModalHeader title="Edit Dashboard" labelId="edit-dashboard" />
         <Form>
           <FormGroup label="Name" isRequired fieldId="rename-name">
             <TextInput id="rename-name" value={draftName} onChange={(_, newVal) => setDraftName(newVal)} isRequired />

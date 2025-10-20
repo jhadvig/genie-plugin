@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextInput, Tooltip } from '@patternfly/react-core';
-import { PencilAltIcon, CheckIcon, TimesIcon } from '@patternfly/react-icons';
+import { CheckIcon, TimesIcon } from '@patternfly/react-icons';
 
 export type EditableInlineProps = {
   value: string;
@@ -33,16 +33,6 @@ export function EditableInline({ value, isTitle, onConfirm }: EditableInlineProp
               <p style={{ margin: 0, color: '#666', fontSize: '14px' }}>{value}</p>
             )}
           </div>
-          <Tooltip content="Edit">
-            <Button
-              variant="plain"
-              aria-label="Edit"
-              onClick={() => setEditing(true)}
-              style={{ marginLeft: 8 }}
-            >
-              <PencilAltIcon />
-            </Button>
-          </Tooltip>
         </>
       ) : (
         <div style={{ display: 'flex', alignItems: 'center', width: isTitle ? 480 : 640 }}>

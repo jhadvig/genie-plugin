@@ -517,3 +517,7 @@
   font-family: var(--rh-font-family-heading, RedHatDisplay, 'Red Hat Display', Helvetica, Arial, sans-serif);
   font-weight: var(--rh-font-weight-heading-medium, 500);
 }
+
+.pf-v6-c-modal-box__header {
+  padding-inline-start: 0px;
+}
