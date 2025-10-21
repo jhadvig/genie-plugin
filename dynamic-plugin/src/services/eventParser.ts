@@ -192,7 +192,8 @@ export function isGenerateUIEvent(event: any): event is GenerateUIEvent {
     event.data &&
     event.data.token &&
     typeof event.data.token === 'object' &&
-    event.data.token.tool_name === 'generate_ui' &&
+    (event.data.token.tool_name === 'generate_ui_component' ||
+      event.data.token.tool_name === 'generate_ui_multiple_components') &&
     (event.data.token.artifact || event.data.token.response)
   );
 }
