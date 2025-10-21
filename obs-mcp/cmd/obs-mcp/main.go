@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// Parse command line flags
-	var listen = flag.String("listen", "", "Listen address for HTTP mode (e.g., :9100, 127.0.0.1:8080)")
+	var listen = flag.String("listen", "127.0.0.1:9100", "Listen address for HTTP mode (e.g., :9100, 127.0.0.1:8080)")
 	flag.Parse()
 
 	// Get Prometheus URL from environment variable

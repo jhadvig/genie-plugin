@@ -4,7 +4,7 @@ import {
   FindWidgetsResponse,
   DashboardWidget,
 } from 'src/types/dashboard';
-
+import { getCSRFToken } from '@openshift-console/dynamic-plugin-sdk/lib/utils/fetch/console-fetch-utils';
 export class DashboardMCPClient {
   private baseURL: string;
   private requestId = 0;
@@ -19,7 +19,10 @@ export class DashboardMCPClient {
 
     const response = await fetch(this.baseURL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken(),
+      },
       body: JSON.stringify({
         jsonrpc: '2.0',
         id: this.requestId++,
@@ -66,7 +69,8 @@ export class DashboardMCPClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Mcp-Session-Id': this.sessionId!,
+        'X-CSRFToken': getCSRFToken(),
+        'Mcp-Session-Id': this.sessionId || '',
       },
       body: JSON.stringify({
         jsonrpc: '2.0',

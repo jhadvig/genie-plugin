@@ -1,0 +1,316 @@
+---
+# PersistentVolumeClaim for PostgreSQL data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  labels:
+    app: postgres
+    component: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: "gp2-csi"  # Use gp2 storage class (common in OpenShift)
+
+---
+# ConfigMap for PostgreSQL configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+    component: database
+data:
+  POSTGRES_DB: "layout_manager"
+  POSTGRES_USER: "postgres"
+  POSTGRES_HOST_AUTH_METHOD: "trust"
+
+---
+# Secret for PostgreSQL password
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secrets
+  labels:
+    app: postgres
+    component: database
+type: Opaque
+data:
+  # Base64 encoded password - replace with your actual password
+  # To encode: echo -n "your-password" | base64
+  POSTGRES_PASSWORD: cGFzc3dvcmQ=  # This is "password" encoded in base64
+
+---
+# Deployment for PostgreSQL database
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+    component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        component: database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        ports:
+        - containerPort: 5432
+          name: postgres
+          protocol: TCP
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_HOST_AUTH_METHOD
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_HOST_AUTH_METHOD
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - layout_manager
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - layout_manager
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+      restartPolicy: Always
+
+---
+# Service for PostgreSQL database
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  labels:
+    app: postgres
+    component: database
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  selector:
+    app: postgres
+
+---
+# ConfigMap for layout-manager configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: layout-manager-config
+  labels:
+    app: layout-manager
+    component: mcp-server
+data:
+  # Database configuration
+  db-host: "postgres-service"  # This should match your PostgreSQL service name
+  db-user: "postgres"
+  db-name: "layout_manager"
+  db-port: "5432"
+  
+  # Server configuration
+  server-host: "0.0.0.0"
+  server-port: "9080"
+  
+  # MCP configuration
+  mcp-host: "0.0.0.0"
+  mcp-port: "9081"
+
+---
+# Secret for sensitive configuration
+apiVersion: v1
+kind: Secret
+metadata:
+  name: layout-manager-secrets
+  labels:
+    app: layout-manager
+    component: mcp-server
+type: Opaque
+data:
+  # Base64 encoded password - replace with your actual password
+  # To encode: echo -n "your-password" | base64
+  db-password: cGFzc3dvcmQ=  # This is "password" encoded in base64
+
+---
+# Deployment for layout-manager MCP server
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: layout-manager
+  labels:
+    app: layout-manager
+    component: mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: layout-manager
+  template:
+    metadata:
+      labels:
+        app: layout-manager
+        component: mcp-server
+    spec:
+      initContainers:
+      - name: wait-for-db
+        image: postgres:15
+        command: ['sh', '-c', 'until pg_isready -h postgres-service.genie-plugin.svc.cluster.local -p 5432 -U postgres; do echo waiting for database; sleep 2; done;']
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secrets
+              key: POSTGRES_PASSWORD
+      containers:
+      - name: layout-manager
+        image: quay.io/jhadvig/layout-manager:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9081
+          name: mcp
+          protocol: TCP
+        env:
+        - name: ENV
+          value: "production"
+        - name: MCP_HOST
+          value: "0.0.0.0"
+        - name: MCP_PORT
+          value: "9081"
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: layout-manager-config
+              key: db-host
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: layout-manager-config
+              key: db-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: layout-manager-secrets
+              key: db-password
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: layout-manager-config
+              key: db-name
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: layout-manager-config
+              key: db-port
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9081
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9081
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000740001
+          runAsGroup: 1000740001
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      restartPolicy: Always
+
+---
+# Service for layout-manager MCP server
+apiVersion: v1
+kind: Service
+metadata:
+  name: layout-manager
+  labels:
+    app: layout-manager
+    component: mcp-server
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9081
+    targetPort: 9081
+    protocol: TCP
+    name: mcp
+  selector:
+    app: layout-manager

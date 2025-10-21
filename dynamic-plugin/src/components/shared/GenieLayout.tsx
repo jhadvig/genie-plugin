@@ -25,17 +25,20 @@ async function testConnection(): Promise<{ success: boolean; message: string }> 
 
     for (const endpoint of healthEndpoints) {
       try {
-        const response = await fetch(`http://localhost:9000/api/proxy/plugin/genie-plugin/lightspeed/${endpoint}`, {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
+        const response = await fetch(
+          `${window.location.origin}/api/proxy/plugin/genie-plugin/lightspeed/${endpoint}`,
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
           },
-        });
+        );
 
         if (response.ok) {
           return {
             success: true,
-            message: `✅ Successfully connected to lightspeed-stack service at localhost:8080${endpoint}`,
+            message: `✅ Successfully connected to lightspeed-stack service at ${window.location.origin}/api/proxy/plugin/genie-plugin/lightspeed/${endpoint}`,
           };
         }
       } catch (e) {
@@ -125,7 +128,7 @@ export function GenieLayout({ title, children, mainContent }: GenieLayoutProps) 
             <div className="genie-container">
               <div className="genie-status">
                 <p>
-                  <strong>📡 Health Check:</strong> <code>localhost:8080/readiness</code>
+                  <strong>📡 Health Check:</strong> <code>openshift-lightspeed</code>
                   <span
                     className={`genie-health-status ${connectionStatus.loading
                         ? 'loading'
