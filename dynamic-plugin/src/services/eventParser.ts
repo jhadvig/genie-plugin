@@ -8,6 +8,7 @@ import {
   AddWidgetResponse,
   GenerateUIEvent,
   SetDashboardMetadataEvent,
+  ManipulateWidgetResponse,
 } from '../types/dashboard';
 import { MCPGenerateUIOutput, ComponentDataHandBuildComponent } from '../types/ngui';
 
@@ -22,12 +23,12 @@ export type ToolCallEvent =
 export function isCreateDashboardEvent(event: any): event is CreateDashboardEvent {
   return (
     event &&
-    event.event === 'tool_call' &&
+    event.event === 'tool_result' &&
     event.data &&
     event.data.token &&
-    typeof event.data.token === 'object' &&
-    event.data.token.tool_name === 'create_dashboard' &&
-    event.data.token.response
+    event.data.token.response &&
+    typeof event.data.token.response === 'object' &&
+    event.data.token.response.operation === 'create_dashboard'
   );
 }
 
@@ -38,53 +39,43 @@ export function parseCreateDashboardEvent(
     return null;
   }
 
-  try {
-    let response = event.data.token.response;
-    console.log({ response });
+  const response = event.data.token.response;
+  console.log('Parsing dashboard event:', { response });
 
-    // Handle case where response is a JSON string
-    if (typeof response === 'string') {
-      response = JSON.parse(response);
-    }
-
-    // Validate the parsed response has required properties
-    if (!response || typeof response !== 'object') {
-      console.warn('Invalid dashboard response: not an object', response);
-      return null;
-    }
-
-    if (!response.layout || !response.layout.name) {
-      console.warn('Invalid dashboard response: missing layout.name', response);
-      return null;
-    }
-
-    // Widgets array is now optional (empty dashboards don't have widgets)
-    if (response.widgets && !Array.isArray(response.widgets)) {
-      console.warn('Invalid dashboard response: widgets is not an array', response);
-      return null;
-    }
-
-    // Ensure widgets array exists even if empty
-    if (!response.widgets) {
-      response.widgets = [];
-    }
-
-    return response as CreateDashboardResponse;
-  } catch (error) {
-    console.error('Failed to parse dashboard response:', error);
+  // Validate the response has required properties
+  if (!response || typeof response !== 'object') {
+    console.warn('Invalid dashboard response: not an object', response);
     return null;
   }
+
+  if (!response.layout || !response.layout.name) {
+    console.warn('Invalid dashboard response: missing layout.name', response);
+    return null;
+  }
+
+  // Widgets array is now optional (empty dashboards don't have widgets)
+  if (response.widgets && !Array.isArray(response.widgets)) {
+    console.warn('Invalid dashboard response: widgets is not an array', response);
+    return null;
+  }
+
+  // Ensure widgets array exists even if empty
+  if (!response.widgets) {
+    response.widgets = [];
+  }
+
+  return response;
 }
 
 export function isAddWidgetEvent(event: any): event is AddWidgetEvent {
   return (
     event &&
-    event.event === 'tool_call' &&
+    event.event === 'tool_result' &&
     event.data &&
     event.data.token &&
-    typeof event.data.token === 'object' &&
-    event.data.token.tool_name === 'add_widget' &&
-    event.data.token.response
+    event.data.token.response &&
+    typeof event.data.token.response === 'object' &&
+    event.data.token.response.operation === 'add_widget'
   );
 }
 
@@ -93,52 +84,76 @@ export function parseAddWidgetEvent(event: AddWidgetEvent): AddWidgetResponse | 
     return null;
   }
 
-  try {
-    let response = (event.data.token as any).response;
-    console.log('Parsing add widget event:', response);
+  const response = event.data.token.response;
+  console.log('Parsing add widget event:', response);
 
-    // Handle case where response is a JSON string
-    if (typeof response === 'string') {
-      response = JSON.parse(response);
-    }
-
-    // Validate the parsed response has required properties
-    if (!response || typeof response !== 'object') {
-      console.warn('Invalid add widget response: not an object', response);
-      return null;
-    }
-
-    if (!Array.isArray(response.widgets)) {
-      console.warn('Invalid add widget response: widgets is not an array', response);
-      return null;
-    }
-
-    // Add Perses component type for chart widgets and extract title from message if needed
-    response.widgets.forEach((widget) => {
-      if (widget.componentType === 'chart') {
-        // Extract title from the response message if not already present
-        let title = widget.props.title;
-        if (!title && response.message) {
-          // Try to extract title from message like "Added chart widget 'Chart showing cluster CPU usage over the past 15 minutes'"
-          const titleMatch = response.message.match(/'([^']+)'/);
-          if (titleMatch) {
-            title = titleMatch[1];
-          }
-        }
-
-        widget.props = {
-          ...widget.props,
-          persesComponent: 'PersesTimeSeries',
-          ...(title && { title }),
-        };
-      }
-    });
-
-    return response as AddWidgetResponse;
-  } catch (error) {
-    console.error('Failed to parse add widget event:', error);
+  // Validate the response has required properties
+  if (!response || typeof response !== 'object') {
+    console.warn('Invalid add widget response: not an object', response);
     return null;
   }
+
+  if (!Array.isArray(response.widgets)) {
+    console.warn('Invalid add widget response: widgets is not an array', response);
+    return null;
+  }
+
+  // Add Perses component type for chart widgets and extract title from message if needed
+  response.widgets.forEach((widget) => {
+    if (widget.componentType) {
+      // Extract title from the response message if not already present
+      let title = widget.props?.title;
+      if (!title && response.message) {
+        // Try to extract title from message like "Added TimeSeriesChart widget 'Chart showing CPU usage in namespaces over the last hour'"
+        const titleMatch = response.message.match(/'([^']+)'/);
+        if (titleMatch) {
+          title = titleMatch[1];
+        }
+      }
+
+      widget.props = {
+        ...widget.props,
+        ...(title && { title }),
+      };
+    }
+  });
+
+  return response;
+}
+
+export function isManipulateWidgetEvent(event: any): event is ManipulateWidgetEvent {
+  return (
+    event &&
+    event.event === 'tool_result' &&
+    event.data &&
+    event.data.token &&
+    event.data.token.response &&
+    typeof event.data.token.response === 'object' &&
+    event.data.token.response.operation === 'manipulate_widget'
+  );
+}
+
+export function parseManipulateWidgetEvent(
+  event: ManipulateWidgetEvent,
+): ManipulateWidgetResponse | null {
+  if (!isManipulateWidgetEvent(event)) {
+    return null;
+  }
+
+  const response = event.data.token.response;
+
+  // Validate the response has required properties
+  if (!response || typeof response !== 'object') {
+    console.warn('Invalid manipulate widget response: not an object', response);
+    return null;
+  }
+
+  if (!Array.isArray(response.widgets)) {
+    console.warn('Invalid manipulate widget response: widgets is not an array', response);
+    return null;
+  }
+
+  return response;
 }
 
 export function isManipulateWidgetArgumentsEvent(
@@ -278,12 +293,7 @@ export function extractWidgetsFromDashboard(
 
 export function isSetDashboardMetadata(event: any): event is SetDashboardMetadataEvent {
   const t = event?.data?.token;
-  return !!(
-    event &&
-    t &&
-    t.tool_name === 'set_dashboard_metadata' &&
-    (t.arguments || t.response)
-  );
+  return !!(event && t && t.tool_name === 'set_dashboard_metadata' && (t.arguments || t.response));
 }
 
 export function parseSetDashboardMetadata(
@@ -304,7 +314,8 @@ export function parseSetDashboardMetadata(
 
     // Fallback to response
     const responsePayload = token.response;
-    const response = typeof responsePayload === 'string' ? JSON.parse(responsePayload) : responsePayload;
+    const response =
+      typeof responsePayload === 'string' ? JSON.parse(responsePayload) : responsePayload;
     const layout = (response as any)?.layout;
     if (!layout) return null;
     return {

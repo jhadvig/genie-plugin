@@ -37,13 +37,11 @@ export type CreateDashboardResponse = {
 };
 
 export type CreateDashboardEvent = {
-  event: 'tool_call';
+  event: 'tool_result';
   data: {
-    id: number;
-    role: 'tool_execution';
     token: {
-      tool_name: 'create_dashboard';
-      response: CreateDashboardResponse;
+      response: CreateDashboardResponse; // Already parsed JSON object
+      status: 'success';
     };
   };
 };
@@ -88,13 +86,11 @@ export type ManipulateWidgetResponse = {
 };
 
 export type ManipulateWidgetEvent = {
-  event: 'tool_call';
+  event: 'tool_result';
   data: {
-    id: number;
-    role: 'tool_execution';
     token: {
-      tool_name: 'manipulate_widget';
-      response: ManipulateWidgetResponse;
+      response: ManipulateWidgetResponse; // Already parsed JSON object
+      status: 'success';
     };
   };
 };
@@ -118,13 +114,11 @@ export type AddWidgetResponse = {
 };
 
 export type AddWidgetEvent = {
-  event: 'tool_call';
+  event: 'tool_result';
   data: {
-    id: number;
-    role: 'tool_execution';
     token: {
-      tool_name: 'add_widget';
-      response: AddWidgetResponse;
+      response: AddWidgetResponse; // Already parsed JSON object
+      status: 'success';
     };
   };
 };

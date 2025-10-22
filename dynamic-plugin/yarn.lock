@@ -1395,10 +1395,10 @@
     "@redhat-cloud-services/ai-client-common" "0.13.0"
     "@redhat-cloud-services/ai-client-state" "0.15.0"
 
-"@redhat-cloud-services/lightspeed-client@^0.14.2":
-  version "0.14.2"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/lightspeed-client/-/lightspeed-client-0.14.2.tgz#28e49e64a37344180df776c7fca56f72aebe7c25"
-  integrity sha512-c1+XkgA0MNjtjCTqUN0/4wmqq+yQ+UH8N4vNJXj++jq4+ZiRnvB5L8Es1354QOsh8ohI+cJJnhsBnA/d2U3unw==
+"@redhat-cloud-services/lightspeed-client@^0.14.3":
+  version "0.14.3"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/lightspeed-client/-/lightspeed-client-0.14.3.tgz#84114c0a1e4c0ec78df3e3230d1023fcadfb520b"
+  integrity sha512-CuyFD/o8FdoiVI9ZuiYLrbjjHv23wXeISeGrX/yH5ectKmDgH8eW1sG/PRgAW9g/BB23Vo9JaH6TPVQ9RnGyjA==
   dependencies:
     "@redhat-cloud-services/ai-client-common" "0.13.0"
 

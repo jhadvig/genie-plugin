@@ -236,7 +236,11 @@ class DefaultStreamingHandler implements ISimpleStreamingHandler<string | Stream
         data: {
           token: {
             tool_name: event_data.tool_name,
-            response: event_data.content,
+            response:
+              // send the object directly if it's not a string
+              typeof event_data.content === 'string'
+                ? JSON.parse(event_data.content)
+                : event_data.content,
             artifact: event_data.artifact,
             status: event_data.status,
           },
