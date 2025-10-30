@@ -49,6 +49,24 @@ export class OcpDatasourceApi implements DatasourceApi {
   getGlobalDatasource = async (
     selector: DatasourceSelector,
   ): Promise<GlobalDatasourceResource | undefined> => {
+    if (selector.kind == "TempoDatasource") {
+      return Promise.resolve({
+        kind: 'GlobalDatasource',
+        metadata: {
+          name: 'Tempo datasource',
+        },
+        spec: {
+          default: false,
+          plugin: {
+            kind: 'TempoDatasource',
+            spec: {
+              directUrl: "/api/proxy/localtempo/",
+            },
+          },
+        },
+      });
+    }
+
     // For new return always the default data source
     const globalDatasource: GlobalDatasourceResource = {
       kind: 'GlobalDatasource',

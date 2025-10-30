@@ -87,6 +87,11 @@ Here is more context about the system:
 
 We also have a NG UI capabilities that can visualize data that is not related to charts. For example, we can show lists, tables, text blocks, and other UI elements.
 
+To visualize a gantt chart, use "TracingGanttChart" as the componentType and add the trace id as a prop named "traceId". Always show TracingGanttChart widget in fullscreen.
+To visualize trace search results, use "TraceTable" as the componentType and add the TraceQL query as a prop named "query". Always show TraceTable widget in fullscreen.
+
+If the user asks you to show all traces which contain errors, use the following TraceQL query: "{status=error}". Use the TraceTable to display it.
+
 =====The following is the user query that was asked:
 ${message}
 `;

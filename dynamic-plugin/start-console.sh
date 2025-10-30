@@ -56,7 +56,7 @@ fi
 BRIDGE_PLUGINS="${PLUGIN_NAME}=http://${HOST_ENDPOINT}:9001"
 
 # Build BRIDGE_PLUGIN_PROXY dynamically based on the determined host endpoint
-BRIDGE_PLUGIN_PROXY="{\"services\": [{\"consoleAPIPath\": \"/api/proxy/plugin/monitoring-console-plugin/perses/\", \"endpoint\": \"http://${HOST_ENDPOINT}:9090\", \"authorize\": true}, {\"consoleAPIPath\": \"/api/proxy/plugin/genie-plugin/lightspeed/\", \"endpoint\": \"http://${HOST_ENDPOINT}:8080/\"}, {\"consoleAPIPath\": \"/api/proxy/plugin/genie-plugin/dashboard-mcp/\", \"endpoint\": \"http://${HOST_ENDPOINT}:9081/mcp\"}]}"
+BRIDGE_PLUGIN_PROXY="{\"services\": [{\"consoleAPIPath\": \"/api/proxy/plugin/monitoring-console-plugin/perses/\", \"endpoint\": \"http://${HOST_ENDPOINT}:9090\", \"authorize\": true}, {\"consoleAPIPath\": \"/api/proxy/localtempo/\", \"endpoint\": \"http://${HOST_ENDPOINT}:3200\", \"authorize\": false}, {\"consoleAPIPath\": \"/api/proxy/plugin/genie-plugin/lightspeed/\", \"endpoint\": \"http://${HOST_ENDPOINT}:8080/\"}, {\"consoleAPIPath\": \"/api/proxy/plugin/genie-plugin/dashboard-mcp/\", \"endpoint\": \"http://${HOST_ENDPOINT}:9081/mcp\"}]}"
 
 # Prefer podman if installed. Otherwise, fall back to docker.
 if [ -x "$(command -v podman)" ]; then
