@@ -7,47 +7,67 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/inecas/obs-mcp/pkg/k8s"
-	"github.com/inecas/obs-mcp/pkg/mcp"
+	"github.com/inecas/obs-mcp/pkg"
 	"github.com/mark3labs/mcp-go/server"
 )
 
 func main() {
-	// Parse command line flags
-	var listen = flag.String("listen", "", "Listen address for HTTP mode (e.g., :9100, 127.0.0.1:8080)")
+	var listen = flag.String("listen", "", "Listen address for HTTP mode")
 	var authMode = flag.String("auth-mode", "", "Authentication mode: kubeconfig, serviceaccount, or header")
 	var insecure = flag.Bool("insecure", false, "Skip TLS certificate verification")
+	var enableAllEndpoints = flag.Bool("enable-all-endpoints", false, "Enable all Prometheus API endpoints (by default, only /api/v1/label/__name__/values and /api/v1/query_range are permitted)")
+	var dev = flag.Bool("dev", false, "Development mode: target Prometheus instead of Thanos Querier (for single-node non-HA clusters)")
 	flag.Parse()
 
-	// Parse and validate auth mode
-	parsedAuthMode, err := mcp.ParseAuthMode(*authMode)
+	parsedAuthMode, err := pkg.ParseAuthMode(*authMode)
 	if err != nil {
 		log.Fatalf("Invalid auth mode: %v", err)
 	}
 
-	// Determine Prometheus URL
-	promURL := determinePrometheusURL(parsedAuthMode)
+	promURL := determinePrometheusURL(parsedAuthMode, *dev)
+
+	var enabledEndpoints []string
+	var endpointConfig *pkg.EndpointConfig
+	if *enableAllEndpoints {
+		endpointConfig = pkg.FullEndpointConfig()
+		for path := range endpointConfig.AllowedEndpoints {
+			enabledEndpoints = append(enabledEndpoints, path)
+		}
+		slog.Info("All endpoints enabled", "endpoints", enabledEndpoints)
+	} else {
+		endpointConfig = pkg.DefaultEndpointConfig()
+		for path := range endpointConfig.AllowedEndpoints {
+			enabledEndpoints = append(enabledEndpoints, path)
+		}
+		slog.Info("Default endpoints enabled", "endpoints", enabledEndpoints)
+	}
 
 	// Create MCP options
-	opts := mcp.ObsMCPOptions{
-		AuthMode: parsedAuthMode,
-		PromURL:  promURL,
-		Insecure: *insecure,
+	opts := pkg.ObsMCPOptions{
+		AuthMode:       parsedAuthMode,
+		PromURL:        promURL,
+		Insecure:       *insecure,
+		EndpointConfig: endpointConfig,
 	}
 
 	// Create MCP server
-	mcpServer, err := mcp.NewMCPServer(opts)
+	mcpServer, err := pkg.NewMCPServer(opts)
 	if err != nil {
 		log.Fatalf("Failed to create MCP server: %v", err)
 	}
 
-	slog.Info("Starting server", "PromURL", opts.PromURL, "AuthMode", opts.AuthMode)
+	slog.Info("Starting server",
+		"PromURL", opts.PromURL,
+		"AuthMode", opts.AuthMode,
+		"Insecure", opts.Insecure,
+		"Listen", *listen,
+	)
 
 	// Choose server mode based on flags
 	if *listen != "" {
 		// HTTP mode
 		ctx := context.Background()
-		if err := mcp.Serve(ctx, mcpServer, *listen); err != nil {
+		if err := pkg.Serve(ctx, mcpServer, *listen); err != nil {
 			log.Fatalf("HTTP server failed: %v", err)
 		}
 	} else {
@@ -59,8 +79,8 @@ func main() {
 	}
 }
 
-// determinePrometheusURL determines the Prometheus URL based on auth mode and environment
-func determinePrometheusURL(authMode mcp.AuthMode) string {
+// determinePrometheusURL determines the Prometheus URL based on auth mode, dev mode, and environment
+func determinePrometheusURL(authMode pkg.AuthMode, devMode bool) string {
 	// Get Prometheus URL from environment variable
 	promURL := os.Getenv("PROMETHEUS_URL")
 
@@ -69,18 +89,29 @@ func determinePrometheusURL(authMode mcp.AuthMode) string {
 		return promURL
 	}
 
-	// For kubeconfig mode, attempt to discover Thanos Querier
-	if authMode == mcp.AuthModeKubeConfig {
-		slog.Info("No Prometheus URL provided, attempting to use kubeconfig to discover Thanos Querier")
-
-		url, err := k8s.GetThanosQuerierURL()
-		if err != nil {
-			slog.Warn("Failed to discover Thanos Querier via kubeconfig, falling back to localhost", "err", err)
-			return "http://localhost:9090"
+	// For kubeconfig mode, attempt service discovery
+	if authMode == pkg.AuthModeKubeConfig {
+		if devMode {
+			// Dev mode: discover Prometheus in kind cluster
+			slog.Info("Dev mode: attempting to discover Prometheus service in kind cluster")
+			url, err := pkg.GetPrometheusURL()
+			if err != nil {
+				slog.Warn("Failed to discover Prometheus via kubeconfig, falling back to localhost:9090", "err", err)
+				return "http://localhost:9090"
+			}
+			slog.Info("Discovered Prometheus URL", "url", url)
+			return url
+		} else {
+			// Production mode: discover Thanos Querier in OpenShift
+			slog.Info("No Prometheus URL provided, attempting to use kubeconfig to discover Thanos Querier")
+			url, err := pkg.GetThanosQuerierURL()
+			if err != nil {
+				slog.Warn("Failed to discover Thanos Querier via kubeconfig, falling back to localhost:9090", "err", err)
+				return "http://localhost:9090"
+			}
+			slog.Info("Discovered Thanos Querier URL", "url", url)
+			return url
 		}
-
-		slog.Info("Discovered Thanos Querier URL", "url", url)
-		return url
 	}
 
 	// Default to localhost for all other auth modes

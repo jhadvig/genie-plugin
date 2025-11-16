@@ -1,10 +1,13 @@
-package k8s
+package pkg
 
 import (
 	"context"
 	"fmt"
+	"net"
 	"strings"
+	"time"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -80,4 +83,40 @@ func GetThanosQuerierURL() (string, error) {
 	}
 
 	return "", fmt.Errorf("no suitable route found for thanos-querier")
+}
+
+// GetPrometheusURL discovers the Prometheus service URL in a kind cluster
+// For dev/testing, this returns a localhost URL that works with kubectl port-forward
+func GetPrometheusURL() (string, error) {
+	ctx := context.Background()
+
+	kubeClient, err := GetKubeClient()
+	if err != nil {
+		return "", fmt.Errorf("failed to get kubernetes client: %w", err)
+	}
+
+	foundService, err := kubeClient.CoreV1().Services(metav1.NamespaceAll).List(ctx, metav1.ListOptions{
+		LabelSelector: "app.kubernetes.io/name=prometheus,app.kubernetes.io/component=server",
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to list services: %w", err)
+	}
+	if len(foundService.Items) != 1 {
+		return "", fmt.Errorf("expected 1 service, got %d", len(foundService.Items))
+	}
+
+	svc := foundService.Items[0]
+	var port string
+	if len(svc.Spec.Ports) > 0 {
+		port = svc.Spec.Ports[0].TargetPort.String()
+	}
+
+	// Check if port-forward is set up in prometheusNs
+	conn, err := net.DialTimeout("tcp", ":"+port, time.Second*5)
+	if err == nil {
+		conn.Close()
+		return "http://localhost:" + port, nil
+	}
+
+	return "", fmt.Errorf("no Prometheus service found: %w", err)
 }

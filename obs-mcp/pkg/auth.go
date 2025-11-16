@@ -1,4 +1,4 @@
-package mcp
+package pkg
 
 import (
 	"context"
@@ -10,8 +10,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/inecas/obs-mcp/pkg/k8s"
-	"github.com/inecas/obs-mcp/pkg/prometheus"
 	promapi "github.com/prometheus/client_golang/api"
 	promcfg "github.com/prometheus/common/config"
 	"k8s.io/client-go/rest"
@@ -24,6 +22,7 @@ const (
 	AuthModeKubeConfig     AuthMode = "kubeconfig"
 	AuthModeServiceAccount AuthMode = "serviceaccount"
 	AuthModeHeader         AuthMode = "header"
+	AuthModeNone           AuthMode = "none"
 
 	// AuthHeaderKey is the context key for the Kubernetes authorization header
 	AuthHeaderKey string = "kubernetes-authorization"
@@ -38,23 +37,11 @@ func ParseAuthMode(mode string) (AuthMode, error) {
 		return AuthModeServiceAccount, nil
 	case string(AuthModeHeader):
 		return AuthModeHeader, nil
+	case string(AuthModeNone):
+		return AuthModeNone, nil
 	default:
-		return "", fmt.Errorf("invalid auth mode: %s (valid options: kubeconfig, serviceaccount, header)", mode)
+		return "", fmt.Errorf("invalid auth mode: %s (valid options: kubeconfig, serviceaccount, header, none)", mode)
 	}
-}
-
-func getPromClient(ctx context.Context, opts ObsMCPOptions) (*prometheus.PrometheusClient, error) {
-	apiConfig, err := createAPIConfig(ctx, opts)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create API config: %v", err)
-	}
-
-	promClient, err := prometheus.NewPrometheusClient(apiConfig)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create Prometheus client: %v", err)
-	}
-
-	return promClient, nil
 }
 
 func createAPIConfig(ctx context.Context, opts ObsMCPOptions) (promapi.Config, error) {
@@ -65,14 +52,15 @@ func createAPIConfig(ctx context.Context, opts ObsMCPOptions) (promapi.Config, e
 		return createServiceAccountAPIConfig(opts)
 	case AuthModeHeader:
 		return createHeaderAPIConfig(ctx, opts)
+	case AuthModeNone:
+		return createNoAuthAPIConfig(opts)
 	default:
 		return promapi.Config{}, fmt.Errorf("unsupported auth mode: %s", opts.AuthMode)
 	}
 }
 
 func createKubeconfigAPIConfig(opts ObsMCPOptions) (promapi.Config, error) {
-	// Get kubeconfig-based transport
-	restConfig, err := k8s.GetClientConfig()
+	restConfig, err := GetClientConfig()
 	if err != nil {
 		return promapi.Config{}, fmt.Errorf("failed to get kubeconfig: %w", err)
 	}
@@ -81,11 +69,8 @@ func createKubeconfigAPIConfig(opts ObsMCPOptions) (promapi.Config, error) {
 		return promapi.Config{}, fmt.Errorf("kubeconfig doesn't contain a bearer token for Prometheus authentication")
 	}
 
-	// For routes/ingresses, we need to configure TLS to skip verification
-	// or use the system's CA pool, since routes typically use different
-	// certificates than the Kubernetes API
-	tlsConfig := rest.TLSClientConfig{Insecure: opts.Insecure}
-	restConfig.TLSClientConfig = tlsConfig
+	// Set TLS verification based on opts
+	restConfig.TLSClientConfig.Insecure = opts.Insecure
 
 	// Create HTTP client with kubeconfig authentication
 	rt, err := rest.TransportFor(restConfig)
@@ -120,6 +105,11 @@ func createHeaderAPIConfig(ctx context.Context, opts ObsMCPOptions) (promapi.Con
 	return createAPIConfigWithToken(opts.PromURL, token, opts.Insecure)
 }
 
+func createNoAuthAPIConfig(opts ObsMCPOptions) (promapi.Config, error) {
+	slog.Info("Using no authentication (suitable for localhost port-forward)")
+	return createAPIConfigWithToken(opts.PromURL, "", opts.Insecure)
+}
+
 func createAPIConfigWithToken(prometheusURL, token string, insecure bool) (promapi.Config, error) {
 	apiConfig := promapi.Config{
 		Address: prometheusURL,
@@ -152,20 +142,10 @@ func createAPIConfigWithToken(prometheusURL, token string, insecure bool) (proma
 	return apiConfig, nil
 }
 
-func getTokenFromCtx(ctx context.Context) string {
+func getTokenFromCtx(_ context.Context) string {
+
 	// TODO: we're ignoring user auth for now, just to see if something improves
 	return ""
-	k8sToken := ctx.Value(AuthHeaderKey)
-	if k8sToken == nil {
-		slog.Warn("No token provided in context.")
-		return ""
-	}
-	k8TokenStr, ok := k8sToken.(string)
-	if !ok {
-		slog.Warn("Couldn't parse token... ignoring.")
-		return ""
-	}
-	return k8TokenStr
 }
 
 func createCertPool() (*x509.CertPool, error) {
