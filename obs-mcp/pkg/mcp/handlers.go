@@ -80,6 +80,14 @@ func ExecuteRangeQueryHandler(opts ObsMCPOptions) func(context.Context, mcp.Call
 		endStr := req.GetString("end", "")
 		durationStr := req.GetString("duration", "")
 
+		if startStr == "NOW" {
+			startStr = ""
+		}
+
+		if endStr == "NOW" {
+			endStr = ""
+		}
+
 		// Validate parameter combinations
 		if startStr != "" && endStr != "" && durationStr != "" {
 			return errorResult("cannot specify both start/end and duration parameters")

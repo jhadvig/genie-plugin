@@ -40,7 +40,7 @@ func CreateExecuteRangeQueryTool() mcp.Tool {
 
 For current time data queries, use only the 'duration' parameter to specify how far back
 to look from now (e.g., '1h' for last hour, '30m' for last 30 minutes). In that case
-YOU MUST NOT provide neither 'start' NOR 'end' at all.
+SET 'end' to 'NOW' and leave 'start' empty.
 
 For historical data queries, use explicit 'start' and 'end' times.
 `),
@@ -57,7 +57,7 @@ For historical data queries, use explicit 'start' and 'end' times.
 			mcp.Description("Start time as RFC3339 or Unix timestamp (optional)"),
 		),
 		mcp.WithString("end",
-			mcp.Description("End time as RFC3339 or Unix timestamp (optional)"),
+			mcp.Description("End time as RFC3339 or Unix timestamp (optional). Use `NOW` for current time."),
 		),
 		mcp.WithString("duration",
 			mcp.Description("Duration to look back from now (e.g., '1h', '30m', '1d', '2w') (optional)"),
