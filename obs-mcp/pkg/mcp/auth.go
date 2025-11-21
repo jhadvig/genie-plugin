@@ -31,6 +31,9 @@ type AuthContextKey string
 const (
 	// AuthHeaderKey is the context key for the Kubernetes authorization header
 	AuthHeaderKey AuthContextKey = "kubernetes-authorization"
+
+	// TestPromClientKey is the context key for injecting a test Prometheus client
+	TestPromClientKey string = "test-prometheus-client"
 )
 
 // ParseAuthMode validates and converts a string to AuthMode
@@ -47,7 +50,16 @@ func ParseAuthMode(mode string) (AuthMode, error) {
 	}
 }
 
-func getPromClient(ctx context.Context, opts ObsMCPOptions) (*prometheus.Client, error) {
+func getPromClient(ctx context.Context, opts ObsMCPOptions) (prometheus.PromClient, error) {
+	// Check if a test client was injected via context
+	if testClient := ctx.Value(TestPromClientKey); testClient != nil {
+		if client, ok := testClient.(prometheus.PromClient); ok {
+			return client, nil
+		}
+	}
+
+	// Normal production path
+
 	apiConfig, err := createAPIConfig(ctx, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create API config: %v", err)

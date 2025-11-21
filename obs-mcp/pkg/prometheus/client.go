@@ -9,10 +9,21 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
+// PromClient defines the interface for querying Prometheus
+type PromClient interface {
+	ListMetrics(ctx context.Context) ([]string, error)
+	ExecuteRangeQuery(ctx context.Context, query string, start, end time.Time, step time.Duration) (map[string]interface{}, error)
+	ExecuteInstantQuery(ctx context.Context, query string, time time.Time) (map[string]interface{}, error)
+}
+
+// PrometheusClient implements PromClient
 type Client struct {
 	client     v1.API
 	guardrails *Guardrails
 }
+
+// Ensure PrometheusClient implements PromClient at compile time
+var _ PromClient = (*Client)(nil)
 
 func NewPrometheusClient(apiConfig api.Config) (*Client, error) {
 	client, err := api.NewClient(apiConfig)
