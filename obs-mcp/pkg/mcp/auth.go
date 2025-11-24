@@ -26,14 +26,14 @@ const (
 	AuthModeHeader         AuthMode = "header"
 )
 
-type AuthContextKey string
+type ContextKey string
 
 const (
 	// AuthHeaderKey is the context key for the Kubernetes authorization header
-	AuthHeaderKey AuthContextKey = "kubernetes-authorization"
+	AuthHeaderKey ContextKey = "kubernetes-authorization"
 
 	// TestPromClientKey is the context key for injecting a test Prometheus client
-	TestPromClientKey string = "test-prometheus-client"
+	TestPromClientKey ContextKey = "test-prometheus-client"
 )
 
 // ParseAuthMode validates and converts a string to AuthMode

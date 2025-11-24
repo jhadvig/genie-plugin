@@ -1,4 +1,3 @@
-import { AbsoluteTimeRange, RelativeTimeRange, TimeRangeValue } from '@perses-dev/core';
 import { Panel } from '@perses-dev/dashboards';
 import {
   DataQueriesProvider,
@@ -6,9 +5,10 @@ import {
   useSuggestedStepMs,
 } from '@perses-dev/plugin-system';
 import { DEFAULT_PROM } from '@perses-dev/prometheus-plugin';
-import React, { useMemo } from 'react';
+import React from 'react';
 import useResizeObserver from 'use-resize-observer';
 import PersesWidgetWrapper from '../PersesWidgetWrapper';
+import { useTimeRange } from '../useTimeRange';
 
 type PersesTimeSeriesProps = {
   duration: string;
@@ -16,22 +16,6 @@ type PersesTimeSeriesProps = {
   query: string;
   start: string;
   step: string;
-};
-
-const useTimeRange = (start?: string, end?: string, duration?: string) => {
-  const result = useMemo(() => {
-    let timeRange: TimeRangeValue;
-    if (start && end) {
-      timeRange = {
-        start: new Date(start),
-        end: new Date(end),
-      } as AbsoluteTimeRange;
-    } else {
-      timeRange = { pastDuration: duration || '1h' } as RelativeTimeRange;
-    }
-    return timeRange;
-  }, [duration, end, start]);
-  return result;
 };
 
 const TimeSeries = ({ query }: PersesTimeSeriesProps) => {
