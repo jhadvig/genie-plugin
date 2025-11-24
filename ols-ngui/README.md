@@ -28,7 +28,7 @@ Or as local image
    podman run --rm -it -p 9200:9200 \
       -v $PWD/ols-ngui:/opt/app-root/config:z \
       --env MCP_PORT="9200" \
-      --env NGUI_MODEL="gpt-4o-mini" \
+      --env NGUI_MODEL="gpt-4.1-nano" \
       --env NGUI_PROVIDER_API_KEY=$OPENAI_API_KEY \
       --env NGUI_CONFIG_PATH="/opt/app-root/config/ngui_openshift_mcp_config.yaml" \
       --env MCP_TOOLS="generate_ui_multiple_components" \
