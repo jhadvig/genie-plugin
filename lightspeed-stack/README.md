@@ -21,7 +21,7 @@ oc login ...
 3. Terminal 3: Next Gen UI MCP
 ```sh
    podman run --rm -it -p 9200:9200 \
-      -v $PWD/mvp-lightspeed-stack/ngui_openshift_mcp_config.yaml:/opt/app-root/config/ngui_openshift_mcp_config.yaml:z \
+      -v $PWD/lightspeed-stack/ngui_openshift_mcp_config.yaml:/opt/app-root/config/ngui_openshift_mcp_config.yaml:z \
       --env MCP_PORT="9200" \
       --env NGUI_MODEL="gpt-4.1-nano" \
       --env NGUI_PROVIDER_API_KEY=$OPENAI_API_KEY \
@@ -43,6 +43,7 @@ podman run \
   -v ./lightspeed-stack.yaml:/app-root/lightspeed-stack.yaml:Z \
   -v ./run.yaml:/app-root/run.yaml:Z \
   -e OPENAI_API_KEY=$OPENAI_API_KEY \
+  -e LOCALHOST=host.containers.internal \
   quay.io/lightspeed-core/lightspeed-stack:0.3.0
 ```
 Verify on [http://localhost:8080/v1/models](http://localhost:8080/v1/models).

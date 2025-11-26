@@ -22,13 +22,13 @@ inference:
 mcp_servers:
   - name: "obs"
     provider_id: "model-context-protocol"
-    url: http://host.containers.internal:9100/mcp
+    url: http://${env.LOCALHOST:=localhost}:9100/mcp
   - name: kube-mcp-server
-    url: http://host.containers.internal:8081/mcp
+    url: http://${env.LOCALHOST:=localhost}:8081/mcp
     # timeout: 120
     # sse_read_timeout: 60
   - name: next-gen-ui
-    url: http://host.containers.internal:9200/mcp
+    url: http://${env.LOCALHOST:=localhost}:9200/mcp
     # timeout: 120
     # sse_read_timeout: 60
 
