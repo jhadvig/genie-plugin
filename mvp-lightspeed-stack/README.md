@@ -34,6 +34,8 @@ oc login ...
 ### Lightspeed Stack
 
 Terminal 4:
+
+#### Podman way
 ```sh
 cd mvp-lightspeed-stack
 podman run \
@@ -44,6 +46,19 @@ podman run \
   quay.io/lightspeed-core/lightspeed-stack:0.3.0
 ```
 Verify on [http://localhost:8080/v1/models](http://localhost:8080/v1/models).
+
+#### Lightspeed-stack Source Code way
+
+```sh
+cd ..
+git clone https://github.com/lightspeed-core/lightspeed-stack.git
+cp genie-plugin/mvp-lightspeed-stack/genie-lightspeed-stack.yaml lightspeed-stack/lightspeed-stack.yaml
+cp genie-plugin/mvp-lightspeed-stack/genie-run.yaml lightspeed-stack/run.yaml
+
+cd lightspeed-stack
+uv sync --group dev --group llslibdev
+make run
+```
 
 ## Test
 
