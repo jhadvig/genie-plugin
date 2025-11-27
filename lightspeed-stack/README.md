@@ -58,8 +58,20 @@ cp genie-plugin/lightspeed-stack/run.yaml lightspeed-stack/run.yaml
 
 cd lightspeed-stack
 uv sync --group dev --group llslibdev
+uv add greenlet
 make run
 ```
+
+VSCode
+
+```sh
+cd lightspeed-stack
+mkdir -p lightspeed-stack/.vscode/
+cp genie-plugin/lightspeed-stack/vscode_launch.json lightspeed-stack/.vscode/launch.json
+code .
+```
+
+And in `Run and Debug` view Run "Python Debugger: LSC".
 
 ## Test
 
