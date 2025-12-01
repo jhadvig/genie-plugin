@@ -1,5 +1,4 @@
-# LightSpeed Evaluation Framework - Focused Query Test Data
-- conversation_group_id: "Basic cpu usage query"
+- conversation_group_id: "nodes-cpu-usage-query"
   description: "Asks about basic metrics in the cluster."
 
   conversation_metrics: []
@@ -21,6 +20,34 @@
               # TODO: this will not work with current guardrails, needs to be
               # updated to match more specific query we want the LLM to use.
               query: .*(instance:node_cpu_utilisation:rate1m|container_cpu_usage_seconds_total).*
+              step: 1m
+      turn_metrics:
+        - "custom:tool_eval"
+
+- conversation_group_id: "network-basic-troubleshooting"
+  description: |
+    Asks about basic network-focued metrics. Targeted to mimic
+    /monitoring/dashboards/dashboard-namespace-by-pod error dashbaord.
+
+  conversation_metrics: []
+  conversation_metrics_metadata: {}
+
+  turns:
+    - turn_id: "turn-1"
+      query: "Where there any packet lost in the openshift-marketplace namespace in the last hour."
+      contexts:
+      expected_response: |
+        The appropraite query is used to load the data?
+      expected_tool_calls:
+        - - tool_name: list_metrics
+            arguments: {}
+        - - tool_name: execute_range_query
+            arguments:
+              duration: 1h
+              end: "NOW"
+              # (inecas): The model I've tested it with (gpt-4o-mini) was not successful yet: more work needed
+              # to make it pass. See also https://issues.redhat.com/browse/GIE-226.
+              query: .*container_network_receive_packets_dropped_total.*namespace="openshift-marketplace"
               step: 1m
 
       turn_metrics:

@@ -2033,7 +2033,7 @@ wheels = [
 ]
 
 [[package]]
-name = "obx-mcp-eval"
+name = "obs-mcp-eval"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
