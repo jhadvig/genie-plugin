@@ -7,6 +7,8 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/prometheus/common/promslog"
+
 	"github.com/inecas/obs-mcp/pkg/k8s"
 	"github.com/inecas/obs-mcp/pkg/mcp"
 	"github.com/mark3labs/mcp-go/server"
@@ -96,26 +98,15 @@ func determinePrometheusURL(authMode mcp.AuthMode) string {
 
 // configureLogging sets up the slog logger with the specified log level
 func configureLogging(levelStr string) {
-	var level slog.Level
-
-	switch levelStr {
-	case "debug":
-		level = slog.LevelDebug
-	case "info":
-		level = slog.LevelInfo
-	case "warn":
-		level = slog.LevelWarn
-	case "error":
-		level = slog.LevelError
-	default:
-		log.Fatalf("Invalid log level: %s (must be debug, info, warn, or error)", levelStr)
+	level := promslog.NewLevel()
+	err := level.Set(levelStr)
+	if err != nil {
+		log.Fatal(err.Error())
 	}
 
-	// Create handler with the specified level
-	handler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+	logger := promslog.New(&promslog.Config{
 		Level: level,
+		Style: promslog.GoKitStyle,
 	})
-
-	// Set as default logger
-	slog.SetDefault(slog.New(handler))
+	slog.SetDefault(logger)
 }
