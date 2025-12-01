@@ -104,9 +104,16 @@ func configureLogging(levelStr string) {
 		log.Fatal(err.Error())
 	}
 
+	format := promslog.NewFormat()
+	err = format.Set("logfmt")
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	logger := promslog.New(&promslog.Config{
-		Level: level,
-		Style: promslog.GoKitStyle,
+		Level:  level,
+		Format: format,
+		Style:  promslog.GoKitStyle,
 	})
 	slog.SetDefault(logger)
 }
