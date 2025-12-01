@@ -17,9 +17,13 @@ func main() {
 	var listen = flag.String("listen", "", "Listen address for HTTP mode (e.g., :9100, 127.0.0.1:8080)")
 	var authMode = flag.String("auth-mode", "", "Authentication mode: kubeconfig, serviceaccount, or header")
 	var insecure = flag.Bool("insecure", false, "Skip TLS certificate verification")
+	var logLevel = flag.String("log-level", "info", "Log level: debug, info, warn, error")
 
 	var noGuardrails = flag.Bool("no-guardrails", false, "Disable guardrails")
 	flag.Parse()
+
+	// Configure slog with specified log level
+	configureLogging(*logLevel)
 
 	// Parse and validate auth mode
 	parsedAuthMode, err := mcp.ParseAuthMode(*authMode)
@@ -88,4 +92,30 @@ func determinePrometheusURL(authMode mcp.AuthMode) string {
 
 	// Default to localhost for all other auth modes
 	return "http://localhost:9090"
+}
+
+// configureLogging sets up the slog logger with the specified log level
+func configureLogging(levelStr string) {
+	var level slog.Level
+
+	switch levelStr {
+	case "debug":
+		level = slog.LevelDebug
+	case "info":
+		level = slog.LevelInfo
+	case "warn":
+		level = slog.LevelWarn
+	case "error":
+		level = slog.LevelError
+	default:
+		log.Fatalf("Invalid log level: %s (must be debug, info, warn, or error)", levelStr)
+	}
+
+	// Create handler with the specified level
+	handler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: level,
+	})
+
+	// Set as default logger
+	slog.SetDefault(slog.New(handler))
 }

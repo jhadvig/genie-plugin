@@ -3,7 +3,7 @@ package mcp
 import (
 	"context"
 	"errors"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -69,10 +69,10 @@ func authFromRequest(ctx context.Context, r *http.Request) context.Context {
 
 func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("[DEBUG] Incoming request: %s %s from %s", r.Method, r.URL.Path, r.RemoteAddr)
-		log.Printf("[DEBUG] Request headers: %v", r.Header)
+		slog.Info("Incoming request", "method", r.Method, "path", r.URL.Path, "remote_addr", r.RemoteAddr)
+		slog.Debug("Request headers", "headers", r.Header)
 		if r.ContentLength > 0 {
-			log.Printf("[DEBUG] Content-Length: %d", r.ContentLength)
+			slog.Info("Request content length", "content_length", r.ContentLength)
 		}
 		next.ServeHTTP(w, r)
 	})
@@ -108,7 +108,7 @@ func Serve(ctx context.Context, mcpServer *server.MCPServer, listenAddr string) 
 
 	serverErr := make(chan error, 1)
 	go func() {
-		log.Printf("HTTP server starting on %s with MCP endpoint at %s", listenAddr, mcpEndpoint)
+		slog.Info("HTTP server starting", "listen_addr", listenAddr, "mcp_endpoint", mcpEndpoint)
 		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErr <- err
 		}
@@ -116,24 +116,24 @@ func Serve(ctx context.Context, mcpServer *server.MCPServer, listenAddr string) 
 
 	select {
 	case sig := <-sigChan:
-		log.Printf("Received signal %v, initiating graceful shutdown", sig)
+		slog.Warn("Received signal, initiating graceful shutdown", "signal", sig)
 		cancel()
 	case <-ctx.Done():
-		log.Printf("Context cancelled, initiating graceful shutdown")
+		slog.Warn("Context cancelled, initiating graceful shutdown")
 	case err := <-serverErr:
-		log.Printf("HTTP server error: %v", err)
+		slog.Error("HTTP server error", "error", err)
 		return err
 	}
 
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer shutdownCancel()
 
-	log.Printf("Shutting down HTTP server gracefully...")
+	slog.Info("Shutting down HTTP server gracefully")
 	if err := httpServer.Shutdown(shutdownCtx); err != nil {
-		log.Printf("HTTP server shutdown error: %v", err)
+		slog.Error("HTTP server shutdown error", "error", err)
 		return err
 	}
 
-	log.Printf("HTTP server shutdown complete")
+	slog.Info("HTTP server shutdown complete")
 	return nil
 }
