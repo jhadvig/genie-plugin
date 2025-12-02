@@ -4,6 +4,7 @@
 BINARY_NAME=layout-manager
 MAIN_PATH=./cmd/layout-manager
 DOCKER_COMPOSE=docker-compose.yml
+CONTAINER_CLI ?= docker
 
 # Go commands
 GO_BUILD=go build
@@ -174,7 +175,7 @@ vet: ## Run go vet
 .PHONY: docker-build
 docker-build: ## Build Docker image
 	@echo "Building Docker image..."
-	docker build -t layout-manager:latest .
+	$(CONTAINER_CLI) build -t layout-manager:latest .
 
 .PHONY: docker-up
 docker-up: ## Start full stack with Docker Compose
