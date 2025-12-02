@@ -11,15 +11,16 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/inecas/obs-mcp/pkg/prometheus"
 	"github.com/mark3labs/mcp-go/server"
 )
 
 // ObsMCPOptions contains configuration options for the MCP server
 type ObsMCPOptions struct {
-	AuthMode      AuthMode
-	PromURL       string
-	Insecure      bool
-	UseGuardrails bool
+	AuthMode   AuthMode
+	PromURL    string
+	Insecure   bool
+	Guardrails *prometheus.Guardrails
 }
 
 const (

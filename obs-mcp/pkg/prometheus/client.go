@@ -9,21 +9,31 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
-type PrometheusClient struct {
-	client v1.API
+type Client struct {
+	client     v1.API
+	guardrails *Guardrails
 }
 
-func NewPrometheusClient(apiConfig api.Config) (*PrometheusClient, error) {
+func NewPrometheusClient(apiConfig api.Config) (*Client, error) {
 	client, err := api.NewClient(apiConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error creating prometheus client: %w", err)
 	}
 
 	v1api := v1.NewAPI(client)
-	return &PrometheusClient{client: v1api}, nil
+	return &Client{
+		client:     v1api,
+		guardrails: DefaultGuardrails(),
+	}, nil
 }
 
-func (p *PrometheusClient) ListMetrics(ctx context.Context) ([]string, error) {
+// WithGuardrails sets a custom Guardrails configuration for the client.
+func (p *Client) WithGuardrails(g *Guardrails) *Client {
+	p.guardrails = g
+	return p
+}
+
+func (p *Client) ListMetrics(ctx context.Context) ([]string, error) {
 	labelValues, _, err := p.client.LabelValues(ctx, "__name__", []string{}, time.Now().Add(-time.Hour), time.Now())
 	if err != nil {
 		return nil, fmt.Errorf("error fetching metric names: %w", err)
@@ -36,9 +46,9 @@ func (p *PrometheusClient) ListMetrics(ctx context.Context) ([]string, error) {
 	return metrics, nil
 }
 
-func (p *PrometheusClient) ExecuteRangeQuery(ctx context.Context, query string, start, end time.Time, step time.Duration, useGuardrails bool) (map[string]interface{}, error) {
-	if useGuardrails {
-		isSafe, err := isSafeQuery(query)
+func (p *Client) ExecuteRangeQuery(ctx context.Context, query string, start, end time.Time, step time.Duration) (map[string]interface{}, error) {
+	if p.guardrails != nil {
+		isSafe, err := p.guardrails.IsSafeQuery(query)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse query: %w", err)
 		}
@@ -71,9 +81,9 @@ func (p *PrometheusClient) ExecuteRangeQuery(ctx context.Context, query string, 
 	return response, nil
 }
 
-func (p *PrometheusClient) ExecuteInstantQuery(ctx context.Context, query string, time time.Time, useGuardrails bool) (map[string]interface{}, error) {
-	if useGuardrails {
-		isSafe, err := isSafeQuery(query)
+func (p *Client) ExecuteInstantQuery(ctx context.Context, query string, time time.Time) (map[string]interface{}, error) {
+	if p.guardrails != nil {
+		isSafe, err := p.guardrails.IsSafeQuery(query)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse query: %w", err)
 		}

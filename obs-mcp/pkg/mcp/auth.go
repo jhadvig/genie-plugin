@@ -47,7 +47,7 @@ func ParseAuthMode(mode string) (AuthMode, error) {
 	}
 }
 
-func getPromClient(ctx context.Context, opts ObsMCPOptions) (*prometheus.PrometheusClient, error) {
+func getPromClient(ctx context.Context, opts ObsMCPOptions) (*prometheus.Client, error) {
 	apiConfig, err := createAPIConfig(ctx, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create API config: %v", err)
@@ -57,6 +57,8 @@ func getPromClient(ctx context.Context, opts ObsMCPOptions) (*prometheus.Prometh
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Prometheus client: %v", err)
 	}
+
+	promClient.WithGuardrails(opts.Guardrails)
 
 	return promClient, nil
 }

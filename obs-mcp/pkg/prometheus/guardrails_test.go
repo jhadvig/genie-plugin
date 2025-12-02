@@ -2,7 +2,8 @@ package prometheus
 
 import "testing"
 
-func TestIsSafeQuery(t *testing.T) {
+func TestGuardrails_IsSafeQuery(t *testing.T) {
+	g := DefaultGuardrails()
 	tests := map[string]bool{
 		// Rule 1: __name__ queries
 		`{__name__="http_requests_total"}`:      false,
@@ -58,13 +59,60 @@ func TestIsSafeQuery(t *testing.T) {
 
 	for query, expectedSafe := range tests {
 		t.Run(query, func(t *testing.T) {
-			safe, err := isSafeQuery(query)
+			safe, err := g.IsSafeQuery(query)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
 			if safe != expectedSafe {
-				t.Errorf("isSafeQuery(%q) = %v, want %v", query, safe, expectedSafe)
+				t.Errorf("IsSafeQuery(%q) = %v, want %v", query, safe, expectedSafe)
 			}
 		})
 	}
+}
+
+func TestGuardrails_DisabledRules(t *testing.T) {
+	t.Run("DisallowExplicitNameLabel disabled", func(t *testing.T) {
+		g := &Guardrails{
+			DisallowExplicitNameLabel: false,
+			RequireLabelMatcher:       true,
+			DisallowBlanketRegex:      true,
+		}
+		safe, err := g.IsSafeQuery(`{__name__="http_requests_total", job="api"}`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !safe {
+			t.Error("expected query to be safe when DisallowExplicitNameLabel is disabled")
+		}
+	})
+
+	t.Run("RequireLabelMatcher disabled", func(t *testing.T) {
+		g := &Guardrails{
+			DisallowExplicitNameLabel: true,
+			RequireLabelMatcher:       false,
+			DisallowBlanketRegex:      true,
+		}
+		safe, err := g.IsSafeQuery(`http_requests_total`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !safe {
+			t.Error("expected query to be safe when RequireLabelMatcher is disabled")
+		}
+	})
+
+	t.Run("DisallowBlanketRegex disabled", func(t *testing.T) {
+		g := &Guardrails{
+			DisallowExplicitNameLabel: true,
+			RequireLabelMatcher:       true,
+			DisallowBlanketRegex:      false,
+		}
+		safe, err := g.IsSafeQuery(`http_requests_total{pod=~".*"}`)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !safe {
+			t.Error("expected query to be safe when DisallowBlanketRegex is disabled")
+		}
+	})
 }

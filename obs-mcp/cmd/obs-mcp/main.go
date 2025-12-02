@@ -11,6 +11,7 @@ import (
 
 	"github.com/inecas/obs-mcp/pkg/k8s"
 	"github.com/inecas/obs-mcp/pkg/mcp"
+	"github.com/inecas/obs-mcp/pkg/prometheus"
 	"github.com/mark3labs/mcp-go/server"
 )
 
@@ -21,7 +22,7 @@ func main() {
 	var insecure = flag.Bool("insecure", false, "Skip TLS certificate verification")
 	var logLevel = flag.String("log-level", "info", "Log level: debug, info, warn, error")
 
-	var noGuardrails = flag.Bool("no-guardrails", false, "Disable guardrails")
+	var guardrails = flag.String("guardrails", "all", "Guardrails configuration: 'all' (default), 'none', or comma-separated list of guardrails to enable (disallow-explicit-name-label, require-label-matcher, disallow-blanket-regex)")
 	flag.Parse()
 
 	// Configure slog with specified log level
@@ -36,12 +37,18 @@ func main() {
 	// Determine Prometheus URL
 	promURL := determinePrometheusURL(parsedAuthMode)
 
+	// Parse guardrails configuration
+	parsedGuardrails, err := prometheus.ParseGuardrails(*guardrails)
+	if err != nil {
+		log.Fatalf("Invalid guardrails configuration: %v", err)
+	}
+
 	// Create MCP options
 	opts := mcp.ObsMCPOptions{
-		AuthMode:      parsedAuthMode,
-		PromURL:       promURL,
-		Insecure:      *insecure,
-		UseGuardrails: !*noGuardrails,
+		AuthMode:   parsedAuthMode,
+		PromURL:    promURL,
+		Insecure:   *insecure,
+		Guardrails: parsedGuardrails,
 	}
 
 	// Create MCP server

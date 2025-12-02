@@ -117,7 +117,7 @@ func ExecuteRangeQueryHandler(opts ObsMCPOptions) func(context.Context, mcp.Call
 		}
 
 		// Execute the range query
-		result, err := promClient.ExecuteRangeQuery(ctx, query, startTime, endTime, stepDuration, opts.UseGuardrails)
+		result, err := promClient.ExecuteRangeQuery(ctx, query, startTime, endTime, stepDuration)
 		if err != nil {
 			return errorResult(fmt.Sprintf("failed to execute range query: %s", err.Error()))
 		}
