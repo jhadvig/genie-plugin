@@ -68,11 +68,12 @@ func TestGuardrails_IsSafeQuery(t *testing.T) {
 	for query, expectedSafe := range tests {
 		t.Run(query, func(t *testing.T) {
 			safe, err := g.IsSafeQuery(context.TODO(), query, nil)
-			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
-			}
 			if safe != expectedSafe {
-				t.Errorf("IsSafeQuery(%q) = %v, want %v", query, safe, expectedSafe)
+				t.Errorf("IsSafeQuery(%q) = %v (err: %v), want %v", query, safe, err, expectedSafe)
+			}
+			// If expected to be unsafe, we should have an error explaining why
+			if !expectedSafe && err == nil {
+				t.Errorf("IsSafeQuery(%q) returned unsafe but no error explaining why", query)
 			}
 		})
 	}
@@ -86,11 +87,8 @@ func TestGuardrails_DisabledRules(t *testing.T) {
 			DisallowBlanketRegex:      true,
 		}
 		safe, err := g.IsSafeQuery(context.TODO(), `{__name__="http_requests_total", job="api"}`, nil)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if !safe {
-			t.Error("expected query to be safe when DisallowExplicitNameLabel is disabled")
+			t.Errorf("expected query to be safe when DisallowExplicitNameLabel is disabled, got error: %v", err)
 		}
 	})
 
@@ -101,11 +99,8 @@ func TestGuardrails_DisabledRules(t *testing.T) {
 			DisallowBlanketRegex:      true,
 		}
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total`, nil)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if !safe {
-			t.Error("expected query to be safe when RequireLabelMatcher is disabled")
+			t.Errorf("expected query to be safe when RequireLabelMatcher is disabled, got error: %v", err)
 		}
 	})
 
@@ -116,11 +111,8 @@ func TestGuardrails_DisabledRules(t *testing.T) {
 			DisallowBlanketRegex:      false,
 		}
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*"}`, nil)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if !safe {
-			t.Error("expected query to be safe when DisallowBlanketRegex is disabled")
+			t.Errorf("expected query to be safe when DisallowBlanketRegex is disabled, got error: %v", err)
 		}
 	})
 }
@@ -266,11 +258,11 @@ func TestGuardrails_MaxLabelCardinality(t *testing.T) {
 		// With MaxLabelCardinality set but no client provided, blanket regex should be rejected
 		// because we can't verify the cardinality
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*"}`, nil)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if safe {
 			t.Error("expected query with blanket regex to be unsafe when MaxLabelCardinality is set but no client provided")
+		}
+		if err == nil {
+			t.Error("expected error explaining why query is unsafe")
 		}
 	})
 
@@ -282,11 +274,11 @@ func TestGuardrails_MaxLabelCardinality(t *testing.T) {
 			MaxLabelCardinality:       0, // 0 means always disallow
 		}
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*"}`, nil)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if safe {
 			t.Error("expected query with blanket regex to be unsafe when MaxLabelCardinality is 0")
+		}
+		if err == nil {
+			t.Error("expected error explaining why query is unsafe")
 		}
 	})
 
@@ -298,11 +290,8 @@ func TestGuardrails_MaxLabelCardinality(t *testing.T) {
 			MaxLabelCardinality:       100,
 		}
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*"}`, nil)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if !safe {
-			t.Error("expected query to be safe when DisallowBlanketRegex is disabled")
+			t.Errorf("expected query to be safe when DisallowBlanketRegex is disabled, got error: %v", err)
 		}
 	})
 
@@ -315,11 +304,8 @@ func TestGuardrails_MaxLabelCardinality(t *testing.T) {
 		}
 		// Selective regex should always pass (no blanket regex)
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~"web-.*"}`, nil)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if !safe {
-			t.Error("expected query with selective regex to be safe")
+			t.Errorf("expected query with selective regex to be safe, got error: %v", err)
 		}
 	})
 }
@@ -412,11 +398,8 @@ func TestGuardrails_MaxLabelCardinalityWithMockedTSDB(t *testing.T) {
 		}
 
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*"}`, mock)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if !safe {
-			t.Error("expected query to be safe when label cardinality is below threshold")
+			t.Errorf("expected query to be safe when label cardinality is below threshold, got error: %v", err)
 		}
 	})
 
@@ -438,11 +421,11 @@ func TestGuardrails_MaxLabelCardinalityWithMockedTSDB(t *testing.T) {
 		}
 
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*"}`, mock)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if safe {
 			t.Error("expected query to be unsafe when label cardinality is above threshold")
+		}
+		if err == nil {
+			t.Error("expected error explaining why query is unsafe")
 		}
 	})
 
@@ -465,11 +448,8 @@ func TestGuardrails_MaxLabelCardinalityWithMockedTSDB(t *testing.T) {
 		}
 
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*", instance=~".+"}`, mock)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if !safe {
-			t.Error("expected query to be safe when all label cardinalities are below threshold")
+			t.Errorf("expected query to be safe when all label cardinalities are below threshold, got error: %v", err)
 		}
 	})
 
@@ -492,11 +472,11 @@ func TestGuardrails_MaxLabelCardinalityWithMockedTSDB(t *testing.T) {
 		}
 
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*", instance=~".+"}`, mock)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if safe {
 			t.Error("expected query to be unsafe when any label cardinality is above threshold")
+		}
+		if err == nil {
+			t.Error("expected error explaining why query is unsafe")
 		}
 	})
 
@@ -518,11 +498,8 @@ func TestGuardrails_MaxLabelCardinalityWithMockedTSDB(t *testing.T) {
 
 		// pod label not in TSDB result, should be allowed
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*"}`, mock)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if !safe {
-			t.Error("expected query to be safe when label not found in TSDB result")
+			t.Errorf("expected query to be safe when label not found in TSDB result, got error: %v", err)
 		}
 	})
 
@@ -545,11 +522,11 @@ func TestGuardrails_MaxLabelCardinalityWithMockedTSDB(t *testing.T) {
 
 		// pod uses selective regex (web-.*), instance uses blanket regex (.*)
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~"web-.*", instance=~".*"}`, mock)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if safe {
 			t.Error("expected query to be unsafe because instance has blanket regex above threshold")
+		}
+		if err == nil {
+			t.Error("expected error explaining why query is unsafe")
 		}
 	})
 
@@ -571,11 +548,11 @@ func TestGuardrails_MaxLabelCardinalityWithMockedTSDB(t *testing.T) {
 
 		// Negative blanket regex (pod!~".*") should also be checked
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod!~".*"}`, mock)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if safe {
 			t.Error("expected query to be unsafe for negative blanket regex above threshold")
+		}
+		if err == nil {
+			t.Error("expected error explaining why query is unsafe")
 		}
 	})
 
@@ -600,11 +577,8 @@ func TestGuardrails_MaxLabelCardinalityWithMockedTSDB(t *testing.T) {
 		}
 
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*"}`, mock)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if !safe {
-			t.Error("expected query to be safe when both metric and label cardinality are below thresholds")
+			t.Errorf("expected query to be safe when both metric and label cardinality are below thresholds, got error: %v", err)
 		}
 	})
 
@@ -629,11 +603,11 @@ func TestGuardrails_MaxLabelCardinalityWithMockedTSDB(t *testing.T) {
 		}
 
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~".*"}`, mock)
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
 		if safe {
 			t.Error("expected query to be unsafe when metric cardinality is above threshold")
+		}
+		if err == nil {
+			t.Error("expected error explaining why query is unsafe")
 		}
 	})
 }

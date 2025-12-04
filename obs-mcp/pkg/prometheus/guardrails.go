@@ -85,8 +85,8 @@ func ParseGuardrails(value string) (*Guardrails, error) {
 // If client is provided and MaxMetricCardinality is set, it checks TSDB metric cardinality.
 // If client is provided and MaxLabelCardinality is set, it checks TSDB label cardinality for blanket regex.
 //
-// Returns (false, error) only if the query syntax is invalid or TSDB check fails.
-// Returns (false, nil) if the query is valid but violates a rule.
+// Returns (false, error) if the query is invalid or violates a guardrail rule.
+// The error message explains which rule was violated.
 // Returns (true, nil) if the query is valid and passes all rules.
 func (g *Guardrails) IsSafeQuery(ctx context.Context, query string, client v1.API) (bool, error) {
 	expr, err := parser.ParseExpr(query)
@@ -94,8 +94,9 @@ func (g *Guardrails) IsSafeQuery(ctx context.Context, query string, client v1.AP
 		return false, fmt.Errorf("failed to parse query: %w", err)
 	}
 
-	foundUnsafe := false
+	var unsafeReason error
 	hasBlanketRegex := false
+	blanketRegexLabels := []string{}
 
 	parser.Inspect(expr, func(node parser.Node, path []parser.Node) error {
 		switch n := node.(type) {
@@ -106,8 +107,8 @@ func (g *Guardrails) IsSafeQuery(ctx context.Context, query string, client v1.AP
 				// Rule 1: Check for explicit __name__ label query
 				if g.DisallowExplicitNameLabel {
 					if m.Name == labels.MetricName && n.Name == "" {
-						foundUnsafe = true
-						return fmt.Errorf("unsafe")
+						unsafeReason = fmt.Errorf("query uses explicit __name__ label matcher, which is disallowed")
+						return unsafeReason
 					}
 				}
 
@@ -122,10 +123,11 @@ func (g *Guardrails) IsSafeQuery(ctx context.Context, query string, client v1.AP
 						// If MaxLabelCardinality is set, defer the check to TSDB lookup
 						if g.MaxLabelCardinality > 0 {
 							hasBlanketRegex = true
+							blanketRegexLabels = append(blanketRegexLabels, m.Name)
 						} else {
 							// MaxLabelCardinality is 0, always disallow blanket regex here
-							foundUnsafe = true
-							return fmt.Errorf("unsafe")
+							unsafeReason = fmt.Errorf("query uses blanket regex (%s) on label %q, which is disallowed", m.Value, m.Name)
+							return unsafeReason
 						}
 					}
 				}
@@ -133,21 +135,25 @@ func (g *Guardrails) IsSafeQuery(ctx context.Context, query string, client v1.AP
 
 			// Rule 2: All vector selectors must have at least one non-name label matcher
 			if g.RequireLabelMatcher && !hasNonNameMatcher {
-				foundUnsafe = true
-				return fmt.Errorf("unsafe")
+				metricName := n.Name
+				if metricName == "" {
+					metricName = "<metric>"
+				}
+				unsafeReason = fmt.Errorf("query for metric %q does not have any label matchers, which is required", metricName)
+				return unsafeReason
 			}
 		}
 		return nil
 	})
 
-	if foundUnsafe {
-		return false, nil
+	if unsafeReason != nil {
+		return false, unsafeReason
 	}
 
 	// If blanket regex was found but we can't check TSDB (no client), reject the query
 	// this is only set to true when MaxLabelCardinality is set and DisallowBlanketRegex is true
 	if hasBlanketRegex && (client == nil || ctx == nil) {
-		return false, nil
+		return false, fmt.Errorf("query uses blanket regex on labels %v, but cannot verify label cardinality without TSDB client", blanketRegexLabels)
 	}
 
 	// Rule 4: Check metric cardinality if enabled and client is provided
@@ -171,7 +177,7 @@ func (g *Guardrails) IsSafeQuery(ctx context.Context, query string, client v1.AP
 			for _, metricName := range metricNames {
 				if count, exists := seriesCountByMetric[metricName]; exists {
 					if count > g.MaxMetricCardinality {
-						return false, nil
+						return false, fmt.Errorf("metric %q has cardinality %d, which exceeds maximum allowed %d", metricName, count, g.MaxMetricCardinality)
 					}
 				}
 			}
@@ -200,7 +206,7 @@ func (g *Guardrails) IsSafeQuery(ctx context.Context, query string, client v1.AP
 			for _, labelName := range labelNames {
 				if count, exists := labelValueCountByLabel[labelName]; exists {
 					if count > g.MaxLabelCardinality {
-						return false, nil
+						return false, fmt.Errorf("label %q has cardinality %d, which exceeds maximum allowed %d for blanket regex", labelName, count, g.MaxLabelCardinality)
 					}
 				}
 			}

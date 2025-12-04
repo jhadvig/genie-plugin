@@ -61,7 +61,7 @@ func (p *RealLoader) ExecuteRangeQuery(ctx context.Context, query string, start,
 	if p.guardrails != nil {
 		isSafe, err := p.guardrails.IsSafeQuery(ctx, query, p.client)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("query validation failed: %w", err)
 		}
 		if !isSafe {
 			return nil, fmt.Errorf("query is not safe")
@@ -95,7 +95,7 @@ func (p *RealLoader) ExecuteInstantQuery(ctx context.Context, query string, time
 	if p.guardrails != nil {
 		isSafe, err := p.guardrails.IsSafeQuery(ctx, query, p.client)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("query validation failed: %w", err)
 		}
 		if !isSafe {
 			return nil, fmt.Errorf("query is not safe")
