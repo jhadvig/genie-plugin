@@ -15,6 +15,10 @@ import (
 	"github.com/mark3labs/mcp-go/server"
 )
 
+const (
+	defaultPrometheusURL = "http://localhost:9090"
+)
+
 func main() {
 	// Parse command line flags
 	var listen = flag.String("listen", "", "Listen address for HTTP mode (e.g., :9100, 127.0.0.1:8080)")
@@ -92,7 +96,7 @@ func determinePrometheusURL(authMode mcp.AuthMode) string {
 		url, err := k8s.GetThanosQuerierURL()
 		if err != nil {
 			slog.Warn("Failed to discover Thanos Querier via kubeconfig, falling back to localhost", "err", err)
-			return "http://localhost:9090"
+			return defaultPrometheusURL
 		}
 
 		slog.Info("Discovered Thanos Querier URL", "url", url)
@@ -100,7 +104,7 @@ func determinePrometheusURL(authMode mcp.AuthMode) string {
 	}
 
 	// Default to localhost for all other auth modes
-	return "http://localhost:9090"
+	return defaultPrometheusURL
 }
 
 // configureLogging sets up the slog logger with the specified log level

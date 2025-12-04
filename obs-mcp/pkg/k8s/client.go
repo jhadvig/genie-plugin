@@ -10,6 +10,13 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
+const (
+	openShiftRouteAPI      = "/apis/route.openshift.io/v1"
+	monitoringNamespace    = "openshift-monitoring"
+	routesResource         = "routes"
+	thanosQuerierRouteName = "thanos-querier"
+)
+
 // GetClientConfig returns a Kubernetes REST config using kubeconfig
 func GetClientConfig() (*rest.Config, error) {
 	// Try to load from kubeconfig first
@@ -51,10 +58,10 @@ func GetThanosQuerierURL() (string, error) {
 
 	restClient := kubeClient.CoreV1().RESTClient()
 	result := restClient.Get().
-		AbsPath("/apis/route.openshift.io/v1").
-		Namespace("openshift-monitoring").
-		Resource("routes").
-		Name("thanos-querier").
+		AbsPath(openShiftRouteAPI).
+		Namespace(monitoringNamespace).
+		Resource(routesResource).
+		Name(thanosQuerierRouteName).
 		Do(ctx)
 
 	if result.Error() != nil {

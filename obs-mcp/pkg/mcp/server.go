@@ -24,14 +24,17 @@ type ObsMCPOptions struct {
 }
 
 const (
-	mcpEndpoint    = "/mcp"
-	healthEndpoint = "/health"
+	mcpEndpoint            = "/mcp"
+	healthEndpoint         = "/health"
+	serverName             = "obs-mcp"
+	serverVersion          = "1.0.0"
+	defaultShutdownTimeout = 10 * time.Second
 )
 
 func NewMCPServer(opts ObsMCPOptions) (*server.MCPServer, error) {
 	mcpServer := server.NewMCPServer(
-		"obs-mcp",
-		"1.0.0",
+		serverName,
+		serverVersion,
 		server.WithLogging(),
 		server.WithToolCapabilities(true),
 	)
@@ -126,7 +129,7 @@ func Serve(ctx context.Context, mcpServer *server.MCPServer, listenAddr string) 
 		return err
 	}
 
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), defaultShutdownTimeout)
 	defer shutdownCancel()
 
 	slog.Info("Shutting down HTTP server gracefully")

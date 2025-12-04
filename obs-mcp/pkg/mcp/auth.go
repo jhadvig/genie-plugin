@@ -26,6 +26,11 @@ const (
 	AuthModeHeader         AuthMode = "header"
 )
 
+const (
+	defaultServiceAccountTokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+	defaultServiceAccountCAPath    = "/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt"
+)
+
 type ContextKey string
 
 const (
@@ -189,7 +194,7 @@ func getTokenFromCtx(ctx context.Context) string {
 func createCertPool() (*x509.CertPool, error) {
 	certs := x509.NewCertPool()
 
-	pemData, err := os.ReadFile(`/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt`)
+	pemData, err := os.ReadFile(defaultServiceAccountCAPath)
 	if err != nil {
 		slog.Error("Failed to read the CA certificate", "err", err)
 		return nil, err
@@ -199,5 +204,5 @@ func createCertPool() (*x509.CertPool, error) {
 }
 
 func readTokenFromFile() ([]byte, error) {
-	return os.ReadFile(`/var/run/secrets/kubernetes.io/serviceaccount/token`)
+	return os.ReadFile(defaultServiceAccountTokenPath)
 }

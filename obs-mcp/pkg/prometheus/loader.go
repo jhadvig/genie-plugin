@@ -9,6 +9,13 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
+const (
+	// ListMetricsTimeRange is the time range used when listing metrics
+	ListMetricsTimeRange = 1 * time.Hour
+	// DefaultQueryTimeout is the default timeout for Prometheus queries
+	DefaultQueryTimeout = 30 * time.Second
+)
+
 // Loader defines the interface for querying Prometheus
 type Loader interface {
 	ListMetrics(ctx context.Context) ([]string, error)
@@ -45,7 +52,7 @@ func (p *RealLoader) WithGuardrails(g *Guardrails) *RealLoader {
 }
 
 func (p *RealLoader) ListMetrics(ctx context.Context) ([]string, error) {
-	labelValues, _, err := p.client.LabelValues(ctx, "__name__", []string{}, time.Now().Add(-time.Hour), time.Now())
+	labelValues, _, err := p.client.LabelValues(ctx, "__name__", []string{}, time.Now().Add(-ListMetricsTimeRange), time.Now())
 	if err != nil {
 		return nil, fmt.Errorf("error fetching metric names: %w", err)
 	}
@@ -75,7 +82,7 @@ func (p *RealLoader) ExecuteRangeQuery(ctx context.Context, query string, start,
 		Step:  step,
 	}
 
-	result, warnings, err := p.client.QueryRange(ctx, query, r, v1.WithTimeout(30*time.Second))
+	result, warnings, err := p.client.QueryRange(ctx, query, r, v1.WithTimeout(DefaultQueryTimeout))
 	if err != nil {
 		return nil, fmt.Errorf("error executing range query: %w", err)
 	}
