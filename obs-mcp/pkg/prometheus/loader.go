@@ -59,11 +59,10 @@ func (p *RealLoader) ListMetrics(ctx context.Context) ([]string, error) {
 
 func (p *RealLoader) ExecuteRangeQuery(ctx context.Context, query string, start, end time.Time, step time.Duration) (map[string]interface{}, error) {
 	if p.guardrails != nil {
-		isSafe, err := p.guardrails.IsSafeQuery(query)
+		isSafe, err := p.guardrails.IsSafeQuery(ctx, query, p.client)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse query: %w", err)
+			return nil, err
 		}
-
 		if !isSafe {
 			return nil, fmt.Errorf("query is not safe")
 		}
@@ -94,9 +93,9 @@ func (p *RealLoader) ExecuteRangeQuery(ctx context.Context, query string, start,
 
 func (p *RealLoader) ExecuteInstantQuery(ctx context.Context, query string, time time.Time) (map[string]interface{}, error) {
 	if p.guardrails != nil {
-		isSafe, err := p.guardrails.IsSafeQuery(query)
+		isSafe, err := p.guardrails.IsSafeQuery(ctx, query, p.client)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse query: %w", err)
+			return nil, err
 		}
 		if !isSafe {
 			return nil, fmt.Errorf("query is not safe")
