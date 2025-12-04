@@ -10,8 +10,14 @@ import (
 )
 
 func TestGuardrails_IsSafeQuery(t *testing.T) {
-	g := DefaultGuardrails()
-	// For static tests, we don't need context or client (pass nil)
+	// Use static guardrails without cardinality limits (no TSDB client needed)
+	g := &Guardrails{
+		DisallowExplicitNameLabel: true,
+		RequireLabelMatcher:       true,
+		DisallowBlanketRegex:      true,
+		MaxMetricCardinality:      0, // Disabled - no TSDB needed
+		MaxLabelCardinality:       0, // Disabled - blanket regex always rejected
+	}
 	tests := map[string]bool{
 		// Rule 1: __name__ queries
 		`{__name__="http_requests_total"}`:      false,
@@ -295,12 +301,12 @@ func TestGuardrails_MaxLabelCardinality(t *testing.T) {
 		}
 	})
 
-	t.Run("MaxLabelCardinality with non-blanket regex", func(t *testing.T) {
+	t.Run("Selective regex passes without TSDB", func(t *testing.T) {
 		g := &Guardrails{
 			DisallowExplicitNameLabel: false,
 			RequireLabelMatcher:       false,
 			DisallowBlanketRegex:      true,
-			MaxLabelCardinality:       100,
+			MaxLabelCardinality:       0, // 0 = blanket regex always rejected, but selective passes
 		}
 		// Selective regex should always pass (no blanket regex)
 		safe, err := g.IsSafeQuery(context.TODO(), `http_requests_total{pod=~"web-.*"}`, nil)
