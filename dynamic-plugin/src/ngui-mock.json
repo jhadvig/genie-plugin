@@ -1,0 +1,55 @@
+{
+  "blocks": [
+    {
+      "id": "37ed4204-ad45-49fc-82f6-e1cbb1883aa2",
+      "rendering": {
+        "id": "37ed4204-ad45-49fc-82f6-e1cbb1883aa2",
+        "component_system": "json",
+        "mime_type": "application/json",
+        "content": "{\"component\":\"table\",\"id\":\"37ed4204-ad45-49fc-82f6-e1cbb1883aa2\",\"title\":\"Pods\",\"fields\":[{\"id\":\"NAME\",\"name\":\"Name\",\"data_path\":\"$..[*].NAME\",\"data\":[\"genie-obs-mcp-f74f9d9b5-ngfbf\",\"lightspeed-app-server-8d87bd889-rhxm4\",\"lightspeed-console-plugin-84f869fb75-75vfn\",\"lightspeed-postgres-server-5df75c5f79-hqnpt\",\"next-gen-ui-mcp-5f5fd97bf5-g6lw7\"]},{\"id\":\"STATUS\",\"name\":\"Status\",\"data_path\":\"$..[*].STATUS\",\"data\":[\"Running\",\"Running\",\"Running\",\"Running\",\"Running\"]},{\"id\":\"READY\",\"name\":\"Ready\",\"data_path\":\"$..[*].READY\",\"data\":[\"1/1\",\"3/3\",\"1/1\",\"1/1\",\"1/1\"]},{\"id\":\"AGE\",\"name\":\"Age\",\"data_path\":\"$..[*].AGE\",\"data\":[\"23d\",\"20d\",\"20d\",\"34d\",\"2d5h\"]},{\"id\":\"IP\",\"name\":\"IP\",\"data_path\":\"$..[*].IP\",\"data\":[\"10.131.0.24\",\"10.131.0.26\",\"10.128.2.199\",\"10.128.2.33\",\"10.128.2.72\"]},{\"id\":\"NODE\",\"name\":\"Node\",\"data_path\":\"$..[*].NODE\",\"data\":[\"ip-10-0-5-144.ec2.internal\",\"ip-10-0-5-144.ec2.internal\",\"ip-10-0-50-43.ec2.internal\",\"ip-10-0-50-43.ec2.internal\",\"ip-10-0-50-43.ec2.internal\"]}]}"
+      },
+      "configuration": {
+        "data_type": "pods_list_in_namespace",
+        "input_data_transformer_name": "fwctable",
+        "component_metadata": {
+          "id": "37ed4204-ad45-49fc-82f6-e1cbb1883aa2",
+          "title": "Pods",
+          "component": "table",
+          "fields": [
+            {
+              "id": "NAME",
+              "name": "Name",
+              "data_path": "$..[*].NAME"
+            },
+            {
+              "id": "STATUS",
+              "name": "Status",
+              "data_path": "$..[*].STATUS"
+            },
+            {
+              "id": "READY",
+              "name": "Ready",
+              "data_path": "$..[*].READY"
+            },
+            {
+              "id": "AGE",
+              "name": "Age",
+              "data_path": "$..[*].AGE"
+            },
+            {
+              "id": "IP",
+              "name": "IP",
+              "data_path": "$..[*].IP"
+            },
+            {
+              "id": "NODE",
+              "name": "Node",
+              "data_path": "$..[*].NODE"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "summary": "Component is rendered in UI. data_type: 'pods_list_in_namespace', title: 'Pods', component_type: table"
+}
