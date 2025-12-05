@@ -1,21 +1,21 @@
 import React, { useMemo } from 'react';
 import {
   K8sResourceCommon,
-  ResourceLink,
   RowProps,
   TableColumn,
   TableData,
-  Timestamp,
   VirtualizedTable,
   useK8sWatchResource,
+  useK8sModel,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ColumnSpec, DataTypeConfig } from './dataTypeRegistry';
-
-type NGUIField = {
-  id: string;
-  name: string;
-  data_path?: string;
-};
+import {
+  getByPath,
+  getSchemaFormat,
+  matchFieldToColumnSpec,
+  NGUIField,
+  typeRenderers,
+} from './widget-utils';
 
 type ResourceListWidgetProps = {
   config?: DataTypeConfig;
@@ -29,24 +29,6 @@ type ResourceListWidgetProps = {
   };
 };
 
-const getByPath = (obj: any, path?: string): any => {
-  if (!obj || !path) return undefined;
-  const parts = path.split('.');
-  let current = obj;
-  for (const p of parts) {
-    if (current == null) return undefined;
-    current = current[p];
-  }
-  return current;
-};
-
-const matchFieldToColumnSpec = (field: NGUIField, allSpecs: ColumnSpec[]): ColumnSpec | undefined => {
-  const byId = allSpecs.find((s) => s.id.toLowerCase() === field.id.toLowerCase());
-  if (byId) return byId;
-  const byName = allSpecs.find((s) => s.title.toLowerCase() === field.name.toLowerCase());
-  return byName;
-};
-
 const ResourceListWidget: React.FC<ResourceListWidgetProps> = ({ config, fields, k8s }) => {
   const groupVersionKind = {
     group: k8s?.group,
@@ -54,25 +36,21 @@ const ResourceListWidget: React.FC<ResourceListWidgetProps> = ({ config, fields,
     kind: k8s?.kind,
   };
 
-  // TODO: Confirm if this is the correct TS type for the items
   const [items, loaded, loadError] = useK8sWatchResource<K8sResourceCommon[]>({
     groupVersionKind,
     isList: true,
-    namespaced: k8s?.namespaced ,
+    namespaced: k8s?.namespaced,
     namespace: k8s?.namespace,
   });
 
-  console.log(
-    'items', items,
-    'loaded', loaded,
-    'loadError', loadError,
-  );
+  const [model] = useK8sModel(groupVersionKind);
+
+  // TODO: Why am I not seeing a schema in the model?
+  console.log('model', model);
 
   const hasLiveData = loaded && !loadError;
+  const tableData: K8sResourceCommon[] = hasLiveData ? items || [] : [];
 
-  const tableData: K8sResourceCommon[] = hasLiveData ? (items || []) : [];
-
-  // Find the column specs for the fields
   const resolvedColumnSpecs: ColumnSpec[] = useMemo(() => {
     const allSpecs = config?.columnSpecs ?? [];
     return fields
@@ -80,7 +58,6 @@ const ResourceListWidget: React.FC<ResourceListWidgetProps> = ({ config, fields,
       .filter((spec): spec is ColumnSpec => Boolean(spec));
   }, [fields, config?.columnSpecs]);
 
-  // Create the table columns from the column specs
   const tableColumns: TableColumn<K8sResourceCommon>[] = useMemo(
     () =>
       resolvedColumnSpecs.map((columnSpec) => ({
@@ -93,27 +70,19 @@ const ResourceListWidget: React.FC<ResourceListWidgetProps> = ({ config, fields,
   const Row: React.FC<RowProps<K8sResourceCommon>> = ({ obj, activeColumnIDs }) => {
     return (
       <>
-        {resolvedColumnSpecs.map((columnSpec) => {
-          let content: React.ReactNode = null;
-          if (columnSpec.accessor) {
-            content = columnSpec.accessor(obj);
-          } else if (columnSpec.type === 'resource') {
-            content = (
-              <ResourceLink
-                groupVersionKind={groupVersionKind}
-                name={getByPath(obj, columnSpec.path)}
-                namespace={obj?.metadata?.namespace}
-              />
-            );
-          } else if (columnSpec.type === 'date') {
-            const ts = getByPath(obj, columnSpec.path);
-            content = ts ? <Timestamp timestamp={ts} /> : '-';
-          } else {
-            const v = getByPath(obj, columnSpec.path);
-            content = v ?? '-';
-          }
+        {resolvedColumnSpecs.map((spec) => {
+          const value = spec.accessor ? spec.accessor(obj) : getByPath(obj, spec.path);
+
+          const effectiveType = spec.type ?? getSchemaFormat(model, spec.path);
+          
+          const typeRenderer = effectiveType ? typeRenderers[effectiveType] : undefined;
+
+          const content = typeRenderer
+            ? typeRenderer(value, obj, groupVersionKind)
+            : value ?? '-';
+
           return (
-            <TableData key={columnSpec.id} id={columnSpec.id} activeColumnIDs={activeColumnIDs}>
+            <TableData key={spec.id} id={spec.id} activeColumnIDs={activeColumnIDs}>
               {content}
             </TableData>
           );
