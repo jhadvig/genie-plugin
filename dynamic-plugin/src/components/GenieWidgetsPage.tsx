@@ -120,6 +120,9 @@ export default function GenieWidgetsPage() {
   const { t } = useTranslation('plugin__genie-plugin');
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const nguiMock = require('../ngui-mock.json');
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const showNGUI = searchParams.get('gie189') === 'true';
 
   return (
     <GenieLayout title={t('Genie Widgets - AI Dashboard Assistant')}>
@@ -132,29 +135,32 @@ export default function GenieWidgetsPage() {
         />
       </div>
       <div className="dashboard">
-      <div style={{ marginTop: '24px', padding: '24px' }}>
-        {Array.isArray(nguiMock?.blocks) &&
-          nguiMock.blocks.map((block: any) => {
-            const dataType = block?.configuration?.data_type ?? '';
-            const fields = block?.configuration?.component_metadata?.fields ?? [];
-            const config = dataTypeRegistry[dataType];
-            if (config) {
-              return (
-                <div key={block?.id || dataType}>
-                  <ResourceListWidget
-                    config={config}
-                    fields={fields}
-                    k8s={{
-                      ...config.k8s,
-                      ...block?.configuration?.k8s,
-                    }}
-                  />
-                </div>
-              );
-            }
-            return null;
-          })}
-      </div>
+        {showNGUI && (
+          <div style={{ marginTop: '24px', padding: '24px' }}>
+            {Array.isArray(nguiMock?.blocks) &&
+              nguiMock.blocks.map((block: any) => {
+                const dataType = block?.configuration?.data_type ?? '';
+                const fields =
+                  block?.configuration?.component_metadata?.fields ?? [];
+                const config = dataTypeRegistry[dataType];
+                if (config) {
+                  return (
+                    <div key={block?.id || dataType}>
+                      <ResourceListWidget
+                        config={config}
+                        fields={fields}
+                        k8s={{
+                          ...config.k8s,
+                          ...block?.configuration?.k8s,
+                        }}
+                      />
+                    </div>
+                  );
+                }
+                return null;
+              })}
+          </div>
+        )}
         <DashboardLayout />
       </div>
       
