@@ -29,7 +29,14 @@ const ResourceListWidget: React.FC<ResourceListWidgetProps> = ({ config, fields,
     ...k8s,
     isList: true,
   });
+
   const { groupVersionKind } = k8s;
+  const { kind, version } = groupVersionKind;
+  // TODO: Improve fallback UX & use translations
+  if (!kind || !version) {
+    return <div>Unable to render resource list as the group version kind is invalid</div>;
+  }
+
   const [model] = useK8sModel(groupVersionKind);
   const hasLiveData = loaded && !loadError;
   const tableData: K8sResourceCommon[] = hasLiveData ? items || [] : [];
