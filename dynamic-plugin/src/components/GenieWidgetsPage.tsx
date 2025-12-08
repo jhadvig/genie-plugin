@@ -144,13 +144,9 @@ export default function GenieWidgetsPage() {
                   <ResourceListWidget
                     config={config}
                     fields={fields}
-                    // TODO: get the k8s group, version, kind, namespaced, namespace from the NGUI block configuration
                     k8s={{
-                      group: '',
-                      version: 'v1',
-                      kind: 'Pod',
-                      namespaced: true,
-                      namespace: 'openshift-monitoring',
+                      ...config.k8s,
+                      ...block?.configuration?.k8s,
                     }}
                   />
                 </div>

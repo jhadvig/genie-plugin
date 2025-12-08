@@ -1,4 +1,4 @@
-import { K8sResourceKind } from '@openshift-console/dynamic-plugin-sdk';
+import { K8sResourceKind, WatchK8sResource } from '@openshift-console/dynamic-plugin-sdk';
 
 export type ColumnSpec = {
   id: string;
@@ -11,6 +11,7 @@ export type ColumnSpec = {
 
 export type DataTypeConfig = {
   columnSpecs: ColumnSpec[];
+  k8s?: WatchK8sResource;
 };
 
 export const dataTypeRegistry: Record<string, DataTypeConfig> = {
@@ -32,10 +33,19 @@ export const dataTypeRegistry: Record<string, DataTypeConfig> = {
           return `${ready}/${total}`;
         },
       },
-      { id: 'AGE', title: 'Age', type: 'date-time', path: 'metadata.creationTimestamp' },
+      { id: 'AGE', title: 'Age', path: 'metadata.creationTimestamp' },
       { id: 'IP', title: 'IP', type: 'ip', path: 'status.podIP' },
       { id: 'NODE', title: 'Node', type: 'string', path: 'spec.nodeName' },
     ],
+    k8s: {
+      groupVersionKind: {
+        group: '',
+        version: 'v1', // TODO: Follow up on how this can be derived
+        kind: 'Pod',
+      },
+      namespaced: true,
+      namespace: 'openshift-monitoring',
+    },
   },
 };
 

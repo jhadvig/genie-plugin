@@ -7,6 +7,7 @@ import {
   VirtualizedTable,
   useK8sWatchResource,
   useK8sModel,
+  WatchK8sResource,
 } from '@openshift-console/dynamic-plugin-sdk';
 import { ColumnSpec, DataTypeConfig } from './dataTypeRegistry';
 import {
@@ -20,34 +21,16 @@ import {
 type ResourceListWidgetProps = {
   config?: DataTypeConfig;
   fields: NGUIField[];
-  k8s?: {
-    group?: string;
-    version?: string;
-    kind?: string;
-    namespaced?: boolean;
-    namespace?: string;
-  };
+  k8s?: WatchK8sResource;
 };
 
 const ResourceListWidget: React.FC<ResourceListWidgetProps> = ({ config, fields, k8s }) => {
-  const groupVersionKind = {
-    group: k8s?.group,
-    version: k8s?.version,
-    kind: k8s?.kind,
-  };
-
   const [items, loaded, loadError] = useK8sWatchResource<K8sResourceCommon[]>({
-    groupVersionKind,
+    ...k8s,
     isList: true,
-    namespaced: k8s?.namespaced,
-    namespace: k8s?.namespace,
   });
-
+  const { groupVersionKind } = k8s;
   const [model] = useK8sModel(groupVersionKind);
-
-  // TODO: Why am I not seeing a schema in the model?
-  console.log('model', model);
-
   const hasLiveData = loaded && !loadError;
   const tableData: K8sResourceCommon[] = hasLiveData ? items || [] : [];
 
