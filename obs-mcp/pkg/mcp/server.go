@@ -11,16 +11,18 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/inecas/obs-mcp/pkg/perses"
 	"github.com/inecas/obs-mcp/pkg/prometheus"
 	"github.com/mark3labs/mcp-go/server"
 )
 
 // ObsMCPOptions contains configuration options for the MCP server
 type ObsMCPOptions struct {
-	AuthMode   AuthMode
-	PromURL    string
-	Insecure   bool
-	Guardrails *prometheus.Guardrails
+	AuthMode       AuthMode
+	PromURL        string
+	Insecure       bool
+	Guardrails     *prometheus.Guardrails
+	OOTBDashboards []perses.PersesDashboardInfo // Out-of-the-box dashboards loaded from YAML
 }
 
 const (
@@ -50,14 +52,23 @@ func SetupTools(mcpServer *server.MCPServer, opts ObsMCPOptions) error {
 	// Create tool definitions
 	listMetricsTool := CreateListMetricsTool()
 	executeRangeQueryTool := CreateExecuteRangeQueryTool()
+	listPersesDashboardsTool := CreateListPersesDashboardsTool()
+	ootbPersesDashboardsTool := CreateOOTBPersesDashboardsTool()
+	getPersesDashboardTool := CreateGetPersesDashboardTool()
 
 	// Create handlers
 	listMetricsHandler := ListMetricsHandler(opts)
 	executeRangeQueryHandler := ExecuteRangeQueryHandler(opts)
+	listPersesDashboardsHandler := ListPersesDashboardsHandler(opts)
+	ootbPersesDashboardsHandler := OOTBPersesDashboardsHandler(opts)
+	getPersesDashboardHandler := GetPersesDashboardHandler(opts)
 
 	// Add tools to server
 	mcpServer.AddTool(listMetricsTool, listMetricsHandler)
 	mcpServer.AddTool(executeRangeQueryTool, executeRangeQueryHandler)
+	mcpServer.AddTool(ootbPersesDashboardsTool, ootbPersesDashboardsHandler)
+	mcpServer.AddTool(listPersesDashboardsTool, listPersesDashboardsHandler)
+	mcpServer.AddTool(getPersesDashboardTool, getPersesDashboardHandler)
 
 	return nil
 }
