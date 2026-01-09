@@ -14,7 +14,7 @@ oc login ...
 
 1. Terminal 1: Kube MCP Server
    1. `npx kubernetes-mcp-server@latest --port 8081 --list-output table --read-only --toolsets core`
-2. Terminal 2: [OBS MCP](../obs-mcp/README.md)
+2. Terminal 2: [OBS MCP](https://github.com/rhobs/obs-mcp/blob/main/README.md)
    1. `cd obs-mcp`
    2. `go run ./cmd/obs-mcp/ --listen 127.0.0.1:9100 --auth-mode kubeconfig --insecure`
 
