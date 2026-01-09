@@ -11,7 +11,7 @@ Before starting, ensure you have the following:
 
 Follow these steps to get up and running:
 
-1. Set up the obs-mcp server. For details, see the [obs-mcp README](./obs-mcp/README.md).
+1. Set up the obs-mcp server. For details, see the [obs-mcp README](https://github.com/rhobs/obs-mcp/blob/main/README.md).
 2. Set up the layout-manager mcp server. For details, see the [layout-manager mcp](./layout-manager/README.md)
 3. Once the servers are running, connect it to your Lightspeed Core (LSC) instance (see [lightspeed-stack dir](lightspeed-stack/README.md) for details).
 4. Setup the console UI (in `dynamic-plugin` dir):
@@ -23,7 +23,7 @@ Follow these steps to get up and running:
 
 ## Getting Started - OLS, Kube MCP, Persers MCP, Next Gen MCP, Layout Manager MCP
 
-1. Perses MCP - [obs-mcp/README.md](./obs-mcp/README.md)
+1. Perses MCP - [obs-mcp/README.md](https://github.com/rhobs/obs-mcp/blob/main/README.md)
 2. Layout Manager MCP - [layout-manager/README.md](./layout-manager/README.md)
 3. Kube MCP, NGUI & OLS - [ols-ngui/README.md](./ols-ngui/README.md)
 4. Openshift Console - [dynamic-plugin/README.md](./dynamic-plugin/README.md)

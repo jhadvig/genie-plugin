@@ -1,5 +1,5 @@
 # Root Makefile for genie-plugin project
-# Builds all components: obs-mcp, layout-manager, and dynamic-plugin
+# Builds all components: layout-manager, and dynamic-plugin
 
 CONTAINER_CLI ?= docker
 
@@ -15,26 +15,6 @@ check-tools: ## Check if required tools are installed
 	@command -v yarn >/dev/null 2>&1 || { echo "Error: yarn is required but not installed."; exit 1; }
 	@command -v $(CONTAINER_CLI) >/dev/null 2>&1 || echo "Warning: $(CONTAINER_CLI) is not installed. Container builds will fail."
 	@echo "✓ All required tools are installed"
-
-# ============================================================================
-# Component: obs-mcp
-# ============================================================================
-
-.PHONY: obs-mcp-build
-obs-mcp-build: ## Build obs-mcp binary
-	@cd obs-mcp && go build -tags strictfipsruntime -o obs-mcp ./cmd/obs-mcp
-
-.PHONY: obs-mcp-test
-obs-mcp-test: ## Run obs-mcp tests
-	@cd obs-mcp && go test -v -race ./...
-
-.PHONY: obs-mcp-clean
-obs-mcp-clean: ## Clean obs-mcp build artifacts
-	@cd obs-mcp && go clean && rm -f obs-mcp/obs-mcp
-
-.PHONY: obs-mcp-container
-obs-mcp-container: obs-mcp-build ## Build obs-mcp container image
-	@cd obs-mcp && $(CONTAINER_CLI) build -f Containerfile -t obs-mcp:latest .
 
 # ============================================================================
 # Component: layout-manager
@@ -81,25 +61,23 @@ dynamic-plugin-container: dynamic-plugin-build ## Build dynamic-plugin container
 # ============================================================================
 
 .PHONY: build
-build: obs-mcp-build layout-manager-build dynamic-plugin-build ## Build all components
+build: layout-manager-build dynamic-plugin-build ## Build all components
 
 .PHONY: test
-test: obs-mcp-test layout-manager-test dynamic-plugin-test ## Run tests for all components
+test: layout-manager-test dynamic-plugin-test ## Run tests for all components
 
 .PHONY: clean
-clean: obs-mcp-clean layout-manager-clean dynamic-plugin-clean ## Clean all build artifacts
+clean: layout-manager-clean dynamic-plugin-clean ## Clean all build artifacts
 
 .PHONY: container
-container: obs-mcp-container layout-manager-container dynamic-plugin-container ## Build all container images
+container: layout-manager-container dynamic-plugin-container ## Build all container images
 
 .PHONY: format
 format: ## Format all code
-	@cd obs-mcp && go fmt ./...
 	@cd layout-manager && $(MAKE) fmt
 	@cd dynamic-plugin && yarn lint --fix
 
 .PHONY: setup
 setup: check-tools ## Install dependencies for all components
-	@cd obs-mcp && go mod download
 	@cd layout-manager && $(MAKE) deps
 	@cd dynamic-plugin && yarn install

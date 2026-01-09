@@ -8,7 +8,6 @@
 **/.DS_Store
 
 # Go binaries
-obs-mcp/obs-mcp
 layout-manager/layout-manager
 
 # Go test coverage
