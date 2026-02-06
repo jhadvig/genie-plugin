@@ -251,6 +251,22 @@ class DefaultStreamingHandler implements ISimpleStreamingHandler<string | Stream
             },
           },
         };
+      } else if (event_data.token.tool_name) {
+        call = {
+          event: 'tool_result',
+          data: {
+            token: {
+              tool_name: event_data.token.tool_name,
+              response:
+                // send the object directly if it's not a string
+                typeof event_data.token.response === 'string'
+                  ? JSON.parse(event_data.token.response)
+                  : event_data.token.response,
+              artifact: event_data.artifact,
+              status: event_data.status,
+            },
+          },
+        };
       } else {
         call = {
           event: 'tool_result',

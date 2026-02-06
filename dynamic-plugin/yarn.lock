@@ -114,6 +114,16 @@
     "@codemirror/view" "^6.17.0"
     "@lezer/common" "^1.0.0"
 
+"@codemirror/autocomplete@^6.18.4":
+  version "6.19.1"
+  resolved "https://registry.yarnpkg.com/@codemirror/autocomplete/-/autocomplete-6.19.1.tgz#355e49c9fd275b42a6e16e9ea0cf4361f67a3ec4"
+  integrity sha512-q6NenYkEy2fn9+JyjIxMWcNjzTL/IhwqfzOut1/G3PrIFkrbl4AL7Wkse5tLrQUUyqGoAKU5+Pi5jnnXxH5HGw==
+  dependencies:
+    "@codemirror/language" "^6.0.0"
+    "@codemirror/state" "^6.0.0"
+    "@codemirror/view" "^6.17.0"
+    "@lezer/common" "^1.0.0"
+
 "@codemirror/commands@^6.0.0", "@codemirror/commands@^6.1.0":
   version "6.8.1"
   resolved "https://registry.yarnpkg.com/@codemirror/commands/-/commands-6.8.1.tgz#639f5559d2f33f2582a2429c58cb0c1b925c7a30"
@@ -541,6 +551,11 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
+"@grafana/lezer-traceql@^0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@grafana/lezer-traceql/-/lezer-traceql-0.0.25.tgz#cf274ba5674b2c4b665c2612aa997ff6ef6aa1c0"
+  integrity sha512-9BhfXMC8CbXD2+7Yb3LuTCg8nhpnzTOiJRxIGh7aEW72UxrHCOFRoDlvUWCvy3tozuVULEnrxwZicjPy4C1fzg==
+
 "@hookform/resolvers@^5.2.2":
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-5.2.2.tgz#5ac16cd89501ca31671e6e9f0f5c5d762a99aa12"
@@ -636,12 +651,24 @@
   resolved "https://registry.yarnpkg.com/@lezer/common/-/common-1.2.3.tgz#138fcddab157d83da557554851017c6c1e5667fd"
   integrity sha512-w7ojc8ejBqr2REPsWxJjrMFsA/ysDCFICn8zEOR9mrqzOu2amhITYuLD8ag6XZf0CFXDrhKqw7+tW8cX66NaDA==
 
+"@lezer/common@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@lezer/common/-/common-1.3.0.tgz#123427ec4c53c2c8367415b4441e555b4f85c696"
+  integrity sha512-L9X8uHCYU310o99L3/MpJKYxPzXPOS7S0NmBaM7UO/x2Kb2WbmMLSkfvdr1KxRIFYOpbY0Jhn7CfLSUDzL8arQ==
+
 "@lezer/highlight@^1.0.0":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@lezer/highlight/-/highlight-1.2.1.tgz#596fa8f9aeb58a608be0a563e960c373cbf23f8b"
   integrity sha512-Z5duk4RN/3zuVO7Jq0pGLJ3qynpxUVsh7IbUbGj88+uV2ApSAn6kWg2au3iJb+0Zi7kKtqffIESgNcRXWZWmSA==
   dependencies:
     "@lezer/common" "^1.0.0"
+
+"@lezer/highlight@^1.2.1x":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@lezer/highlight/-/highlight-1.2.3.tgz#a20f324b71148a2ea9ba6ff42e58bbfaec702857"
+  integrity sha512-qXdH7UqTvGfdVBINrgKhDsVTJTxactNNxLk7+UMwZhU13lMHaOBlJe9Vqp907ya56Y3+ed2tlqzys7jDkTmW0g==
+  dependencies:
+    "@lezer/common" "^1.3.0"
 
 "@lezer/json@^1.0.0":
   version "1.0.3"
@@ -1008,6 +1035,19 @@
     prop-types "^15.8.1"
     react-is "^19.0.0"
 
+"@mui/x-data-grid@^7.20.0":
+  version "7.29.9"
+  resolved "https://registry.yarnpkg.com/@mui/x-data-grid/-/x-data-grid-7.29.9.tgz#91758075e138b8eb01cb544d6c03113bee9e50c3"
+  integrity sha512-RfK7Fnuu4eyv/4eD3MEB1xxZsx0xRBsofb1kifghIjyQV1EKAeRcwvczyrzQggj7ZRT5AqkwCzhLsZDvE5O0nQ==
+  dependencies:
+    "@babel/runtime" "^7.25.7"
+    "@mui/utils" "^5.16.6 || ^6.0.0 || ^7.0.0"
+    "@mui/x-internals" "7.29.0"
+    clsx "^2.1.1"
+    prop-types "^15.8.1"
+    reselect "^5.1.1"
+    use-sync-external-store "^1.0.0"
+
 "@mui/x-date-pickers@^7.23.1":
   version "7.29.4"
   resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-7.29.4.tgz#b8808cb8e28c1d4e528b37b336effc8074e65faf"
@@ -1340,6 +1380,15 @@
   resolved "https://registry.yarnpkg.com/@perses-dev/table-plugin/-/table-plugin-0.8.0.tgz#fedb1136480ddaa2adaaa26b7602649a6b98912f"
   integrity sha512-wtE85W2nuD5mjphcIv0SJfejAsvzAowzJh9qUOGm9G7sw6W5HnzqWlP1PcVCPLMihblRx4FxeXznJFlw9hddQw==
 
+"@perses-dev/tempo-plugin@^0.54.0":
+  version "0.54.0"
+  resolved "https://registry.yarnpkg.com/@perses-dev/tempo-plugin/-/tempo-plugin-0.54.0.tgz#47db29c5277a876a845375334586c3a7c89aaaa2"
+  integrity sha512-s9YkZyLvgzglS5OI0k43Dm2WLsZ+Vv5VFVOUR45guCAxfBSBlYdIt3CbecqYuEUCtjnbxFBQGZ6T0T7IY/Ei7A==
+  dependencies:
+    "@codemirror/autocomplete" "^6.18.4"
+    "@grafana/lezer-traceql" "^0.0.25"
+    "@lezer/highlight" "^1.2.1x"
+
 "@perses-dev/timeseries-chart-plugin@^0.10.1":
   version "0.10.1"
   resolved "https://registry.yarnpkg.com/@perses-dev/timeseries-chart-plugin/-/timeseries-chart-plugin-0.10.1.tgz#91fef73d20578d8987df39af0b9df3362b235fd0"
@@ -1351,6 +1400,20 @@
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/@perses-dev/timeseries-table-plugin/-/timeseries-table-plugin-0.9.0.tgz#7bacd42233354b769d2c29d9da92fafdbe2070d6"
   integrity sha512-3CZ5M6rSaodR7mQao7rEkSCg8EEi6uskzRJR9926CoziX2DqfDtM6nH2LOBZue8zTRlYwcJHTqVGnd+O/2eD1A==
+
+"@perses-dev/trace-table-plugin@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@perses-dev/trace-table-plugin/-/trace-table-plugin-0.9.0.tgz#5760b6ae40f93a9a26b9698dfd9d173a58a904b9"
+  integrity sha512-omk7/7nsxIuuTduINfJYMDyZFQBvUyFRqq0rGimj/UNVDVCSsgZ9JJzaIh2gwmKJJrBebcj2/N53OOUHe2ySRw==
+  dependencies:
+    "@mui/x-data-grid" "^7.20.0"
+
+"@perses-dev/tracing-gantt-chart-plugin@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@perses-dev/tracing-gantt-chart-plugin/-/tracing-gantt-chart-plugin-0.10.0.tgz#d03421b4308257f9bdbd5ae4d3a07b8bf98edae1"
+  integrity sha512-ZqW3v2LRA8+7D1pa1JPGGjmwRdx84D93P2mYeCHtG8e6+cqJnNmnQryS6VdOHCr+Tv0v2RtghOgT1LfkdOz0Yw==
+  dependencies:
+    color-hash "^2.0.2"
 
 "@popperjs/core@^2.11.8":
   version "2.11.8"
@@ -9821,6 +9884,11 @@ reselect@4.x:
   resolved "https://registry.yarnpkg.com/reselect/-/reselect-4.1.8.tgz#3f5dc671ea168dccdeb3e141236f69f02eaec524"
   integrity sha512-ab9EmR80F/zQTMNeneUr4cv+jSwPJgIlvEmVwLerwrWVbpLlBuls9XHzIeTFy4cegU2NHBp3va0LKOzU5qFEYQ==
 
+reselect@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/reselect/-/reselect-5.1.1.tgz#c766b1eb5d558291e5e550298adb0becc24bb72e"
+  integrity sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==
+
 resize-observer-polyfill@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
@@ -11640,6 +11708,11 @@ use-resize-observer@^9.0.0, use-resize-observer@^9.1.0:
   integrity sha512-R25VqO9Wb3asSD4eqtcxk8sJalvIOYBqS8MNZlpDSQ4l4xMQxC/J7Id9HoTqPq8FwULIn0PVW+OAqF2dyYbjow==
   dependencies:
     "@juggle/resize-observer" "^3.3.1"
+
+use-sync-external-store@^1.0.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.6.0.tgz#b174bfa65cb2b526732d9f2ac0a408027876f32d"
+  integrity sha512-Pp6GSwGP/NrPIrxVFAIkOQeyw8lFenOHijQWkUTrDvrF4ALqylP2C/KCkeS9dpUM3KvYRQhna5vt7IL95+ZQ9w==
 
 use-sync-external-store@^1.2.0, use-sync-external-store@^1.2.2:
   version "1.5.0"

@@ -31,7 +31,7 @@ var ComponentRegistry = map[string]ComponentDefinition{
 				},
 				"chartType": map[string]interface{}{
 					"type":        "string",
-					"enum":        []string{"line", "bar", "pie", "area", "scatter"},
+					"enum":        []string{"line", "bar", "pie", "area", "scatter", "gantt"},
 					"description": "Type of chart visualization",
 				},
 				"dataSource": map[string]interface{}{

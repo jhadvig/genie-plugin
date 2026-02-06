@@ -65,7 +65,7 @@ func CreateAddWidgetTool() mcp.Tool {
 		mcp.WithString("component_type",
 			mcp.Required(),
 			mcp.Description("Type of component to create"),
-			mcp.Enum("TimeSeriesChart", "Table", "PieChart"),
+			mcp.Enum("TimeSeriesChart", "Table", "PieChart", "TraceTable", "TracingGanttChart"),
 		),
 		mcp.WithString("position_hint",
 			mcp.Description("Optional position hint (e.g., 'top right', 'bottom left', 'next to the sales chart')"),

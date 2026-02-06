@@ -6,6 +6,12 @@ const componentMapper = {
   TimeSeriesChart: React.lazy(() => import('../PersesBindings/PersesWidgets/PersesTimeSeries')),
   Table: React.lazy(() => import('../PersesBindings/PersesWidgets/PersesTable')),
   PieChart: React.lazy(() => import('../PersesBindings/PersesWidgets/PersesPieChart')),
+  TraceTable: React.lazy(
+    () => import('../PersesBindings/PersesWidgets/PersesTraceTable'),
+  ),
+  TracingGanttChart: React.lazy(
+    () => import('../PersesBindings/PersesWidgets/PersesTracingGanttChart'),
+  ),
 };
 
 interface WidgetRendererProps {
